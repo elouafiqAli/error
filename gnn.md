@@ -39,8 +39,7 @@ To reduce cognitive overhead, we keep the following conventions fixed unless sta
 - Graphs are finite, simple, and undirected.
 - Vertex sets are denoted by $V$ and edge sets by $E$.
 - A partition is always a set of non-empty, pairwise disjoint cells whose union is the ambient set.
-- The refinement order is written $
-\Pi_1 \preceq \Pi_2$, meaning **"$\Pi_1$ is finer than $\Pi_2$"**.
+- The refinement order is written $\Pi_1 \preceq \Pi_2$, meaning **"$\Pi_1$ is finer than $\Pi_2$"**.
 - For binary-label information theory, the binary entropy inverse $H_{\mathrm{bin}}^{-1}$ always denotes the inverse branch on $[0,1/2]$.
 - When a section is partly conjectural, empirical, or heuristic rather than theorem-level, we state this explicitly in prose.
 
@@ -134,20 +133,35 @@ Let $\Pi_1, \Pi_2 \in \text{Part}(V)$. We say $\Pi_1$ is **finer** than $\Pi_2$ 
 $$\forall C \in \Pi_1, \exists C' \in \Pi_2 \text{ such that } C \subseteq C'$$
 If $\Pi_1 \preceq \Pi_2$ and $\Pi_1 \neq \Pi_2$, we say $\Pi_1$ is **strictly finer** than $\Pi_2$, written $\Pi_1 \prec \Pi_2$.
 
-#### Theorem 1.2 ($\text{Part}(V)$ as a Lattice)
-*The poset $(\text{Part}(V), \preceq)$ forms a complete lattice. This means that for any two partitions $\Pi_1, \Pi_2 \in \text{Part}(V)$, there exists a unique **greatest lower bound** (meet, $\Pi_1 \wedge \Pi_2$) and a unique **least upper bound** (join, $\Pi_1 \vee \Pi_2$).*
+#### Theorem 1.2 ($\text{Part}(V)$ as a Finite Lattice, Hence Complete)
+*The poset $(\text{Part}(V), \preceq)$ is a lattice: every pair of partitions $\Pi_1, \Pi_2 \in \text{Part}(V)$ has a unique **greatest lower bound** (meet, $\Pi_1 \wedge \Pi_2$) and a unique **least upper bound** (join, $\Pi_1 \vee \Pi_2$). Since $V$ is finite, the set $\text{Part}(V)$ is finite; therefore every subset has both an infimum and a supremum, so $(\text{Part}(V), \preceq)$ is in fact a complete lattice.*
 
-*Proof of Meet ($\Pi_1 \wedge \Pi_2$)*:
-Define the candidate meet $\Pi_m$ as the collection of all non-empty pairwise intersections of the cells of $\Pi_1$ and $\Pi_2$:
-$$\Pi_m = \{ C \cap C' \mid C \in \Pi_1, C' \in \Pi_2 \text{ and } C \cap C' \neq \emptyset \}$$
-1. **Verification of Partition**:
-   - Every block in $\Pi_m$ is non-empty by construction.
-   - For any $v \in V$, since $\Pi_1, \Pi_2$ are partitions, there exist unique $C \in \Pi_1$ and $C' \in \Pi_2$ containing $v$. Thus $v \in C \cap C' \in \Pi_m$, proving exhaustiveness.
-   - If $(C_1 \cap C'_1) \cap (C_2 \cap C'_2) \neq \emptyset$, then there exists some $w \in C_1 \cap C_2$ and $w \in C'_1 \cap C'_2$. Since cells in $\Pi_1$ and $\Pi_2$ are disjoint, we must have $C_1 = C_2$ and $C'_1 = C'_2$. This establishes disjointness. Thus $\Pi_m$ is a partition.
-2. **Greatest Lower Bound**:
-   - By definition, for any $B = C \cap C' \in \Pi_m$, we have $B \subseteq C \in \Pi_1$ and $B \subseteq C' \in \Pi_2$. Thus $\Pi_m \preceq \Pi_1$ and $\Pi_m \preceq \Pi_2$. $\Pi_m$ is a lower bound.
-   - Let $\Pi_3$ be another lower bound such that $\Pi_3 \preceq \Pi_1$ and $\Pi_3 \preceq \Pi_2$. For any block $B_3 \in \Pi_3$, there must exist $C \in \Pi_1$ and $C' \in \Pi_2$ such that $B_3 \subseteq C$ and $B_3 \subseteq C'$. Consequently, $B_3 \subseteq C \cap C' \in \Pi_m$. This implies $\Pi_3 \preceq \Pi_m$.
-Thus, $\Pi_m$ is the greatest lower bound, so $\Pi_1 \wedge \Pi_2 = \Pi_m$. $\blacksquare$
+*Proof.*
+We construct the meet and join explicitly.
+
+1. **Meet ($\Pi_1 \wedge \Pi_2$).**
+   Define
+   $$
+   \Pi_m := \{ C \cap C' \mid C \in \Pi_1,\; C' \in \Pi_2,\; C \cap C' \neq \emptyset \}.
+   $$
+   - Every block of $\Pi_m$ is non-empty by construction.
+   - For any $v \in V$, there are unique cells $C \in \Pi_1$ and $C' \in \Pi_2$ containing $v$, so $v \in C \cap C' \in \Pi_m$. Thus $\Pi_m$ covers $V$.
+   - If two blocks $C_1 \cap C'_1$ and $C_2 \cap C'_2$ intersect, then some $w$ lies in both. Hence $w \in C_1 \cap C_2$ and $w \in C'_1 \cap C'_2$. Because cells of a partition are pairwise disjoint, this forces $C_1=C_2$ and $C'_1=C'_2$. So distinct blocks of $\Pi_m$ are disjoint.
+
+   Therefore $\Pi_m$ is a partition. Moreover every block of $\Pi_m$ lies inside a block of $\Pi_1$ and inside a block of $\Pi_2$, so $\Pi_m \preceq \Pi_1$ and $\Pi_m \preceq \Pi_2$.
+
+   Now let $\Pi_3$ be any lower bound with $\Pi_3 \preceq \Pi_1$ and $\Pi_3 \preceq \Pi_2$. Every block $B \in \Pi_3$ must lie inside some $C \in \Pi_1$ and some $C' \in \Pi_2$, hence $B \subseteq C \cap C' \in \Pi_m$. So $\Pi_3 \preceq \Pi_m$. Thus $\Pi_m$ is the greatest lower bound.
+
+2. **Join ($\Pi_1 \vee \Pi_2$).**
+   Let $\sim_1$ and $\sim_2$ be the equivalence relations induced by $\Pi_1$ and $\Pi_2$. Consider the smallest equivalence relation containing $\sim_1 \cup \sim_2$; equivalently, take the transitive closure of $\sim_1 \cup \sim_2$ and call it $\approx$. Let $\Pi_j$ be the partition induced by $\approx$.
+
+   We claim that $\Pi_j$ is the least upper bound.
+   - Because $\sim_1 \subseteq \approx$ and $\sim_2 \subseteq \approx$, every block of $\Pi_1$ and every block of $\Pi_2$ is contained in a block of $\Pi_j$. Hence $\Pi_1 \preceq \Pi_j$ and $\Pi_2 \preceq \Pi_j$.
+   - Let $\Pi'$ be any other upper bound with $\Pi_1 \preceq \Pi'$ and $\Pi_2 \preceq \Pi'$, and let $\sim'$ be its equivalence relation. Then $\sim_1 \subseteq \sim'$ and $\sim_2 \subseteq \sim'$. Since $\sim'$ is already an equivalence relation, it must also contain the equivalence relation generated by $\sim_1 \cup \sim_2$, namely $\approx$. Therefore every block of $\Pi_j$ is contained in a block of $\Pi'$, so $\Pi_j \preceq \Pi'$.
+
+   Thus $\Pi_j$ is the least upper bound.
+
+The existence of meet and join makes $(\text{Part}(V),\preceq)$ a lattice. Because $V$ is finite, $\text{Part}(V)$ is finite, and every finite lattice is complete. $\blacksquare$
 
 ---
 
@@ -213,7 +227,7 @@ This table is the finite, concrete prototype of every later partition process in
 #### The Intuition of GNN Partition Dynamics
 Why do GNN researchers study set partitions? Because GNNs operate via message passing, which is fundamentally a local coloring process. Every node $v$ updates its state based only on the states of its neighbors. Consequently, if two nodes $u$ and $v$ have identical local structural neighborhoods, their representations will remain identical across *every* layer, regardless of GNN parameterization. 
 
-The GNN stable partition $\Pi^{(\infty)}$ represents the structural ceiling of the GNN architecture. If a task $f$ requires distinguishing node $u$ from node $v$, but they belong to the same block in $\Pi^{(\infty)}$, then **no parameter training can ever solve the task**.
+The GNN stable partition $\Pi^{(\infty)}$ represents the structural ceiling of the GNN architecture **for the fixed observable inputs and message-passing scheme under consideration**. If a task $f$ requires distinguishing node $u$ from node $v$, but they belong to the same block in $\Pi^{(\infty)}$, then no choice of parameters within that setup can separate them exactly.
 
 #### Pathological Edge Cases: Where 1-WL is Blind
 1. **Vertex-Transitive Graphs**: Consider the cycle graph $C_n$. If we initialize the vertex features to a constant (e.g., $c_v^{(0)} = 1$ for all $v$), every vertex has exactly degree 2. At step 1, every vertex receives the multiset $\{\!\{1, 1\}\!\}$. Thus, the partition never refines:
@@ -224,7 +238,7 @@ The GNN stable partition $\Pi^{(\infty)}$ represents the structural ceiling of t
 #### Direct Link to PA-MPC Paper §3.1
 This algebraic refinement framework is the exact foundation of **Definition 3.1** in the PA-MPC paper. PA-MPC defines the architecture-induced partition as:
 $$\Pi_{\mathcal{A}}(G, L) := \mathrm{LossyWL}^L\big(\Pi_{\mathcal{A}}^{(0)}; G\big)$$
-By explicitly indexing on the **initial observable partition** $\Pi_{\mathcal{A}}^{(0)}$, PA-MPC allows us to study how feature richness (e.g., GIN's constant initialization vs. GCN's degree initialization) affects the refinement chain. GCN begins at a finer lattice point $\Pi^{(0)}_{\mathrm{GCN}}$ than GIN's $\Pi^{(0)}_{\mathrm{GIN}}$, explaining why GCN can resolve certain tasks at lower depths than GIN.
+By explicitly indexing on the **initial observable partition** $\Pi_{\mathcal{A}}^{(0)}$, PA-MPC allows us to study how feature richness (e.g., GIN's constant initialization vs. GCN's degree initialization) affects the refinement chain. In this formalization, a degree-revealing initialization starts from a finer lattice point than a constant initialization, which helps explain why some architectures can resolve certain tasks at lower depths than others.
 
 ---
 
@@ -265,7 +279,7 @@ $$(\Pi_1 \wedge \Pi_2) \wedge \Pi_3 = \Pi_1 \wedge (\Pi_2 \wedge \Pi_3)$$
 8. The stable GNN representation is identical for both graphs, proving that 1-WL cannot distinguish $R_{4,4}$ from the Shrikhande graph. $\blacksquare$
 
 #### Exercise 1.3: Number of Partitions of a Small Set (Bell Numbers)
-**Task**: Enumerate all partitions of $V = \{1, 2, 3, 4\}$ and verify that the count equals the Bell number $B_4 = 15$. Then verify the recursion $B_{n+1} = \sum_{k=0}^n \binom{n}{k} B_k$ for $n = 3$.
+**Task**: Count the partitions of $V = \{1, 2, 3, 4\}$ by block-size signature and verify that the count equals the Bell number $B_4 = 15$. Then verify the recursion $B_{n+1} = \sum_{k=0}^n \binom{n}{k} B_k$ for $n = 3$.
 
 **Solution**:
 1. By Theorem 1.1 it suffices to enumerate equivalence relations on $V$, equivalently the partitions themselves.
@@ -335,15 +349,19 @@ $$(\Pi_1 \wedge \Pi_2) \wedge \Pi_3 = \Pi_1 \wedge (\Pi_2 \wedge \Pi_3)$$
 **Task**: Let $\Pi^{(0)} = \{\{1, 2, 3\}, \{4, 5\}\}$ on $V = \{1, 2, 3, 4, 5\}$. List all partitions strictly finer than $\Pi^{(0)}$ in $\mathrm{Part}(V)$.
 
 **Solution**:
-1. A partition $\Pi \prec \Pi^{(0)}$ must split at least one cell of $\Pi^{(0)}$ while never merging across cells.
-2. The number of partitions of a set of size $k$ is the Bell number $B_k$. For $\{1,2,3\}$, $B_3 = 5$: $\{\{1,2,3\}\}, \{\{1\},\{2,3\}\}, \{\{2\},\{1,3\}\}, \{\{3\},\{1,2\}\}, \{\{1\},\{2\},\{3\}\}$.
-3. For $\{4, 5\}$, $B_2 = 2$: $\{\{4,5\}\}$ and $\{\{4\}, \{5\}\}$.
-4. Partitions of $V$ refining $\Pi^{(0)}$ are in bijection with pairs (partition of $\{1,2,3\}$, partition of $\{4,5\}$), giving $5 \times 2 = 10$ partitions.
-5. *Strictly* finer excludes the case (full cell $\{1,2,3\}$, full cell $\{4,5\}$), which equals $\Pi^{(0)}$. So $10 - 1 = 9$ partitions are strictly finer:
-   - Splitting only $\{1,2,3\}$ (4 ways) while keeping $\{4,5\}$: 4 partitions.
-   - Splitting only $\{4,5\}$ (1 way) while keeping $\{1,2,3\}$: 1 partition.
-   - Splitting both: $4 \times 1 = 4$ partitions.
-   Total: $4 + 1 + 4 = 9$. ✓ $\blacksquare$
+A partition strictly finer than $\Pi^{(0)}$ may split the cell $\{1,2,3\}$, the cell $\{4,5\}$, or both, but it may never merge across these two original cells. The nine strictly finer partitions are:
+
+1. $\{\{1\},\{2,3\},\{4,5\}\}$
+2. $\{\{2\},\{1,3\},\{4,5\}\}$
+3. $\{\{3\},\{1,2\},\{4,5\}\}$
+4. $\{\{1\},\{2\},\{3\},\{4,5\}\}$
+5. $\{\{1,2,3\},\{4\},\{5\}\}$
+6. $\{\{1\},\{2,3\},\{4\},\{5\}\}$
+7. $\{\{2\},\{1,3\},\{4\},\{5\}\}$
+8. $\{\{3\},\{1,2\},\{4\},\{5\}\}$
+9. $\{\{1\},\{2\},\{3\},\{4\},\{5\}\}$
+
+A quick counting check confirms this list: there are $B_3 B_2 = 5 \cdot 2 = 10$ refinements in total, and removing the original partition itself leaves $9$ strictly finer ones. $\blacksquare$
 
 #### Exercise 1.10: 1-WL Fails to Distinguish $C_6$ from $2C_3$
 **Task**: Let $G_1 = C_6$ (a single 6-cycle) and $G_2 = 2 C_3$ (two disjoint triangles, total $6$ vertices), with constant initial coloring $c_v^{(0)} = \star$. Show whether 1-WL distinguishes $G_1$ from $G_2$ at depth $L = 1$, and explain the algebraic reason.
@@ -353,7 +371,7 @@ $$(\Pi_1 \wedge \Pi_2) \wedge \Pi_3 = \Pi_1 \wedge (\Pi_2 \wedge \Pi_3)$$
 2. The hash $\mathrm{hash}(\star, \{\!\{\star, \star\}\!\})$ produces the same color for every vertex in *both* graphs. Hence $\Pi^{(1)}_{G_1} = \{V_{G_1}\}$ and $\Pi^{(1)}_{G_2} = \{V_{G_2}\}$.
 3. Both partitions are single-cell with $|V| = 6$; the multiset of vertex-colors $\{\!\{\chi, \chi, \chi, \chi, \chi, \chi\}\!\}$ is identical across the two graphs.
 4. Therefore 1-WL does *not* distinguish $C_6$ from $2 C_3$ under constant init at depth $1$ — and by Exercise 1.6 / vertex-transitivity, it never will at any depth.
-5. **Algebraic reason**: both graphs are vertex-transitive and $2$-regular; the multiset-hashing operator is blind to global connectivity (whether the graph is one component or two), and any structural distinguisher would require at least the $k = 3$ Folklore-WL test (3-WL detects connectivity / triangle counts in this setting). $\blacksquare$
+5. **Algebraic reason**: both graphs are $2$-regular, so the multiset-hashing operator sees the same local degree pattern everywhere at every round under constant initialization. In particular, 1-WL is blind here to the global difference between “one connected 6-cycle” and “two disconnected 3-cycles.” $\blacksquare$
 
 ---
 
