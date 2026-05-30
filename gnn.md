@@ -404,6 +404,18 @@ $$H_{\mathrm{bin}}(p) := -p \log_2 p - (1-p) \log_2 (1-p)$$
 2. $H_{\mathrm{bin}}(p)$ is strictly concave on $[0, 1]$.
 3. $H_{\mathrm{bin}}(0) = H_{\mathrm{bin}}(1) = 0$, and it achieves its unique maximum at $p = 1/2$ with $H_{\mathrm{bin}}(1/2) = 1$.
 
+*Proof.*
+1. Symmetry is immediate from the formula
+   $$H_{\mathrm{bin}}(p) = -p\log_2 p -(1-p)\log_2(1-p),$$
+   which is unchanged when $p$ and $1-p$ are swapped.
+2. On $(0,1)$,
+   $$H'_{\mathrm{bin}}(p)=\log_2\!\left(\frac{1-p}{p}\right),$$
+   and therefore
+   $$H''_{\mathrm{bin}}(p) = -\frac{\log_2 e}{p(1-p)}<0.$$ 
+   Hence $H_{\mathrm{bin}}$ is strictly concave on $(0,1)$, and therefore on $[0,1]$ as well.
+3. Substituting $p=0$ and $p=1$ gives $H_{\mathrm{bin}}(0)=H_{\mathrm{bin}}(1)=0$. By strict concavity together with symmetry, the unique maximizer must occur at the midpoint $p=1/2$, where
+   $$H_{\mathrm{bin}}(1/2) = -\tfrac12\log_2\tfrac12 - \tfrac12\log_2\tfrac12 = 1.$$ $\blacksquare$
+
 ### 2.2 Conditional Partition Entropy (Depth Information Gap - DIG)
 Let $V$ be the finite set of vertices, and let $\mu$ be the uniform probability measure on $V$, i.e., $\mu(v) = 1/|V|$ for all $v \in V$.
 Let $f: V \to \{0, 1\}$ be a binary task.
@@ -472,12 +484,12 @@ This completes the proof. $\blacksquare$
 Why do we choose conditional entropy (DIG) to measure task difficulty? 
 Traditional GNN expressivity theory is **binary**: it only tells you if a task is theoretically possible ($0$) or impossible ($\infty$). But in the real world, GNN tasks have degrees of difficulty. If a GNN induces a partition where a cell $C$ contains 90% positive nodes and 10% negative nodes, it is much easier to make highly accurate predictions than if the cell contains 50% positive and 50% negative nodes. Conditional entropy captures this continuous difficulty smoothly.
 
-In the revised PA-MPC draft, Ali Elouafiq leverages this to prove the **two-sided Bridge Inequality (Theorem 1)**:
+In the revised PA-MPC draft, Ali Elouafiq leverages this to prove the **two-sided bridge inequality**:
 $$H_{\mathrm{bin}}^{-1}(\mathrm{DIG}(f \mid \Pi)) \le \varepsilon_\Pi^* \le \frac{1}{2}\,\mathrm{DIG}(f \mid \Pi)$$
 This inequality is extremely powerful:
-1. **The Lower Bound** (via Fano) proves that if DIG is positive, the GNN **must** incur a classification error rate of at least $H_{\mathrm{bin}}^{-1}(\mathrm{DIG})$.
+1. **The Lower Bound** (via Fano) proves that if DIG is positive, the GNN must incur a classification error rate of at least $H_{\mathrm{bin}}^{-1}(\mathrm{DIG})$.
 2. **The Upper Bound** guarantees that the maximum possible error rate is bounded by half the DIG.
-Thus, DIG is not just a statistical proxy—it is the **exact mathematical envelope** that bounds prediction accuracy.
+Thus, DIG is not merely a heuristic score: within this binary partition-based framework, it gives a mathematically controlled description of the achievable prediction error.
 
 To avoid ambiguity, throughout this monograph the notation $H_{\mathrm{bin}}^{-1}$ always means the inverse of the binary entropy function on the monotone branch $[0,1/2] \to [0,1]$. This is the branch relevant for Bayes error, because a binary misclassification rate never exceeds $1/2$.
 
@@ -552,8 +564,8 @@ Once an architecture induces a partition $\Pi$, the residual difficulty of a bin
 7. Upper bound: $\frac{1}{2} \cdot 1 = 1/2$. Equal to $\varepsilon^*_\Pi$. ✓
 8. Both halves collapse simultaneously, illustrating that the balanced-cell limit is the unique tightness point of *both* sides of the bridge inequality. This is also the worst-case PA-MPC scenario (the GNN's representation is operationally vacuous on $f$). $\blacksquare$
 
-#### Exercise 2.5: Fano's Inequality on the Binary Alphabet
-**Task**: Prove the binary-alphabet Fano inequality: for any predictor $\hat{f}$ of a $\{0,1\}$-valued random variable $f$ from any random variable $C$,
+#### Exercise 2.5: Alternate Proof of the Binary-Alphabet Fano Inequality
+**Task**: Re-prove the binary-alphabet Fano inequality: for any predictor $\hat{f}$ of a $\{0,1\}$-valued random variable $f$ from any random variable $C$,
 $$H(f \mid C) \leq H_{\mathrm{bin}}(P_e), \qquad P_e := \Pr[\hat{f}(C) \neq f].$$
 State the role this plays in the lower-half of Theorem 1.
 
@@ -567,7 +579,7 @@ State the role this plays in the lower-half of Theorem 1.
 6. Combining: $H(f \mid C) = H(E \mid C) + H(f \mid E, C) \leq H_{\mathrm{bin}}(P_e)$. ✓
 7. **Role in Theorem 1**: aggregating this per-cell inequality with cell-mass weights $q_C$ and choosing $\hat{f}$ to be the Bayes-optimal cell predictor (Theorem 6.1) gives $\mathrm{DIG}(f \mid \Pi) \leq H_{\mathrm{bin}}(\varepsilon^*_\Pi)$. Inverting on the increasing branch yields the lower bound of the sandwich. $\blacksquare$
 
-#### Exercise 2.6: $H_{\mathrm{bin}}^{-1}$ is Lipschitz-Free Near $1$
+#### Exercise 2.6: $H_{\mathrm{bin}}^{-1}$ Has Unbounded Slope Near $1$
 **Task**: Compute $H_{\mathrm{bin}}^{-1}(0.9)$, $H_{\mathrm{bin}}^{-1}(0.99)$, $H_{\mathrm{bin}}^{-1}(0.999)$ numerically (to $4$ decimal digits), and explain why $H_{\mathrm{bin}}^{-1}$ has unbounded derivative as the argument approaches $1$.
 
 **Solution**:

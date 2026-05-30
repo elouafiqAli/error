@@ -27,7 +27,7 @@ This file is the active worklog, audit checklist, and postmortem ledger for the 
 - [x] Audit all exercises one by one
 - [x] Apply chapter fixes to `gnn.md`
 - [x] Write chapter postmortem
-- [ ] Commit chapter
+- [x] Commit chapter
 
 ## Pre-fix findings
 
@@ -71,3 +71,51 @@ Chapter 1 was conceptually strong from the start, but the audit found one major 
 
 #### Net result
 Chapter 1 now reads more like a reliable textbook chapter than a research-note chapter: the central lattice theorem is complete, the narrative claims are scoped correctly, and the exercise section now matches its own prompts.
+
+---
+
+# Chapter 2 Audit — Entropy, DIG, and the Fano Bridge
+
+## Chapter 2 checklist
+- [x] Read chapter roadmap
+- [x] Audit all definitions
+- [x] Audit all theorem and lemma statements
+- [x] Audit all proofs
+- [x] Audit all exercises one by one
+- [x] Apply chapter fixes to `gnn.md`
+- [x] Write chapter postmortem
+- [ ] Commit chapter
+
+## Pre-fix findings
+
+### Theorem / lemma level
+1. **Lemma 2.1 has no proof.** For a graduate textbook, the symmetry / concavity / extremizer properties of binary entropy should either be proved or explicitly deferred.
+2. **Cross-reference ambiguity in §2.4.** The text refers to “Theorem 1” before the local chapter has introduced such a theorem inside the monograph. This is survivable, but textbook style is cleaner if the bridge inequality is named descriptively when first previewed.
+
+### Exercise level
+3. **Exercise 2.5 substantially duplicates Theorem 2.2.** That is pedagogically acceptable, but it should be framed as a re-proof / alternate derivation rather than an apparently new result.
+4. **Exercise 2.6 title is stylistically odd.** “Lipschitz-Free” is not standard terminology in this context; the actual content is about the inverse slope blowing up near entropy 1.
+
+### Narrative level
+5. **§2.4 contains a slightly strong rhetorical sentence (“exact mathematical envelope”).** The underlying mathematics is fine, but the sentence can be made calmer without losing content.
+
+## Planned fixes
+- Add a short proof of Lemma 2.1.
+- Clarify the first bridge-inequality preview in §2.4.
+- Reframe Exercise 2.5 as a restatement / alternate proof exercise.
+- Rename Exercise 2.6 more plainly.
+- Slightly soften the rhetoric in §2.4.
+
+## Postmortem
+### Chapter 2 postmortem
+Chapter 2 was already mathematically coherent, but it had a few textbook-quality issues: one unproved lemma, one cross-reference that read too much like an external-paper import, and some rhetoric/titling that was sharper or stranger than necessary for a graduate text.
+
+#### What was repaired
+- Lemma 2.1 now has a compact proof covering symmetry, strict concavity, and the unique maximizer.
+- The bridge-inequality preview in §2.4 was made self-contained rather than sounding like an unresolved external theorem reference.
+- The strongest rhetorical sentence in §2.4 was softened while preserving the mathematical point.
+- Exercise 2.5 is now clearly labeled as an alternate proof exercise rather than a duplicate theorem masquerading as new material.
+- Exercise 2.6 now uses standard descriptive language.
+
+#### Net result
+Chapter 2 now reads more like a polished textbook chapter: the entropy preliminaries are self-contained, the transition from theory to interpretation is smoother, and the exercises are better aligned with their pedagogical role.
