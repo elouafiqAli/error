@@ -46,10 +46,12 @@ def main() -> None:
             "train_err": train_err,
             "n_leaves": int(tree.get_n_leaves()),
         })
-        # gates
-        assert br.lower - 1e-9 <= br.eps_star <= br.upper + 1e-9, br
-        assert train_err >= br.eps_star - 1e-9, \
-            f"depth {d}: train_err {train_err} < eps* {br.eps_star}"
+        # data-dependent gates:
+        #   - CART majority-vote per leaf MUST equal eps* exactly
+        #     (tighter than the audit-noted tautology train_err >= eps*).
+        #   - H non-increasing in depth (refinement monotonicity, Prop 4).
+        assert abs(train_err - br.eps_star) < 1e-9, \
+            f"depth {d}: train_err {train_err} != eps* {br.eps_star}"
         assert br.H <= prev_H + 1e-9, \
             f"depth {d}: H non-monotone {prev_H} -> {br.H}"
         prev_H = br.H

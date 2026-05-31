@@ -1,0 +1,9 @@
+# Python dependencies for the reader monograph's notebooks.
+# Pin only minor versions to keep notebooks reproducible across sessions.
+
+numpy>=1.26,<2.3
+scipy>=1.11,<1.14
+matplotlib>=3.8,<3.10
+sympy>=1.12,<1.14
+jupyterlab>=4.0,<5.0
+ipywidgets>=8.1,<9.0

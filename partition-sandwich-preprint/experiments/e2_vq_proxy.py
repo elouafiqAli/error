@@ -67,11 +67,14 @@ def main() -> None:
             "t_bracket_s": t_bracket,
             "t_lr_s":      t_lr,
         })
-        # gates
+        # data-dependent gates:
+        #   - plug-in majority MUST equal eps* exactly (tautology check on impl).
+        #   - LR on saturated one-hot of cells MUST match plug-in to numerical precision
+        #     (the genuine "training adds nothing beyond the partition" claim).
         assert abs(plug_err - br.eps_star) < 1e-9, \
             f"k={k}: plug-in {plug_err} != eps* {br.eps_star}"
-        assert abs(lr_err - br.eps_star) < 0.01, \
-            f"k={k}: LR err {lr_err} differs from eps* {br.eps_star} by >1%"
+        assert abs(lr_err - br.eps_star) < 1e-3, \
+            f"k={k}: LR err {lr_err} differs from eps* {br.eps_star} by >0.1%"
         print(f"  k={k:4d}  H={br.H:.4f}  eps*={br.eps_star:.4f}  "
               f"lower={br.lower:.4f}  LR={lr_err:.4f}  "
               f"bracket={t_bracket*1000:.0f}ms  LR={t_lr:.2f}s")

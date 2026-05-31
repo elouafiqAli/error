@@ -1,0 +1,234 @@
+{
+  "main": {
+    "id": "fed6ff209fbaa193",
+    "type": "split",
+    "children": [
+      {
+        "id": "e21e9d51dd99e5e5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "71eca4a744dd2e39",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "partition-sandwich-preprint/main.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "main"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "dab2107125ff4e01",
+    "type": "split",
+    "children": [
+      {
+        "id": "60d84d4b8d4ddcc4",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "44678b526444e277",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "170ab5e9e000f3ee",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "7a6700abffccd00d",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "a67b031bf809a21e",
+    "type": "split",
+    "children": [
+      {
+        "id": "d2cfe970191abd0f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "fc80e5987fba823d",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "partition-sandwich-preprint/main.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for main"
+            }
+          },
+          {
+            "id": "9269cd8cb6ffc980",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "partition-sandwich-preprint/main.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from main"
+            }
+          },
+          {
+            "id": "2c3a9e565913959d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "136e31a799c92afa",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "c37098a806527150",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "partition-sandwich-preprint/main.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of main"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "71eca4a744dd2e39",
+  "lastOpenFiles": [
+    "partition-sandwich-preprint/experiments/figures/e3_pubmed_funnel.pdf",
+    "partition-sandwich-preprint/experiments/data/ind.pubmed.test.index",
+    "partition-sandwich-preprint/experiments/data/ind.pubmed.graph",
+    "partition-sandwich-preprint/experiments/data/ind.pubmed.ally",
+    "partition-sandwich-preprint/experiments/data/ind.pubmed.allx",
+    "partition-sandwich-preprint/experiments/data/ind.pubmed.ty",
+    "partition-sandwich-preprint/experiments/data/ind.pubmed.tx",
+    "partition-sandwich-preprint/experiments/data/ind.pubmed.y",
+    "partition-sandwich-preprint/experiments/data/ind.pubmed.x",
+    "partition-sandwich-preprint/experiments/figures/e3_citeseer_funnel.pdf",
+    "partition-sandwich-preprint/experiments/data/ind.citeseer.test.index",
+    "partition-sandwich-preprint/experiments/PLANS.md",
+    "partition-sandwich-preprint/experiments/REPORTS.md",
+    "partition-sandwich-preprint/experiments/README.md",
+    "partition-sandwich-preprint/VERIFICATION.md",
+    "partition-sandwich-preprint/main.md",
+    "gnn.md",
+    "reader-monograph/plots/plot07_prior_aware.png",
+    "reader-monograph/plots/plot06_ib_depth.png",
+    "reader-monograph/plots/plot05_massey.png",
+    "reader-monograph/plots/plot04_hvs_envelopes.png",
+    "reader-monograph/plots/plot03_slack_max.png",
+    "reader-monograph/plots/plot02_bridge_sandwich.png",
+    "reader-monograph/plots/plot01_binary_entropy.png",
+    "reader-monograph/solutions/README.md",
+    "reader-monograph/notebooks/README.md",
+    "reader-monograph/exercises/README.md",
+    "ch03.md",
+    "ch01.md",
+    "reader-monograph/README.md",
+    "reader-monograph/PLAN.md",
+    "notes/paper-arxiv-review/13-bayes-entropy-sandwich-literature-note.md",
+    "notes/paper-arxiv-review/12-edit-summary.md",
+    "notes/paper-arxiv-review/11-editorial-improvement-proposal.md",
+    "notes/paper-arxiv-review/10-chapter-by-chapter-formalization-review.md",
+    "notes/paper-arxiv-review/03-paper-section-map.md",
+    "notes/paper-arxiv-review/02-background-theorem-extraction.md",
+    "notes/paper-arxiv-review/01-source-inventory.md",
+    "notes/paper-arxiv-review/00-plan.md",
+    "PAPER-ARXIV.md",
+    "PAPER-OLD.md",
+    "PAPER2-SCOPE.md",
+    "SCOPE.md",
+    "background/arXiv-2505.18410v2 2/boxplot.png",
+    "background/arXiv-2505.18410v2 2/boxplot_lambda.png"
+  ]
+}

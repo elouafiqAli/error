@@ -1,0 +1,294 @@
+\begin{thebibliography}{57}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Adams et~al.(2021)Adams, Hansen, and Zhang]{adams2021identification}
+Jeffrey Adams, Niels Hansen, and Kun Zhang.
+\newblock Identification of partially observed linear causal models: Graphical conditions for the non-gaussian and heterogeneous cases.
+\newblock \emph{Advances in Neural Information Processing Systems}, 34:\penalty0 22822--22833, 2021.
+
+\bibitem[Ali et~al.(2009)Ali, Richardson, and Spirtes]{ali2009ancestral}
+R.~Ayesha Ali, Thomas~S. Richardson, and Peter Spirtes.
+\newblock {Markov equivalence for ancestral graphs}.
+\newblock \emph{The Annals of Statistics}, 37\penalty0 (5B):\penalty0 2808 -- 2837, 2009.
+
+\bibitem[Allman et~al.(2009)Allman, Matias, and Rhodes]{allman2009}
+Elizabeth~S Allman, Catherine Matias, and John~A Rhodes.
+\newblock Identifiability of parameters in latent structure models with many observed variables.
+\newblock \emph{The Annals of Statistics}, 37\penalty0 (6A):\penalty0 3099--3132, 2009.
+
+\bibitem[Anandkumar et~al.(2013)Anandkumar, Hsu, Javanmard, and Kakade]{anandkumar2013learning}
+Animashree Anandkumar, Daniel Hsu, Adel Javanmard, and Sham Kakade.
+\newblock Learning linear bayesian networks with latent variables.
+\newblock In \emph{International Conference on Machine Learning}, pp.\  249--257. PMLR, 2013.
+
+\bibitem[Billingsley(2013)]{billingsley2013convergence}
+Patrick Billingsley.
+\newblock \emph{Convergence of probability measures}.
+\newblock John Wiley \& Sons, 2013.
+
+\bibitem[Bollen(2002)]{bollen2002latent}
+Kenneth~A Bollen.
+\newblock Latent variables in psychology and the social sciences.
+\newblock \emph{Annual review of psychology}, 53\penalty0 (1):\penalty0 605--634, 2002.
+
+\bibitem[Chen et~al.(2015)Chen, Liu, Xu, and Ying]{chen2015statistical}
+Yunxiao Chen, Jingchen Liu, Gongjun Xu, and Zhiliang Ying.
+\newblock Statistical analysis of {Q}-matrix based diagnostic classification models.
+\newblock \emph{Journal of the American Statistical Association}, 110\penalty0 (510):\penalty0 850--866, 2015.
+
+\bibitem[Chen et~al.(2022)Chen, Xie, Qiao, Hao, Zhang, and Cai]{chen2022identification}
+Zhengming Chen, Feng Xie, Jie Qiao, Zhifeng Hao, Kun Zhang, and Ruichu Cai.
+\newblock Identification of linear latent variable model with arbitrary distribution.
+\newblock In \emph{Proceedings of the AAAI Conference on Artificial Intelligence}, volume~36, pp.\  6350--6357, 2022.
+
+\bibitem[Chen et~al.(2024)Chen, Cai, Xie, Qiao, Wu, Li, Hao, and Zhang]{chen2024learning}
+Zhengming Chen, Ruichu Cai, Feng Xie, Jie Qiao, Anpeng Wu, Zijian Li, Zhifeng Hao, and Kun Zhang.
+\newblock Learning discrete latent variable structures with tensor rank conditions.
+\newblock In \emph{Advances in Neural Information Processing Systems}, volume~37, pp.\  17398--17427, 2024.
+
+\bibitem[Chen et~al.(2025)Chen, Xia, Xie, Qiao, Hao, Cai, and Zhang]{chen2025identification}
+Zhengming Chen, Yewei Xia, Feng Xie, Jie Qiao, Zhifeng Hao, Ruichu Cai, and Kun Zhang.
+\newblock Identification of latent confounders via investigating the tensor ranks of the nonlinear observations.
+\newblock In \emph{Forty-second International Conference on Machine Learning}, 2025.
+
+\bibitem[Chickering(2002)]{chickering2002optimal}
+David~Maxwell Chickering.
+\newblock Optimal structure identification with greedy search.
+\newblock \emph{Journal of machine learning research}, 3\penalty0 (Nov):\penalty0 507--554, 2002.
+
+\bibitem[Choi et~al.(2011)Choi, Tan, Anandkumar, and Willsky]{choi2011learning}
+Myung~Jin Choi, Vincent~YF Tan, Animashree Anandkumar, and Alan~S Willsky.
+\newblock Learning latent tree graphical models.
+\newblock \emph{The Journal of Machine Learning Research}, 12:\penalty0 1771--1812, 2011.
+
+\bibitem[Dong et~al.(2023)Dong, Huang, Ng, Song, Zheng, Jin, Legaspi, Spirtes, and Zhang]{dong2023versatile}
+Xinshuai Dong, Biwei Huang, Ignavier Ng, Xiangchen Song, Yujia Zheng, Songyao Jin, Roberto Legaspi, Peter Spirtes, and Kun Zhang.
+\newblock A versatile causal discovery framework to allow causally-related hidden variables.
+\newblock \emph{arXiv preprint arXiv:2312.11001}, 2023.
+
+\bibitem[Evans(2016)]{evans2016graphs}
+Robin~J Evans.
+\newblock {Graphs for margins of Bayesian networks}.
+\newblock \emph{Scandinavian Journal of Statistics}, 43\penalty0 (3):\penalty0 625--648, 2016.
+
+\bibitem[Evans(2018)]{evans2018margins}
+Robin~J Evans.
+\newblock Margins of discrete bayesian networks.
+\newblock \emph{The Annals of Statistics}, 46\penalty0 (6A):\penalty0 2623--2656, 2018.
+
+\bibitem[Frot et~al.(2019)Frot, Nandy, and Maathuis]{frot2019robust}
+Benjamin Frot, Preetam Nandy, and Marloes~H Maathuis.
+\newblock Robust causal structure learning with some hidden variables.
+\newblock \emph{Journal of the Royal Statistical Society Series B: Statistical Methodology}, 81\penalty0 (3):\penalty0 459--487, 2019.
+
+\bibitem[George et~al.(2016)George, Robitzsch, Kiefer, Gro{\ss}, and {\"U}nl{\"u}]{george2016r}
+Ann~Cathrice George, Alexander Robitzsch, Thomas Kiefer, J{\"u}rgen Gro{\ss}, and Ali {\"U}nl{\"u}.
+\newblock The r package cdm for cognitive diagnosis models.
+\newblock \emph{Journal of Statistical Software}, 74:\penalty0 1--24, 2016.
+
+\bibitem[Goodman(1974)]{goodman1974exploratory}
+Leo~A Goodman.
+\newblock Exploratory latent structure analysis using both identifiable and unidentifiable models.
+\newblock \emph{Biometrika}, 61\penalty0 (2):\penalty0 215--231, 1974.
+
+\bibitem[Gordon et~al.(2023)Gordon, Mazaheri, Rabani, and Schulman]{gordon2023causal}
+Spencer~L Gordon, Bijan Mazaheri, Yuval Rabani, and Leonard Schulman.
+\newblock Causal inference despite limited global confounding via mixture models.
+\newblock In \emph{Conference on Causal Learning and Reasoning}, pp.\  574--601. PMLR, 2023.
+
+\bibitem[Gu(2025)]{gu2025blessing}
+Yuqi Gu.
+\newblock {Blessing of dependence: Identifiability and geometry of discrete models with multiple binary latent variables}.
+\newblock \emph{Bernoulli}, 31\penalty0 (2):\penalty0 948--972, 2025.
+
+\bibitem[Gu \& Dunson(2023)Gu and Dunson]{gu2023bayesian}
+Yuqi Gu and David~B Dunson.
+\newblock Bayesian pyramids: Identifiable multilayer discrete latent structure models for discrete data.
+\newblock \emph{Journal of the Royal Statistical Society Series B: Statistical Methodology}, 85\penalty0 (2):\penalty0 399--426, 2023.
+
+\bibitem[Harshman et~al.(1970)]{harshman1970foundations}
+Richard~A Harshman et~al.
+\newblock {Foundations of the PARAFAC procedure: Models and conditions for an “explanatory” multi-modal factor analysis}.
+\newblock \emph{UCLA working papers in phonetics}, 16\penalty0 (1):\penalty0 84, 1970.
+
+\bibitem[Huang et~al.(2022)Huang, Low, Xie, Glymour, and Zhang]{huang2022latent}
+Biwei Huang, Charles Jia~Han Low, Feng Xie, Clark Glymour, and Kun Zhang.
+\newblock Latent hierarchical causal structure discovery with rank constraints.
+\newblock \emph{Advances in neural information processing systems}, 35:\penalty0 5549--5561, 2022.
+
+\bibitem[Junker \& Sijtsma(2001)Junker and Sijtsma]{junker2001dina}
+Brian~W. Junker and Klaas Sijtsma.
+\newblock Cognitive assessment models with few assumptions, and connections with nonparametric item response theory.
+\newblock \emph{Applied Psychological Measurement}, 25:\penalty0 258--272, 2001.
+
+\bibitem[Kivva et~al.(2021)Kivva, Rajendran, Ravikumar, and Aragam]{kivva2021learning}
+Bohdan Kivva, Goutham Rajendran, Pradeep Ravikumar, and Bryon Aragam.
+\newblock Learning latent causal graphs via mixture oracles.
+\newblock \emph{Advances in Neural Information Processing Systems}, 34:\penalty0 18087--18101, 2021.
+
+\bibitem[Kolda \& Bader(2009)Kolda and Bader]{kolda2009tensor}
+Tamara~G Kolda and Brett~W Bader.
+\newblock Tensor decompositions and applications.
+\newblock \emph{SIAM review}, 51\penalty0 (3):\penalty0 455--500, 2009.
+
+\bibitem[Kong et~al.(2024)Kong, Chen, Huang, Xing, Chi, and Zhang]{kong2024learning}
+Lingjing Kong, Guangyi Chen, Biwei Huang, Eric Xing, Yuejie Chi, and Kun Zhang.
+\newblock Learning discrete concepts in latent hierarchical models.
+\newblock \emph{Advances in Neural Information Processing Systems}, 37:\penalty0 36938--36975, 2024.
+
+\bibitem[Kruskal(1977)]{kruskal1977three}
+Joseph~B Kruskal.
+\newblock Three-way arrays: rank and uniqueness of trilinear decompositions, with application to arithmetic complexity and statistics.
+\newblock \emph{Linear Algebra and its Applications}, 18\penalty0 (2):\penalty0 95--138, 1977.
+
+\bibitem[Lee \& Gu(2024{\natexlab{a}})Lee and Gu]{lee2024latent}
+Seunghyun Lee and Yuqi Gu.
+\newblock {Latent conjunctive Bayesian network: Unify attribute hierarchy and Bayesian network for cognitive diagnosis}.
+\newblock \emph{The Annals of Applied Statistics}, 18\penalty0 (3):\penalty0 1988--2011, 2024{\natexlab{a}}.
+
+\bibitem[Lee \& Gu(2024{\natexlab{b}})Lee and Gu]{lee2024new}
+Seunghyun Lee and Yuqi Gu.
+\newblock New paradigm of identifiable general-response cognitive diagnostic models: beyond categorical data.
+\newblock \emph{Psychometrika}, 89\penalty0 (4):\penalty0 1304--1336, 2024{\natexlab{b}}.
+
+\bibitem[Lee \& Gu(2025)Lee and Gu]{lee2025deep}
+Seunghyun Lee and Yuqi Gu.
+\newblock Deep discrete encoders: Identifiable deep generative models for rich data with discrete latent layers.
+\newblock \emph{Journal of American Statistical Association}, pp.\  1--25, 2025.
+
+\bibitem[Li et~al.(2025)Li, Wang, and Liu]{li2025recovery}
+Xiu-Chuan Li, Jun Wang, and Tongliang Liu.
+\newblock Recovery of causal graph involving latent variables via homologous surrogates.
+\newblock In \emph{The Thirteenth International Conference on Learning Representations}, 2025.
+
+\bibitem[Lyu \& Yang(2025)Lyu and Yang]{pmlr-v291-lyu25a}
+Yichen Lyu and Pengkun Yang.
+\newblock Identifiability and estimation in high-dimensional nonparametric latent structure models.
+\newblock In Nika Haghtalab and Ankur Moitra (eds.), \emph{Proceedings of Thirty Eighth Conference on Learning Theory}, volume 291 of \emph{Proceedings of Machine Learning Research}, pp.\  3879--3880. PMLR, 30 Jun--04 Jul 2025.
+
+\bibitem[Ma et~al.(2023)Ma, Ouyang, and Xu]{ma2023learning}
+Chenchen Ma, Jing Ouyang, and Gongjun Xu.
+\newblock Learning latent and hierarchical structures in cognitive diagnosis models.
+\newblock \emph{Psychometrika}, 88\penalty0 (1):\penalty0 175--207, 2023.
+
+\bibitem[Markham \& Grosse-Wentrup(2020)Markham and Grosse-Wentrup]{markham2020measurement}
+Alex Markham and Moritz Grosse-Wentrup.
+\newblock Measurement dependence inducing latent causal models.
+\newblock In \emph{Conference on Uncertainty in Artificial Intelligence}, pp.\  590--599. PMLR, 2020.
+
+\bibitem[McHugh(1956)]{mchugh1956efficient}
+Richard~B McHugh.
+\newblock Efficient estimation and local identification in latent class analysis.
+\newblock \emph{Psychometrika}, 21\penalty0 (4):\penalty0 331--347, 1956.
+
+\bibitem[Montagna et~al.(2023)Montagna, Noceti, Rosasco, Zhang, and Locatello]{montagna2023causal}
+Francesco Montagna, Nicoletta Noceti, Lorenzo Rosasco, Kun Zhang, and Francesco Locatello.
+\newblock Causal discovery with score matching on additive models with arbitrary noise.
+\newblock In \emph{Conference on Causal Learning and Reasoning}, pp.\  726--751. PMLR, 2023.
+
+\bibitem[Montagna et~al.(2025)Montagna, Cairney-Leeming, Sridhar, and Locatello]{montagna2025demystifying}
+Francesco Montagna, Max Cairney-Leeming, Dhanya Sridhar, and Francesco Locatello.
+\newblock Demystifying amortized causal discovery with transformers.
+\newblock \emph{Transactions on Machine Learning Research}, 2025.
+\newblock ISSN 2835-8856.
+
+\bibitem[Moran \& Aragam(2025)Moran and Aragam]{moran2025towards}
+Gemma~E Moran and Bryon Aragam.
+\newblock Towards interpretable deep generative models via causal representation learning.
+\newblock \emph{arXiv preprint arXiv:2504.11609}, 2025.
+
+\bibitem[Ouyang \& Xu(2022)Ouyang and Xu]{ouyang2022identifiability}
+Jing Ouyang and Gongjun Xu.
+\newblock Identifiability of latent class models with covariates.
+\newblock \emph{Psychometrika}, 87\penalty0 (4):\penalty0 1343--1360, 2022.
+
+\bibitem[Pearl(2014)]{pearl2014probabilistic}
+Judea Pearl.
+\newblock \emph{Probabilistic reasoning in intelligent systems: networks of plausible inference}.
+\newblock Elsevier, 2014.
+
+\bibitem[Pearl \& Tarsi(1986)Pearl and Tarsi]{pearl1986structuring}
+Judea Pearl and Michael Tarsi.
+\newblock Structuring causal trees.
+\newblock \emph{Journal of Complexity}, 2\penalty0 (1):\penalty0 60--77, 1986.
+
+\bibitem[Pearl \& Verma(1992)Pearl and Verma]{pearl1992statistical}
+Judea Pearl and Thomas~S Verma.
+\newblock A statistical semantics for causation.
+\newblock \emph{Statistics and Computing}, 2:\penalty0 91--95, 1992.
+
+\bibitem[Rhodes(2010)]{rhodes2010concise}
+John~A Rhodes.
+\newblock A concise proof of {K}ruskal’s theorem on tensor decomposition.
+\newblock \emph{Linear Algebra and its Applications}, 432\penalty0 (7):\penalty0 1818--1824, 2010.
+
+\bibitem[Richardson \& Spirtes(2002)Richardson and Spirtes]{richardson2002ancestral}
+Thomas Richardson and Peter Spirtes.
+\newblock Ancestral graph {M}arkov models.
+\newblock \emph{The Annals of Statistics}, 30\penalty0 (4):\penalty0 962--1030, 2002.
+
+\bibitem[Silva \& Scheines(2004)Silva and Scheines]{silva2004generalized}
+Ricardo Silva and Richard Scheines.
+\newblock \emph{Generalized measurement models}.
+\newblock Carnegie Mellon University. Center for Automated Learning and Discovery, 2004.
+
+\bibitem[Silva et~al.(2006)Silva, Scheines, Glymour, Spirtes, and Chickering]{silva2006learning}
+Ricardo Silva, Richard Scheines, Clark Glymour, Peter Spirtes, and David~Maxwell Chickering.
+\newblock Learning the structure of linear latent variable models.
+\newblock \emph{Journal of Machine Learning Research}, 7\penalty0 (2), 2006.
+
+\bibitem[Song et~al.(2014)Song, Liu, Parikh, and Xing]{song2014nonparametric}
+Le~Song, Han Liu, Ankur Parikh, and Eric Xing.
+\newblock Nonparametric latent tree graphical models: Inference, estimation, and structure learning.
+\newblock \emph{arXiv preprint arXiv:1401.3940}, 2014.
+
+\bibitem[Spirtes et~al.(2001)Spirtes, Glymour, and Scheines]{spirtes2001causation}
+Peter Spirtes, Clark Glymour, and Richard Scheines.
+\newblock \emph{Causation, prediction, and search}.
+\newblock MIT press, 2001.
+
+\bibitem[Tahmasebi et~al.(2018)Tahmasebi, Motahari, and Maddah-Ali]{tahmasebi2018identifiability}
+Behrooz Tahmasebi, Seyed~Abolfazl Motahari, and Mohammad~Ali Maddah-Ali.
+\newblock On the identifiability of finite mixtures of finite product measures.
+\newblock \emph{arXiv preprint arXiv:1807.05444}, 2018.
+
+\bibitem[Tatsuoka(2002)]{tatsuoka2002data}
+Curtis Tatsuoka.
+\newblock Data analytic methods for latent partially ordered classification models.
+\newblock \emph{Journal of the Royal Statistical Society Series C: Applied Statistics}, 51\penalty0 (3):\penalty0 337--350, 2002.
+
+\bibitem[von Davier(2008)]{von2008general}
+Matthias von Davier.
+\newblock A general diagnostic model applied to language testing data.
+\newblock \emph{British Journal of Mathematical and Statistical Psychology}, 61:\penalty0 287--307, 2008.
+
+\bibitem[Wang et~al.(2017)Wang, Guo, Hao, and Zhang]{wang2017spectral}
+Xiaofei Wang, Jianhua Guo, Lizhu Hao, and Nevin~L Zhang.
+\newblock Spectral methods for learning discrete latent tree models.
+\newblock \emph{Statistics and Its Interface}, 10\penalty0 (4):\penalty0 677, 2017.
+
+\bibitem[Xie et~al.(2020)Xie, Cai, Huang, Glymour, Hao, and Zhang]{xie2020generalized}
+Feng Xie, Ruichu Cai, Biwei Huang, Clark Glymour, Zhifeng Hao, and Kun Zhang.
+\newblock Generalized independent noise condition for estimating latent variable causal graphs.
+\newblock \emph{Advances in neural information processing systems}, 33:\penalty0 14891--14902, 2020.
+
+\bibitem[Xie et~al.(2022)Xie, Huang, Chen, He, Geng, and Zhang]{xie2022identification}
+Feng Xie, Biwei Huang, Zhengming Chen, Yangbo He, Zhi Geng, and Kun Zhang.
+\newblock Identification of linear non-gaussian latent hierarchical structure.
+\newblock In \emph{International Conference on Machine Learning}, pp.\  24370--24387. PMLR, 2022.
+
+\bibitem[Xie et~al.(2024)Xie, Huang, Chen, Cai, Glymour, Geng, and Zhang]{xie2024generalized}
+Feng Xie, Biwei Huang, Zhengming Chen, Ruichu Cai, Clark Glymour, Zhi Geng, and Kun Zhang.
+\newblock Generalized independent noise condition for estimating causal structure with latent variables.
+\newblock \emph{Journal of Machine Learning Research}, 25\penalty0 (191):\penalty0 1--61, 2024.
+
+\bibitem[Zhang et~al.(2025)Zhang, Wang, and Gu]{zhang2025causalrep}
+Wenjin Zhang, Yixin Wang, and Yuqi Gu.
+\newblock Causal representation learning with discrete latent variables.
+\newblock \emph{Manuscript}, 2025.
+
+\end{thebibliography}

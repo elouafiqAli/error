@@ -1,0 +1,14 @@
+{
+  "tier": "T1 (float spot-check, NOT certified)",
+  "samples": 1000,
+  "seed": 20260531,
+  "violations": 0,
+  "upper_passed": true,
+  "lower_passed": true,
+  "max_eps_star": 0.5,
+  "max_upper_slack": 0.1609640474436812,
+  "max_lower_slack": 0.16094780761906946,
+  "min_upper_slack": 0.0,
+  "min_lower_slack": -5.551115123125783e-16,
+  "caveat": "Float arithmetic; use verify.jl (T2) for rigorously certified verdicts."
+}

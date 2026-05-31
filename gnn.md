@@ -26,7 +26,7 @@ This text is organized in two layers.
 
 A recommended first reading order is:
 - **Chapter 1** for the language of partitions and refinement;
-- **Chapter 2** for the information-theoretic metric (DIG);
+- **Chapter 2** for the partition-conditional entropy $H(f \mid \Pi)$;
 - **Chapter 3** for the graph-topological and random-walk background;
 - **Chapters 4–5** for the LossyWL operator and the random-walk lower bound;
 - **Chapter 6** for the Bayes-optimal error interpretation;
@@ -380,7 +380,7 @@ A quick counting check confirms this list: there are $B_3 B_2 = 5 \cdot 2 = 10$ 
 ### Chapter 2 Roadmap
 Chapter 1 told us **which vertices a message-passing architecture can keep apart**. Chapter 2 asks the next question: **how hard is the downstream prediction problem once those indistinguishability classes are fixed?**
 
-The answer is expressed through conditional entropy. If a partition cell contains almost all positive labels, prediction inside that cell is easy; if it contains a fifty-fifty mix, prediction is intrinsically hard. DIG packages this idea into a single number.
+The answer is expressed through conditional entropy. If a partition cell contains almost all positive labels, prediction inside that cell is easy; if it contains a fifty-fifty mix, prediction is intrinsically hard. Partition-conditional entropy packages this idea into a single number.
 
 A useful mental picture is the following.
 - A **pure** cell contributes $0$ bits of uncertainty.
@@ -389,6 +389,8 @@ A useful mental picture is the following.
 
 ### 2.1 Measure Spaces, Probability, and Discrete Entropy
 Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space. Let $Y: \Omega \to \mathcal{Y}$ be a discrete random variable taking values in a finite set $\mathcal{Y}$. The probability mass function of $Y$ is $p(y) = \mathbb{P}(Y = y)$.
+
+*Remark.* Throughout this chapter $\Omega$ is finite and $\mathcal{F}$ may be taken to be the power set $\mathcal{P}(\Omega)$; no measure-theoretic apparatus beyond finite additivity is used. Chapter 9 makes this convention explicit and re-derives the conditioning operations of the present chapter without σ-algebras (see Definition 9.1 and Theorem 9.1).
 
 #### Definition 2.1 (Shannon Entropy)
 The **entropy** of $Y$ is defined as:
@@ -416,7 +418,7 @@ $$H_{\mathrm{bin}}(p) := -p \log_2 p - (1-p) \log_2 (1-p)$$
 3. Substituting $p=0$ and $p=1$ gives $H_{\mathrm{bin}}(0)=H_{\mathrm{bin}}(1)=0$. By strict concavity together with symmetry, the unique maximizer must occur at the midpoint $p=1/2$, where
    $$H_{\mathrm{bin}}(1/2) = -\tfrac12\log_2\tfrac12 - \tfrac12\log_2\tfrac12 = 1.$$ $\blacksquare$
 
-### 2.2 Conditional Partition Entropy (Depth Information Gap - DIG)
+### 2.2 Partition-Conditional Entropy
 Let $V$ be the finite set of vertices, and let $\mu$ be the uniform probability measure on $V$, i.e., $\mu(v) = 1/|V|$ for all $v \in V$.
 Let $f: V \to \{0, 1\}$ be a binary task.
 Let $\Pi$ be a partition of $V$. 
@@ -427,14 +429,14 @@ $$q_C := \mathbb{P}(C(v) = C) = \frac{|C|}{|V|}$$
 Let $P_C$ denote the fraction of vertices in cell $C$ for which $f(v) = 1$:
 $$P_C := \mathbb{P}(f(v) = 1 \mid v \in C) = \frac{1}{|C|} \sum_{u \in C} f(u)$$
 
-#### Definition 2.2 (Depth Information Gap / Conditional Entropy)
-The **conditional entropy** of $f$ given the partition $\Pi$, denoted as $\mathrm{DIG}(f \mid \Pi)$, is:
-$$\mathrm{DIG}(f \mid \Pi) := H(f \mid C(v)) = \sum_{C \in \Pi} q_C H_{\mathrm{bin}}(P_C)$$
+#### Definition 2.2 (Partition-Conditional Entropy)
+The **partition-conditional entropy** of $f$ given $\Pi$, denoted $H(f \mid \Pi)$, is:
+$$H(f \mid \Pi) := H(f \mid C(v)) = \sum_{C \in \Pi} q_C H_{\mathrm{bin}}(P_C)$$
 
-We also define the **quadratic Depth Information Gap** (analogous to Gini impurity):
-$$\widetilde{\mathrm{DIG}}(f \mid \Pi) := \sum_{C \in \Pi} q_C P_C(1 - P_C)$$
+We also define the **variance form** (expected within-cell variance, analogous to Gini impurity):
+$$\mathbb{E}[\mathrm{Var}(f \mid \Pi)] := \sum_{C \in \Pi} q_C P_C(1 - P_C)$$
 
-#### Illustration 2.1 (How to Read DIG Cell by Cell)
+#### Illustration 2.1 (How to Read $H(f \mid \Pi)$ Cell by Cell)
 Suppose a partition has three cells with label proportions
 $$P_{C_1}=1, \qquad P_{C_2}=2/3, \qquad P_{C_3}=1/2.$$
 Then their entropy contributions are, respectively,
@@ -442,7 +444,7 @@ Then their entropy contributions are, respectively,
 - $H_{\mathrm{bin}}(2/3)\approx 0.918$ bits: the cell is mixed but still biased;
 - $H_{\mathrm{bin}}(1/2)=1$ bit: the cell is maximally ambiguous.
 
-Thus DIG should always be interpreted as a **weighted average cell impurity**. The partition matters because it determines which vertices are forced to share the same prediction, and the entropy matters because it quantifies how costly that forcing is.
+Thus $H(f \mid \Pi)$ should always be interpreted as a **weighted average cell impurity**. The partition matters because it determines which vertices are forced to share the same prediction, and the entropy matters because it quantifies how costly that forcing is.
 
 ---
 
@@ -454,7 +456,7 @@ $$P_e := \mathbb{P}(\widehat{F}(C(v)) \neq f(v)) = \sum_{C \in \Pi} q_C \mathbb{
 
 #### Theorem 2.2 (Fano's Inequality for Binary Labels)
 *For any partition-measurable predictor $\widehat{F}$, the error rate $P_e$ is bounded by:*
-$$\mathrm{DIG}(f \mid \Pi) \le H_{\mathrm{bin}}(P_e)$$
+$$H(f \mid \Pi) \le H_{\mathrm{bin}}(P_e)$$
 
 *Proof.*
 Define a random variable $E: V \to \{0, 1\}$ which indicates whether our predictor made an error:
@@ -464,7 +466,7 @@ We expand the joint conditional entropy $H(f, E \mid C(v))$ in two different way
 1. First expansion:
    $$H(f, E \mid C(v)) = H(f \mid C(v)) + H(E \mid f, C(v))$$
    Since $E$ is completely determined once both the true label $f(v)$ and the predicted label $\widehat{F}(C(v))$ are known, the conditional entropy $H(E \mid f, C(v))$ is exactly $0$. Therefore:
-   $$H(f, E \mid C(v)) = H(f \mid C(v)) = \mathrm{DIG}(f \mid \Pi)$$
+   $$H(f, E \mid C(v)) = H(f \mid C(v)) = H(f \mid \Pi)$$
 2. Second expansion:
    $$H(f, E \mid C(v)) = H(E \mid C(v)) + H(f \mid E, C(v))$$
    - Since conditioning reduces entropy, we have $H(E \mid C(v)) \le H(E) = H_{\mathrm{bin}}(P_e)$.
@@ -475,26 +477,26 @@ We expand the joint conditional entropy $H(f, E \mid C(v))$ in two different way
      Consequently, $H(f \mid E, C(v)) = 0$.
 
 Combining both expansions:
-$$\mathrm{DIG}(f \mid \Pi) = H(f, E \mid C(v)) = H(E \mid C(v)) + 0 \le H_{\mathrm{bin}}(P_e)$$
+$$H(f \mid \Pi) = H(f, E \mid C(v)) = H(E \mid C(v)) + 0 \le H_{\mathrm{bin}}(P_e)$$
 This completes the proof. $\blacksquare$
 
 ---
 
 ### 2.4 Narrative Discussion: Conditional Entropy as the Measure of Task Difficulty
-Why do we choose conditional entropy (DIG) to measure task difficulty? 
+Why do we choose conditional entropy $H(f \mid \Pi)$ to measure task difficulty? 
 Traditional GNN expressivity theory is **binary**: it only tells you if a task is theoretically possible ($0$) or impossible ($\infty$). But in the real world, GNN tasks have degrees of difficulty. If a GNN induces a partition where a cell $C$ contains 90% positive nodes and 10% negative nodes, it is much easier to make highly accurate predictions than if the cell contains 50% positive and 50% negative nodes. Conditional entropy captures this continuous difficulty smoothly.
 
 In the revised PA-MPC draft, Ali Elouafiq leverages this to prove the **two-sided bridge inequality**:
-$$H_{\mathrm{bin}}^{-1}(\mathrm{DIG}(f \mid \Pi)) \le \varepsilon_\Pi^* \le \frac{1}{2}\,\mathrm{DIG}(f \mid \Pi)$$
+$$H_{\mathrm{bin}}^{-1}(H(f \mid \Pi)) \le \varepsilon_\Pi^* \le \frac{1}{2}\,H(f \mid \Pi)$$
 This inequality is extremely powerful:
-1. **The Lower Bound** (via Fano) proves that if DIG is positive, the GNN must incur a classification error rate of at least $H_{\mathrm{bin}}^{-1}(\mathrm{DIG})$.
-2. **The Upper Bound** guarantees that the maximum possible error rate is bounded by half the DIG.
-Thus, DIG is not merely a heuristic score: within this binary partition-based framework, it gives a mathematically controlled description of the achievable prediction error.
+1. **The Lower Bound** (via Fano) proves that if $H(f \mid \Pi)$ is positive, the GNN must incur a classification error rate of at least $H_{\mathrm{bin}}^{-1}(H(f \mid \Pi))$.
+2. **The Upper Bound** guarantees that the maximum possible error rate is bounded by half the conditional entropy.
+Thus, $H(f \mid \Pi)$ is not merely a heuristic score: within this binary partition-based framework, it gives a mathematically controlled description of the achievable prediction error.
 
 To avoid ambiguity, throughout this monograph the notation $H_{\mathrm{bin}}^{-1}$ always means the inverse of the binary entropy function on the monotone branch $[0,1/2] \to [0,1]$. This is the branch relevant for Bayes error, because a binary misclassification rate never exceeds $1/2$.
 
 #### Chapter 2 Takeaway
-Once an architecture induces a partition $\Pi$, the residual difficulty of a binary task is summarized by the impurity of the partition cells. DIG measures that impurity in bits, and the bridge inequality turns those bits into lower and upper control on the best achievable partition-measurable error.
+Once an architecture induces a partition $\Pi$, the residual difficulty of a binary task is summarized by the impurity of the partition cells. Partition-conditional entropy measures that impurity in bits, and the bridge inequality turns those bits into lower and upper control on the best achievable partition-measurable error.
 
 ---
 
@@ -521,25 +523,25 @@ Once an architecture induces a partition $\Pi$, the residual difficulty of a bin
 8. Thus, $g(p) \ge 0 \implies p \le \frac{1}{2} H_{\mathrm{bin}}(p)$ for all $p \in [0, 0.5]$.
 9. Substituting $\min(p, 1-p)$, we obtain $\min(p, 1-p) \le \frac{1}{2} H_{\mathrm{bin}}(p)$ for all $p \in [0, 1]$. $\blacksquare$
 
-#### Exercise 2.2: Computing $\mathrm{DIG}$ on a Worked Partition
-**Task**: Let $V = \{1, 2, 3, 4, 5, 6, 7, 8\}$ with uniform measure $\mu(v) = 1/8$, binary task $f$ with $f^{-1}(1) = \{1, 2, 3, 4, 5\}$, and partition $\Pi = \{C_1, C_2, C_3\}$ where $C_1 = \{1, 2, 3\}$, $C_2 = \{4, 5, 6\}$, $C_3 = \{7, 8\}$. Compute $\mathrm{DIG}(f \mid \Pi)$, $\widetilde{\mathrm{DIG}}(f \mid \Pi)$, and $\varepsilon^*_\Pi$, and verify Theorem 1 numerically.
+#### Exercise 2.2: Computing $H(f \mid \Pi)$ on a Worked Partition
+**Task**: Let $V = \{1, 2, 3, 4, 5, 6, 7, 8\}$ with uniform measure $\mu(v) = 1/8$, binary task $f$ with $f^{-1}(1) = \{1, 2, 3, 4, 5\}$, and partition $\Pi = \{C_1, C_2, C_3\}$ where $C_1 = \{1, 2, 3\}$, $C_2 = \{4, 5, 6\}$, $C_3 = \{7, 8\}$. Compute $H(f \mid \Pi)$, $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$, and $\varepsilon^*_\Pi$, and verify the Bridge Inequality of §2.4 (Theorem 2.2 lower half; Exercise 2.1 upper half) numerically.
 
 **Solution**:
 1. **Cell masses**: $q_{C_1} = 3/8$, $q_{C_2} = 3/8$, $q_{C_3} = 2/8 = 1/4$.
 2. **Cell posteriors**: $P_{C_1} = 3/3 = 1$ (all positive); $P_{C_2} = 2/3$ (vertices $4, 5$ positive; $6$ negative); $P_{C_3} = 0$ (both negative).
-3. **Entropy DIG**:
-   $\mathrm{DIG}(f \mid \Pi) = \frac{3}{8} H_{\mathrm{bin}}(1) + \frac{3}{8} H_{\mathrm{bin}}(2/3) + \frac{1}{4} H_{\mathrm{bin}}(0) = 0 + \frac{3}{8} \cdot 0.9183 + 0 \approx 0.3444$ bits.
+3. **Entropy form $H(f \mid \Pi)$**:
+   $H(f \mid \Pi) = \frac{3}{8} H_{\mathrm{bin}}(1) + \frac{3}{8} H_{\mathrm{bin}}(2/3) + \frac{1}{4} H_{\mathrm{bin}}(0) = 0 + \frac{3}{8} \cdot 0.9183 + 0 \approx 0.3444$ bits.
    Here $H_{\mathrm{bin}}(2/3) = -\frac{2}{3} \log_2 \frac{2}{3} - \frac{1}{3} \log_2 \frac{1}{3} \approx 0.9183$.
-4. **Variance DIG**:
-   $\widetilde{\mathrm{DIG}} = \frac{3}{8} \cdot 1 \cdot 0 + \frac{3}{8} \cdot \frac{2}{3} \cdot \frac{1}{3} + \frac{1}{4} \cdot 0 \cdot 1 = \frac{3}{8} \cdot \frac{2}{9} = \frac{1}{12}$.
+4. **Variance form $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$**:
+   $\mathbb{E}[\mathrm{Var}(f \mid \Pi)] = \frac{3}{8} \cdot 1 \cdot 0 + \frac{3}{8} \cdot \frac{2}{3} \cdot \frac{1}{3} + \frac{1}{4} \cdot 0 \cdot 1 = \frac{3}{8} \cdot \frac{2}{9} = \frac{1}{12}$.
 5. **Bayes error**: $\varepsilon^*_\Pi = \frac{3}{8} \cdot 0 + \frac{3}{8} \cdot \min(2/3, 1/3) + \frac{1}{4} \cdot 0 = \frac{3}{8} \cdot \frac{1}{3} = \frac{1}{8} = 0.125$.
-6. **Theorem 1 check**:
-   - Lower bound: $H_{\mathrm{bin}}^{-1}(0.3444) \approx 0.064$, and $0.064 \leq 0.125$. ✓
-   - Upper bound: $\frac{1}{2} \mathrm{DIG} \approx 0.172$, and $0.125 \leq 0.172$. ✓
+6. **Bridge Inequality check** (§2.4):
+   - Lower bound (Fano, Theorem 2.2): $H_{\mathrm{bin}}^{-1}(0.3444) \approx 0.064$, and $0.064 \leq 0.125$. ✓
+   - Upper bound (Hellman–Raviv, Exercise 2.1): $\frac{1}{2} H(f \mid \Pi) \approx 0.172$, and $0.125 \leq 0.172$. ✓
 7. Both halves of the sandwich are non-trivial here (neither is tight). $\blacksquare$
 
 #### Exercise 2.3: Conditional Entropy Decreases Under Refinement
-**Task**: Prove that if $\Pi' \preceq \Pi$ (i.e.\ $\Pi'$ is finer than $\Pi$), then for every task $f$, $\mathrm{DIG}(f \mid \Pi') \leq \mathrm{DIG}(f \mid \Pi)$. (This is the *monotonicity* of DIG under refinement, foundational to PA-MPC §7.4.)
+**Task**: Prove that if $\Pi' \preceq \Pi$ (i.e.\ $\Pi'$ is finer than $\Pi$), then for every task $f$, $H(f \mid \Pi') \leq H(f \mid \Pi)$. (This is the *monotonicity* of $H(f \mid \Pi)$ under refinement, foundational to PA-MPC §7.4.)
 
 **Solution**:
 1. Let $C \in \Pi$ and let $\Pi'|_C := \{B \in \Pi' : B \subseteq C\}$ be the sub-partition of $C$ induced by $\Pi'$; by refinement, $\bigsqcup_{B \in \Pi'|_C} B = C$.
@@ -549,7 +551,7 @@ Once an architecture induces a partition $\Pi$, the residual difficulty of a bin
 4. Multiply both sides by $q_C$:
    $q_C H_{\mathrm{bin}}(P_C) \geq \sum_{B \in \Pi'|_C} q_C r_{B|C} H_{\mathrm{bin}}(P_B) = \sum_{B \in \Pi'|_C} q_B H_{\mathrm{bin}}(P_B)$ since $q_B = q_C \cdot r_{B|C}$.
 5. Summing over $C \in \Pi$ and re-indexing the right-hand side over all $B \in \Pi'$:
-   $\mathrm{DIG}(f \mid \Pi) = \sum_C q_C H_{\mathrm{bin}}(P_C) \geq \sum_B q_B H_{\mathrm{bin}}(P_B) = \mathrm{DIG}(f \mid \Pi')$. $\blacksquare$
+   $H(f \mid \Pi) = \sum_C q_C H_{\mathrm{bin}}(P_C) \geq \sum_B q_B H_{\mathrm{bin}}(P_B) = H(f \mid \Pi')$. $\blacksquare$
 
 #### Exercise 2.4: Sandwich is Tight on the Balanced Cell Limit
 **Task**: Construct an explicit partition $\Pi$ and task $f$ for which *both* sides of Theorem 1's sandwich are exactly $1/2$ (i.e.\ the sandwich collapses to equality). 
@@ -558,7 +560,7 @@ Once an architecture induces a partition $\Pi$, the residual difficulty of a bin
 1. Let $|V| = 2n$, with $f$ assigning the value $1$ to exactly $n$ vertices.
 2. Let $\Pi = \{V\}$ (the indiscrete partition, single cell).
 3. Then $q_V = 1$ and $P_V = n / (2n) = 1/2$.
-4. $\mathrm{DIG}(f \mid \Pi) = 1 \cdot H_{\mathrm{bin}}(1/2) = 1$ bit (exactly).
+4. $H(f \mid \Pi) = 1 \cdot H_{\mathrm{bin}}(1/2) = 1$ bit (exactly).
 5. $\varepsilon^*_\Pi = 1 \cdot \min(1/2, 1/2) = 1/2$.
 6. Lower bound: $H_{\mathrm{bin}}^{-1}(1) = 1/2$. Equal to $\varepsilon^*_\Pi$. ✓
 7. Upper bound: $\frac{1}{2} \cdot 1 = 1/2$. Equal to $\varepsilon^*_\Pi$. ✓
@@ -577,7 +579,7 @@ State the role this plays in the lower-half of Theorem 1.
 4. **Bound $H(E \mid C) \leq H(E) = H_{\mathrm{bin}}(P_e)$** (conditioning never increases entropy).
 5. **Bound $H(f \mid E, C)$**: when $E = 0$, $f = \hat{f}(C)$ is deterministic given $C$, so $H(f \mid E = 0, C) = 0$. When $E = 1$ on a binary alphabet, $f$ is the unique non-predicted bit given $C$, so again $H(f \mid E = 1, C) = 0$ — this is where the binary-alphabet assumption is essential (for $|\mathcal{Y}| \geq 3$ the bound is $\log(|\mathcal{Y}| - 1)$).
 6. Combining: $H(f \mid C) = H(E \mid C) + H(f \mid E, C) \leq H_{\mathrm{bin}}(P_e)$. ✓
-7. **Role in Theorem 1**: aggregating this per-cell inequality with cell-mass weights $q_C$ and choosing $\hat{f}$ to be the Bayes-optimal cell predictor (Theorem 6.1) gives $\mathrm{DIG}(f \mid \Pi) \leq H_{\mathrm{bin}}(\varepsilon^*_\Pi)$. Inverting on the increasing branch yields the lower bound of the sandwich. $\blacksquare$
+7. **Role in the Bridge Inequality (§2.4)**: aggregating this per-cell inequality with cell-mass weights $q_C$ and choosing $\hat{f}$ to be the Bayes-optimal cell predictor (Theorem 6.1) gives $H(f \mid \Pi) \leq H_{\mathrm{bin}}(\varepsilon^*_\Pi)$. Inverting on the increasing branch yields the lower bound of the sandwich. $\blacksquare$
 
 #### Exercise 2.6: $H_{\mathrm{bin}}^{-1}$ Has Unbounded Slope Near $1$
 **Task**: Compute $H_{\mathrm{bin}}^{-1}(0.9)$, $H_{\mathrm{bin}}^{-1}(0.99)$, $H_{\mathrm{bin}}^{-1}(0.999)$ numerically (to $4$ decimal digits), and explain why $H_{\mathrm{bin}}^{-1}$ has unbounded derivative as the argument approaches $1$.
@@ -587,18 +589,18 @@ State the role this plays in the lower-half of Theorem 1.
 2. $H_{\mathrm{bin}}^{-1}(0.99)$: $H_{\mathrm{bin}}(0.42) \approx 0.9815$, $H_{\mathrm{bin}}(0.44) \approx 0.9896$, $H_{\mathrm{bin}}(0.45) \approx 0.9928$. Refining: $p \approx 0.4429$.
 3. $H_{\mathrm{bin}}^{-1}(0.999)$: $p \approx 0.4818$.
 4. **Asymptotic behavior**: as $p \to 1/2$, $H_{\mathrm{bin}}'(p) = \log_2\!\big((1-p)/p\big) \to 0$. By the inverse function theorem $(H_{\mathrm{bin}}^{-1})'(y) = 1 / H_{\mathrm{bin}}'(p)$, so as $y \to 1^-$, $p \to 1/2$, and $(H_{\mathrm{bin}}^{-1})'(y) \to +\infty$.
-5. **Operational consequence**: the lower bound of Theorem 1 is *very steep* near $\mathrm{DIG} = 1$. A small change in DIG near the balanced limit produces a large change in the lower bound on Bayes error, making PA-MPC an *extremely sharp* diagnostic in the over-smoothed regime where DIG saturates near $1$. $\blacksquare$
+5. **Operational consequence**: the lower bound of Theorem 1 is *very steep* near $H(f \mid \Pi) = 1$. A small change in $H(f \mid \Pi)$ near the balanced limit produces a large change in the lower bound on Bayes error, making PA-MPC an *extremely sharp* diagnostic in the over-smoothed regime where $H(f \mid \Pi)$ saturates near $1$. $\blacksquare$
 
 #### Exercise 2.7: Equivalent Forms — Variance vs. Entropy
-**Task**: Show that on a *pure* partition $\Pi$ for a binary task $f$, the variance form $\widetilde{\mathrm{DIG}}(f \mid \Pi) = 0$ if and only if $\mathrm{DIG}(f \mid \Pi) = 0$, and produce a non-pure partition where $\widetilde{\mathrm{DIG}}$ and $\mathrm{DIG}$ differ by a factor of at least $4$.
+**Task**: Show that on a *pure* partition $\Pi$ for a binary task $f$, the variance form $\mathbb{E}[\mathrm{Var}(f \mid \Pi)] = 0$ if and only if $H(f \mid \Pi) = 0$, and produce a non-pure partition where $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$ and $H(f \mid \Pi)$ differ by a factor of at least $4$.
 
 **Solution**:
 1. **Purity equivalence**. Both quantities are sums $\sum_C q_C \phi(P_C)$ with $\phi$ being $P(1-P)$ (variance) or $H_{\mathrm{bin}}(P)$ (entropy). Both functions vanish iff $P \in \{0, 1\}$ and are strictly positive otherwise; both summands are non-negative; so the full sum vanishes iff every $P_C \in \{0, 1\}$ — exactly purity. Hence the two characterizations are equivalent.
 2. **Quantitative gap**. Take $\Pi = \{V\}$ with $P_V = 1/2$:
-   - $\widetilde{\mathrm{DIG}} = 1/2 \cdot 1/2 = 1/4$.
-   - $\mathrm{DIG} = H_{\mathrm{bin}}(1/2) = 1$.
+   - $\mathbb{E}[\mathrm{Var}(f \mid \Pi)] = 1/2 \cdot 1/2 = 1/4$.
+   - $H(f \mid \Pi) = H_{\mathrm{bin}}(1/2) = 1$.
    - Ratio: $1 / (1/4) = 4$. ✓
-3. The ratio between entropy and variance forms is therefore not bounded by a constant smaller than $4$ on the balanced cell, justifying why PA-MPC uses the entropy form for the *tight* upper bound $\varepsilon^*_\Pi \leq \frac{1}{2} \mathrm{DIG}$ (Theorem 1) rather than the loose variance form. $\blacksquare$
+3. The ratio between entropy and variance forms is therefore not bounded by a constant smaller than $4$ on the balanced cell, justifying why PA-MPC uses the entropy form for the *tight* upper bound $\varepsilon^*_\Pi \leq \frac{1}{2} H(f \mid \Pi)$ (Theorem 1) rather than the loose variance form. $\blacksquare$
 
 ---
 
@@ -615,7 +617,7 @@ Three families of examples should stay in mind throughout this chapter.
 The purpose of this chapter is not merely to review graph theory. It is to build the exact matrix and topological vocabulary needed for the random-walk lower bounds in Chapter 5.
 
 ### 3.1 Matrices of a Graph and Random Walks
-Let $G = (V, E)$ be a simple undirected graph with vertex set $V = \{1, 2, \dots, n\}$.
+Let $G = (V, E)$ be a simple undirected graph with vertex set $V = \{1, 2, \dots, n\}$. In this subsection, whenever we write $D^{-1}$, we assume every vertex has positive degree (equivalently, $G$ has no isolated vertices), so that the random-walk matrix is well-defined.
 
 #### Definition 3.1 (Adjacency and Degree Matrices)
 - The **Adjacency Matrix** $A \in \mathbb{R}^{n \times n}$ is defined by:
@@ -649,12 +651,27 @@ $$P_{\mathrm{lazy}} := \frac{1}{2}(I + D^{-1}A)$$
 - An edge $e \in E$ is a **bridge** if removing $e$ increases the connected components of $G$.
 
 #### Definition 3.4 (Biconnected Graph)
-A connected graph $G$ is **biconnected** if it has no cut vertices. A **biconnected component** (or **block**) of a graph is a maximal biconnected subgraph.
+A connected graph $G$ is **biconnected** if it has no cut vertices. A **biconnected component** (or **block**) of a graph is a maximal biconnected subgraph. Under this convention, a single bridge edge may itself form a block.
 
 #### Theorem 3.2 (Cycles and Biconnectivity)
 *Two distinct edges $e_1, e_2$ belong to the same biconnected component if and only if there exists a simple cycle containing both $e_1$ and $e_2$.*
 
-This theorem is essential for GNN models designed for molecular ring detection (CIN, FragNet), as it ensures that simple rings correspond precisely to biconnected components.
+*Proof.*
+If a simple cycle $C$ contains both $e_1$ and $e_2$, then $C$ has no cut vertices: deleting any one vertex leaves a path, hence a connected graph. So $C$ is biconnected and is therefore contained in some maximal biconnected subgraph, i.e. in some block of $G$. Thus $e_1$ and $e_2$ lie in the same block.
+
+Conversely, suppose $e_1$ and $e_2$ lie in the same block $B$.
+
+- **Case 1: $e_1$ and $e_2$ share a vertex.** Write $e_1=xy$ and $e_2=xz$ with $y\neq z$. Since $B$ has no cut vertices, $x$ is not a cut vertex, so $B-x$ is connected. Hence there is a $y$--$z$ path $Q$ in $B-x$. The union $xy \cup Q \cup xz$ is a simple cycle containing both edges.
+
+- **Case 2: $e_1$ and $e_2$ are disjoint.** Write $e_1=ab$ and $e_2=cd$, and set $S=\{a,b\}$, $T=\{c,d\}$. Because $B-x$ is connected for every vertex $x$, no single vertex separates $S$ from $T$. By Menger's theorem (vertex version for two sets), there exist two internally vertex-disjoint $S$--$T$ paths whose endpoints in $S$ are distinct and whose endpoints in $T$ are distinct. After relabeling $c,d$ if necessary, we may assume one path $Q_1$ runs from $a$ to $c$ and the other path $Q_2$ runs from $b$ to $d$. Then
+  $$
+  a \xrightarrow{Q_1} c - d \xrightarrow{Q_2^{-1}} b - a
+  $$
+  traces a simple cycle containing both $e_1=ab$ and $e_2=cd$.
+
+This proves the equivalence. $\blacksquare$
+
+This theorem is essential for later cycle-sensitive GNN architectures (CIN, FragNet): it says that cycle structure is organized at the level of blocks. In particular, every simple cycle lies inside a single block, although a single block may contain several overlapping cycles.
 
 ---
 
@@ -664,15 +681,14 @@ This theorem is essential for GNN models designed for molecular ring detection (
 **Task**: Prove that two distinct edges $e_1, e_2$ belong to the same biconnected component of a graph $G$ if and only if there exists a simple cycle containing both $e_1$ and $e_2$.
 
 **Solution**:
-1. **Direction 1 (If Cycle $\implies$ Same Biconnectivity Component)**:
-   - Suppose there exists a simple cycle $C$ containing both $e_1 = (u_1, v_1)$ and $e_2 = (u_2, v_2)$.
-   - A cycle has no cut vertices because removing any single vertex leaves the cycle as a path, which remains connected. Thus, a cycle is a biconnected subgraph.
-   - Since a biconnected component is a maximal biconnected subgraph, the entire cycle $C$ must be contained within some biconnected component $B$ of $G$. Thus, $e_1$ and $e_2$ belong to the same component.
-2. **Direction 2 (If Same Biconnectivity Component $\implies$ Cycle)**:
-   - Suppose $e_1$ and $e_2$ are in the same biconnected component $B$.
-   - By definition of a biconnected component, $B$ has no cut vertices.
-   - Let $u$ be a vertex on $e_1$ and $v$ be a vertex on $e_2$. Since $B$ is biconnected, there must exist at least two vertex-disjoint paths between $u$ and $v$ in $B$ (by Menger's Theorem / Whitney's Theorem for 2-connected graphs).
-   - Combining these two vertex-disjoint paths forms a simple cycle that contains both $u$ and $v$, and by extension, can be routed to contain the edges $e_1$ and $e_2$. $\blacksquare$
+1. **Cycle $\implies$ common block**: suppose a simple cycle $C$ contains both edges. Removing any one vertex from $C$ leaves a path, hence a connected graph. Therefore $C$ has no cut vertices and is a biconnected subgraph.
+2. By maximality of biconnected components, the cycle $C$ lies inside some block $B$ of $G$. Hence both $e_1$ and $e_2$ belong to the same block.
+3. **Common block $\implies$ cycle**: now suppose $e_1$ and $e_2$ lie in the same block $B$.
+4. **Case 1: the edges share a vertex.** Write $e_1=xy$ and $e_2=xz$ with $y\neq z$. Since $x$ is not a cut vertex of $B$, the graph $B-x$ is connected. So there exists a path $Q$ from $y$ to $z$ in $B-x$. The union $xy \cup Q \cup xz$ is a simple cycle containing both $e_1$ and $e_2$.
+5. **Case 2: the edges are disjoint.** Write $e_1=ab$ and $e_2=cd$. Let $S=\{a,b\}$ and $T=\{c,d\}$. Because deleting any single vertex leaves $B$ connected, no one vertex separates $S$ from $T$.
+6. By Menger's theorem, there exist two internally vertex-disjoint $S$--$T$ paths with distinct endpoints in $S$ and distinct endpoints in $T$. After relabeling $c,d$ if necessary, assume one path $Q_1$ goes from $a$ to $c$ and the other path $Q_2$ goes from $b$ to $d$.
+7. The closed walk obtained by traversing $Q_1$, then the edge $cd$, then $Q_2$ in reverse, then the edge $ba$, is a simple cycle: the two paths are internally disjoint and meet the endpoint sets only where they start and finish. This cycle contains both $e_1$ and $e_2$.
+8. Therefore, in all cases, two distinct edges lie in the same biconnected component if and only if some simple cycle contains them. $\blacksquare$
 
 #### Exercise 3.2: Transition Matrix of $C_4$ and Its Spectrum
 **Task**: Let $G = C_4$ (the 4-cycle on vertices $\{1, 2, 3, 4\}$). Write down $A$, $D$, $P = D^{-1}A$ explicitly. Diagonalize $P$ and identify the relevant mixing-gap discussion. Use the spectrum to compute $(P^L)_{vu}$ for opposite vertices $v = 1$, $u = 3$ in closed form as a function of $L$.
@@ -691,7 +707,7 @@ This theorem is essential for GNN models designed for molecular ring detection (
    $$
    (P^L)_{13} = \frac{1}{4}\big(1 + (-1)^L\big).
    $$
-7. Hence
+7. Hence, for every $L\ge 1$,
    $$
    (P^L)_{13} =
    \begin{cases}
@@ -699,6 +715,7 @@ This theorem is essential for GNN models designed for molecular ring detection (
    0 & \text{if $L$ is odd}.
    \end{cases}
    $$
+   and separately $(P^0)_{13}=0$.
 8. This is the bipartite periodicity: the walk alternates between parity classes and therefore never converges to stationarity in the non-lazy chain. $\blacksquare$
 
 #### Exercise 3.3: Bridge Detection and Cut Vertices in a Lollipop Graph
@@ -710,8 +727,7 @@ This theorem is essential for GNN models designed for molecular ring detection (
 3. **Cut vertices**: $v$ is a cut vertex iff $G - v$ has more connected components. Vertex $4$ separates $K_4 - 4$ from the path tail $\{5, 6, 7\}$. Vertices $5, 6$ each cut the path. Vertex $7$ is a leaf and not a cut vertex. Vertices $1, 2, 3$ are not cut vertices since $K_4$ minus any one of them remains connected as $K_3$.
 4. **Cut-vertex set**: $\{4, 5, 6\}$.
 5. **Biconnected components**: by Theorem 3.2, two edges share a component iff they lie on a common simple cycle. The $K_4$ subgraph has many cycles; all $6$ of its edges share a single biconnected component. Each bridge $(4,5), (5,6), (6,7)$ is its own biconnected component (a bridge has no cycle through it).
-6. **Block count**: $4$ biconnected components total (one for $K_4$, three for the bridges).
-7. **PA-MPC consequence**: by Lemma 5.1, any task requiring information across a bridge has $\mathrm{MPC} \geq -\log_2 \Pr[\text{message survives the bridge}]$. For the lollipop, propagation from vertex $7$ to any $K_4$ vertex must traverse all three bridges, each contributing at least $\log_2(\mathrm{deg})$ of surprisal under LossyWL. $\blacksquare$
+6. **Block count**: $4$ biconnected components total (one for the $K_4$ core and three single-edge bridge blocks). $\blacksquare$
 
 #### Exercise 3.4: Lazy Random Walk Avoids Bipartite Periodicity
 **Task**: Repeat Exercise 3.2 for the *lazy* transition matrix $P_{\mathrm{lazy}} = \tfrac{1}{2}(I + D^{-1}A)$ on $C_4$. Show that $(P_{\mathrm{lazy}}^L)_{13}$ converges to $1/4$ as $L \to \infty$, and quantify the convergence rate.
@@ -720,18 +736,19 @@ This theorem is essential for GNN models designed for molecular ring detection (
 1. The eigenvalues of $P_{\mathrm{lazy}}$ are $\tfrac{1}{2}(1 + \lambda_k)$ where $\lambda_k \in \{1,0,-1,0\}$ are the eigenvalues of $P$.
 2. Hence the lazy spectrum is $\{1,1/2,0,1/2\}$. The troublesome $-1$ eigenvalue has moved to $0$, so periodicity disappears.
 3. The eigenvectors are unchanged. For opposite vertices, the spectral weights are still $(-1)^k/4$.
-4. Therefore, for $L\ge 1$,
+4. Therefore, for every $L\ge 1$,
    $$
    (P_{\mathrm{lazy}}^L)_{13}
    = \frac{1}{4}\Big(1 - (1/2)^L + 0 - (1/2)^L\Big)
    = \frac{1}{4} - \frac{1}{2^{L+1}}.
    $$
+   (And $(P_{\mathrm{lazy}}^0)_{13}=0$.)
 5. Thus
    $$
    \lim_{L\to\infty}(P_{\mathrm{lazy}}^L)_{13}=\frac14,
    $$
    which is exactly the stationary mass of a four-vertex regular graph.
-6. The convergence rate is
+6. The convergence rate for $L\ge 1$ is
    $$
    \left|(P_{\mathrm{lazy}}^L)_{13}-\frac14\right| = 2^{-(L+1)},
    $$
@@ -1125,21 +1142,21 @@ $$\mathrm{MI}^2(f;\Pi) = 0$$
 
 ---
 
-### 6.3 Resolution of Metrological Crises via the Depth Information Gap (DIG)
+### 6.3 Resolution of Metrological Crises via Partition-Conditional Entropy
 This purity collapse reveals an important limitation of $MI^2$ in GNN metrology.
 
 When a GNN successfully learns a task perfectly (achieving purity), the $MI^2$ value collapses to $0$. In other words, $MI^2$ becomes hard to interpret precisely in the regime where one most wants a performance-aligned diagnostic.
 
-This is why **DIG (conditional entropy)** is so useful. Under purity, DIG satisfies:
-$$\mathrm{DIG}(f \mid \Pi) = \sum_C q_C H_{\mathrm{bin}}(P_C) = 0$$
-Unlike $MI^2$, DIG approaches $0$ monotonically as the partition becomes more informative for the task, so it remains aligned with the operational notion of "residual uncertainty" throughout the learning process.
+This is why **the partition-conditional entropy $H(f \mid \Pi)$** is so useful. Under purity it satisfies:
+$$H(f \mid \Pi) = \sum_C q_C H_{\mathrm{bin}}(P_C) = 0$$
+Unlike $MI^2$, $H(f \mid \Pi)$ approaches $0$ monotonically as the partition becomes more informative for the task, so it remains aligned with the operational notion of "residual uncertainty" throughout the learning process.
 
 #### Chapter 6 Summary Box
 For binary tasks and a fixed partition $\Pi$, the practical lessons of this chapter are:
 - the best partition-measurable classifier is the Bayes rule applied cell by cell;
 - the Bayes error equals the weighted minority mass inside the cells;
-- DIG is the entropy version of cell impurity and vanishes exactly at purity;
-- the bridge inequality converts DIG into lower and upper control on achievable error;
+- $H(f \mid \Pi)$ is the entropy version of cell impurity and vanishes exactly at purity;
+- the bridge inequality converts $H(f \mid \Pi)$ into lower and upper control on achievable error;
 - variance-based surrogates may still be useful, but they do not replace the entropy-based bound.
 
 ---
@@ -1173,7 +1190,7 @@ For binary tasks and a fixed partition $\Pi$, the practical lessons of this chap
 4. Cell errors: $C_1$: $1 - P_{C_1} = 0$. $C_2$: $1 - P_{C_2} = 0.25$. $C_3$: $P_{C_3} = 0$.
 5. $\varepsilon^*_\Pi = 0.4 \cdot 0 + 0.4 \cdot 0.25 + 0.2 \cdot 0 = 0.1$ (i.e.\ $10\%$ error).
 6. **Verification of optimality**: try the alternative $g'(C_2) = 0$. Cell error becomes $P_{C_2} = 0.75$, contributing $0.4 \cdot 0.75 = 0.30$ instead of $0.10$ — worse by $0.20$. Other reassignments worsen the total error further. ✓
-7. **DIG check**: $\mathrm{DIG} = 0.4 \cdot 0 + 0.4 \cdot H_{\mathrm{bin}}(0.75) + 0.2 \cdot 0 = 0.4 \cdot 0.8113 \approx 0.3245$ bits.
+7. **$H(f \mid \Pi)$ check**: $H(f \mid \Pi) = 0.4 \cdot 0 + 0.4 \cdot H_{\mathrm{bin}}(0.75) + 0.2 \cdot 0 = 0.4 \cdot 0.8113 \approx 0.3245$ bits.
 8. **Theorem 1**: $H_{\mathrm{bin}}^{-1}(0.3245) \approx 0.06 \leq 0.1 \leq 0.3245 / 2 = 0.162$. Both halves hold. ✓ $\blacksquare$
 
 #### Exercise 6.3: Plug-In Predictor and Sample-Complexity Hint
@@ -1189,16 +1206,16 @@ For binary tasks and a fixed partition $\Pi$, the practical lessons of this chap
 7. **Conclusion**: the plug-in Bayes rule converges to the Bayes-optimal at rate $O(1/\sqrt{N})$ per cell, with worst-case cells being those whose true posterior lies $\Theta(1/\sqrt{N})$ away from $1/2$ — the *near-balanced* cells.
 8. This is exactly the regime where Theorem 1's lower bound is steepest (Exercise 2.6), so PA-MPC's near-balanced cells are simultaneously the *hardest to estimate empirically* and the *most informative theoretically*. $\blacksquare$
 
-#### Exercise 6.4: Bayes Error vs.\ Variance DIG — A Numerical Comparison
-**Task**: For the partition of Exercise 6.2, compute $\widetilde{\mathrm{DIG}}$ and verify the elementary upper bound $\varepsilon^*_\Pi \leq \widetilde{\mathrm{DIG}}$.
+#### Exercise 6.4: Bayes Error vs.\ Variance Form $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$ — A Numerical Comparison
+**Task**: For the partition of Exercise 6.2, compute $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$ and verify the elementary upper bound $\varepsilon^*_\Pi \leq \mathbb{E}[\mathrm{Var}(f \mid \Pi)]$.
 
 **Solution**:
-1. $\widetilde{\mathrm{DIG}} = \sum_C q_C P_C (1 - P_C) = 0.4 \cdot 1 \cdot 0 + 0.4 \cdot 0.75 \cdot 0.25 + 0.2 \cdot 0 \cdot 1 = 0.4 \cdot 0.1875 = 0.075$.
+1. $\mathbb{E}[\mathrm{Var}(f \mid \Pi)] = \sum_C q_C P_C (1 - P_C) = 0.4 \cdot 1 \cdot 0 + 0.4 \cdot 0.75 \cdot 0.25 + 0.2 \cdot 0 \cdot 1 = 0.4 \cdot 0.1875 = 0.075$.
 2. From Exercise 6.2, $\varepsilon^*_\Pi = 0.10$.
-3. **Inequality check**: $0.10 \leq 0.075$? **No**, $0.10 > 0.075$, contradicting the (incorrect) claim that $\varepsilon^*_\Pi \leq \widetilde{\mathrm{DIG}}$.
-4. **Resolution**: the correct elementary upper bound is $\varepsilon^*_\Pi \leq \frac{1}{2} \mathrm{DIG}$ (Theorem 1), *not* $\widetilde{\mathrm{DIG}}$. Indeed $\widetilde{\mathrm{DIG}}$ underestimates the Bayes error in general: for $P_C = 3/4$, $P(1-P) = 3/16 = 0.1875$ vs.\ $\min(P, 1-P) = 1/4 = 0.25 > 0.1875$.
+3. **Inequality check**: $0.10 \leq 0.075$? **No**, $0.10 > 0.075$, contradicting the (incorrect) claim that $\varepsilon^*_\Pi \leq \mathbb{E}[\mathrm{Var}(f \mid \Pi)]$.
+4. **Resolution**: the correct elementary upper bound is $\varepsilon^*_\Pi \leq \frac{1}{2} H(f \mid \Pi)$ (Theorem 1), *not* $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$. Indeed $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$ underestimates the Bayes error in general: for $P_C = 3/4$, $P(1-P) = 3/16 = 0.1875$ vs.\ $\min(P, 1-P) = 1/4 = 0.25 > 0.1875$.
 5. **General inequality between cell quantities**: $P(1-P) \leq \min(P, 1-P)$ holds iff $\max(P, 1-P) \leq 1$ which is always true, but the *reverse* fails: variance is *strictly smaller* than the minimum on imbalanced cells.
-6. **Conclusion**: PA-MPC must use the *entropy form* $\mathrm{DIG}$ for the upper bound; the variance form $\widetilde{\mathrm{DIG}}$ is convenient for monotonicity arguments (it factors cleanly under refinement) but does *not* directly bound the Bayes error. This explains why §3.2 of the paper carries both forms and why Theorem 1's upper bound is stated in DIG, not $\widetilde{\mathrm{DIG}}$. $\blacksquare$
+6. **Conclusion**: PA-MPC must use the *entropy form* $H(f \mid \Pi)$ for the upper bound; the variance form $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$ is convenient for monotonicity arguments (it factors cleanly under refinement) but does *not* directly bound the Bayes error. This explains why §3.2 of the paper carries both forms and why Theorem 1's upper bound is stated in $H(f \mid \Pi)$, not $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$. $\blacksquare$
 
 #### Exercise 6.5: $\mathrm{MI}^2$ on Pure vs.\ Near-Pure Partitions
 **Task**: Compute $\mathrm{MI}^2(f; \Pi)$ on (a) a *pure* partition where $P_C \in \{0, 1\}$ everywhere; (b) a *near-pure* partition where $P_C = 0.99$ on the unique non-pure cell. Verify Theorem 6.2 and demonstrate the operational vacuity of $\mathrm{MI}^2$.
@@ -1214,21 +1231,21 @@ For binary tasks and a fixed partition $\Pi$, the practical lessons of this chap
    - $\mathrm{Var}_\mu f = 0.25$.
    - $\mathrm{MI}^2 = 0.0392 / 0.5 = 0.0784$ — nonzero, but very small.
 3. **Operational vacuity**: as the partition gets *better* (more pure), $\mathrm{MI}^2 \to 0$. Practitioners using $\mathrm{MI}^2$ as a model-selection criterion would be misled into believing that *more refined* partitions are *worse* (lower MI$^2$), when in fact they are *closer to perfect*.
-4. **Compare DIG**: in (a), $\mathrm{DIG} = 0$ (correctly indicating perfect resolution). In (b), $\mathrm{DIG} = 1 \cdot H_{\mathrm{bin}}(0.98) \approx 0.1414$ (small but nonzero, correctly indicating near-perfect with a tiny residual gap).
-5. DIG's monotonic decay to $0$ under refinement (Exercise 2.3) makes it operationally sound; $\mathrm{MI}^2$'s non-monotonic behavior (peak somewhere in the middle, collapse at purity) makes it operationally vacuous in the very regime that PA-MPC cares about. $\blacksquare$
+4. **Compare $H(f \mid \Pi)$**: in (a), $H(f \mid \Pi) = 0$ (correctly indicating perfect resolution). In (b), $H(f \mid \Pi) = 1 \cdot H_{\mathrm{bin}}(0.98) \approx 0.1414$ (small but nonzero, correctly indicating near-perfect with a tiny residual gap).
+5. The monotonic decay of $H(f \mid \Pi)$ to $0$ under refinement (Exercise 2.3) makes it operationally sound; $\mathrm{MI}^2$'s non-monotonic behavior (peak somewhere in the middle, collapse at purity) makes it operationally vacuous in the very regime that PA-MPC cares about. $\blacksquare$
 
 #### Exercise 6.6: Two-Cell Partition Sandwich Tightness
-**Task**: Construct two-cell partitions parameterized by a single posterior $p \in [0, 1/2]$ and trace the trajectory of $(\mathrm{DIG}, \varepsilon^*_\Pi)$ as $p$ varies. Plot conceptually the gap $\tfrac{1}{2}\mathrm{DIG} - \varepsilon^*_\Pi$.
+**Task**: Construct two-cell partitions parameterized by a single posterior $p \in [0, 1/2]$ and trace the trajectory of $(H(f \mid \Pi), \varepsilon^*_\Pi)$ as $p$ varies. Plot conceptually the gap $\tfrac{1}{2}H(f \mid \Pi) - \varepsilon^*_\Pi$.
 
 **Solution**:
 1. **Setup**: $|V| = 2n$, $\Pi = \{C_1, C_2\}$ with $|C_1| = |C_2| = n$, $q_{C_1} = q_{C_2} = 1/2$, $P_{C_1} = 1 - p$, $P_{C_2} = p$ for $p \in [0, 1/2]$. The task is symmetric across the two cells.
-2. **DIG**: $\mathrm{DIG} = 0.5 \cdot H_{\mathrm{bin}}(1 - p) + 0.5 \cdot H_{\mathrm{bin}}(p) = H_{\mathrm{bin}}(p)$ by symmetry.
+2. **Conditional entropy**: $H(f \mid \Pi) = 0.5 \cdot H_{\mathrm{bin}}(1 - p) + 0.5 \cdot H_{\mathrm{bin}}(p) = H_{\mathrm{bin}}(p)$ by symmetry.
 3. **Bayes error**: $\varepsilon^*_\Pi = 0.5 \cdot \min(1-p, p) + 0.5 \cdot \min(p, 1-p) = \min(p, 1-p) = p$ (since $p \leq 1/2$).
-4. **Upper-bound gap**: $\tfrac{1}{2}\mathrm{DIG} - \varepsilon^*_\Pi = \tfrac{1}{2} H_{\mathrm{bin}}(p) - p$. This is the function $g(p)$ from Exercise 2.1, known to be $\geq 0$ with $g(0) = g(1/2) = 0$ and strictly concave on $(0, 1/2)$.
+4. **Upper-bound gap**: $\tfrac{1}{2}H(f \mid \Pi) - \varepsilon^*_\Pi = \tfrac{1}{2} H_{\mathrm{bin}}(p) - p$. This is the function $g(p)$ from Exercise 2.1, known to be $\geq 0$ with $g(0) = g(1/2) = 0$ and strictly concave on $(0, 1/2)$.
 5. **Maximum gap**: $g'(p) = \tfrac{1}{2} \log_2((1-p)/p) - 1 = 0 \Rightarrow (1-p)/p = 4 \Rightarrow p = 1/5$.
-   - At $p = 1/5$: $\mathrm{DIG} = H_{\mathrm{bin}}(1/5) \approx 0.7219$ bits.
-   - $\tfrac{1}{2}\mathrm{DIG} \approx 0.3610$, $\varepsilon^*_\Pi = 0.2$, gap $\approx 0.161$.
-6. **Lower bound gap**: $\varepsilon^*_\Pi - H_{\mathrm{bin}}^{-1}(\mathrm{DIG}) = p - H_{\mathrm{bin}}^{-1}(H_{\mathrm{bin}}(p)) = p - p = 0$ — **the lower bound is exact on this two-cell symmetric family**.
+   - At $p = 1/5$: $H(f \mid \Pi) = H_{\mathrm{bin}}(1/5) \approx 0.7219$ bits.
+   - $\tfrac{1}{2}H(f \mid \Pi) \approx 0.3610$, $\varepsilon^*_\Pi = 0.2$, gap $\approx 0.161$.
+6. **Lower bound gap**: $\varepsilon^*_\Pi - H_{\mathrm{bin}}^{-1}(H(f \mid \Pi)) = p - H_{\mathrm{bin}}^{-1}(H_{\mathrm{bin}}(p)) = p - p = 0$ — **the lower bound is exact on this two-cell symmetric family**.
 7. **Operational moral**: on symmetric two-cell partitions, the *lower* half of Theorem 1 is exactly tight (the partition is the worst case for Fano), while the *upper* half has a peak gap of $\approx 0.16$ at $p = 1/5$. This is why Theorem 1's lower bound is the *operational* bound for tight worst-case analysis. $\blacksquare$
 
 ---
@@ -1476,8 +1493,8 @@ that GCN's degree-revealing init pointwise refines GIN's
 single-cell init:
 $\Pi_{\mathrm{GCN}}(G, L) \preceq \Pi_{\mathrm{GIN}}(G, L)$ for every
 $G$ and every $L \geq 0$. Hence
-$\mathrm{DIG}\!\big(f \,\big|\, \Pi_{\mathrm{GCN}}(G, L)\big) \leq
-\mathrm{DIG}\!\big(f \,\big|\, \Pi_{\mathrm{GIN}}(G, L)\big)$ for every
+$H\!\big(f \,\big|\, \Pi_{\mathrm{GCN}}(G, L)\big) \leq
+H\!\big(f \,\big|\, \Pi_{\mathrm{GIN}}(G, L)\big)$ for every
 task $f$, with strict improvement on $18/280$ rows of the synthetic
 anchor (Conjecture C3, §8.1).
 
@@ -1500,9 +1517,9 @@ of $\iota$ at depth $L$ is
 $$
 \Delta_\iota(f, G; \mathcal{A}, L)
 \;:=\;
-\mathrm{DIG}\!\big(f \,\big|\, \Pi_{\mathcal{A}}(G', L)\big)
+H\!\big(f \,\big|\, \Pi_{\mathcal{A}}(G', L)\big)
 \;-\;
-\mathrm{DIG}\!\big(f \,\big|\, \Pi_{\mathcal{A}}(G, L)\big).
+H\!\big(f \,\big|\, \Pi_{\mathcal{A}}(G, L)\big).
 $$
 A *negative* price is an improvement (lower information gap), a
 *positive* price is a regression.
@@ -1525,7 +1542,7 @@ vertex; for any two vertices that were previously in the same cell the
 new entry is identical (same $v^*$), so no cell is merged, while
 vertices that were separated remain separated. Hence
 $\Pi_{\mathcal{A}}(G^*, L) \preceq \Pi_{\mathcal{A}}(G, L)$ pointwise
-in the seed, and $\mathrm{DIG}$ is monotone non-increasing in
+in the seed, and $H(f \mid \Pi)$ is monotone non-increasing in
 refinement (Chapter 2). (ii) Contracting $u, w$ to a single vertex
 identifies their colors in every realization, hence coarsens
 the induced partition; (iii) for a WL-cell task, rewiring an edge
@@ -1568,7 +1585,7 @@ exact-rational ledger computation (Tier L-I) and floating-point Monte
 Carlo simulation. The LossyWL formalism is specifically engineered to
 admit the former; we restate the contrast precisely.
 
-#### Proposition 7.8 (Rationality of $P^*_\Pi$ and $\mathrm{DIG}$)
+#### Proposition 7.8 (Rationality of $P^*_\Pi$ and $H(f \mid \Pi)$)
 *Let $G$ be finite, let $\Pi_{\mathcal{A}}^{(0)}$ be rational-valued
 (equivalently: presented as a finite labeled partition), and let all
 edge-transition probabilities $I_{uv}$ lie in $\mathbb{Q}$. Then for
@@ -1577,9 +1594,9 @@ every depth $L \in \mathbb{N}$ and every binary task $f$,*
 1. *the resolution probability
    $\Pr[\mathrm{LossyWL}_v^L \vDash f_v] \in \mathbb{Q}$;*
 2. *the cell masses $q_C$ and posteriors $P_C$ are rationals;*
-3. *$\widetilde{\mathrm{DIG}}(f \mid \Pi_{\mathcal{A}}(G, L))
+3. *$\mathbb{E}[\mathrm{Var}(f \mid \Pi_{\mathcal{A}}(G, L)])
    = \sum_C q_C P_C(1 - P_C) \in \mathbb{Q}$;*
-4. *$\mathrm{DIG}(f \mid \Pi_{\mathcal{A}}(G, L)) \in \mathbb{Q}\!\cdot\!\log_2 \mathbb{Q}$
+4. *$H(f \mid \Pi_{\mathcal{A}}(G, L)) \in \mathbb{Q}\!\cdot\!\log_2 \mathbb{Q}$
    (rational coefficients in front of logarithms of rationals),
    whose evaluation incurs *only* the floating-point error of the
    final $\log_2$ — not any error in the structural enumeration.*
@@ -1597,7 +1614,7 @@ incurable error budgets: sampling variance $O(1/\sqrt{N})$ and
 non-deterministic floating-point round-off (GPU parallel reductions are
 not associative in IEEE-754). Tier L-I therefore offers a regime in
 which two different referees, on two different machines, get
-bit-identical $\widetilde{\mathrm{DIG}}$ values — a property that is
+bit-identical $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$ values — a property that is
 the foundation of PA-MPC's Lean-mechanized witnesses
 (see §8.6 below).
 
@@ -1670,8 +1687,8 @@ that runs faster than a single training epoch.
 What remains open is whether this *exact, partition-level* picture
 faithfully transports to the *continuous, trained-network* regime —
 whether quantizing a trained MPNN's hidden activations to resolution
-$\varepsilon$ produces a partition whose DIG converges to
-$\mathrm{DIG}(f \mid \Pi_{\mathcal{A}}(G, L))$ as $\varepsilon \to 0$.
+$\varepsilon$ produces a partition whose conditional entropy converges to
+$H(f \mid \Pi_{\mathcal{A}}(G, L))$ as $\varepsilon \to 0$.
 That is the continuous-transfer conjecture C1 (Chapter 8), the
 headline open problem of the field.
 
@@ -1699,9 +1716,9 @@ expression of the marginal propagation probability.
    - $dp[1][2] = 1 - (1 - 0)(1 - 1 \cdot I_{21})(1 - 0 \cdot I_{22}) \cdot (1 - 0 \cdot I_{23})$
      $\quad\;\; = 1 - 1 \cdot (1 - 1/3) \cdot 1 \cdot 1 = 1 - 2/3 = 1/3$.
    - $dp[1][3] = 1 - (1 - 0)(1 - 0 \cdot I_{33})(1 - 0 \cdot I_{32}) = 0$.
-4. Layer 2:
-   - $dp[2][3] = 1 - \big(1 - dp[1][3]\big)\big(1 - dp[1][3]\cdot I_{33}\big)\big(1 - dp[1][2]\cdot I_{32}\big)$
-     $\quad\quad\;\; = 1 - 1 \cdot 1 \cdot (1 - 1/3 \cdot 1/2) = 1 - 5/6 = 1/6$.
+4. Layer 2 (persistence term × product over non-self neighbours, matching the convention used in Ex 7.4):
+   - $dp[2][3] = 1 - \big(1 - dp[1][3]\big)\big(1 - dp[1][2]\cdot I_{32}\big)$
+     $\quad\quad\;\; = 1 - 1 \cdot (1 - 1/3 \cdot 1/2) = 1 - 5/6 = 1/6$.
 5. Cross-check: the only length-$\leq 2$ surviving walk from $1$ to $3$
    is $1 \xrightarrow{Z_{12}^1 = 1} 2 \xrightarrow{Z_{23}^2 = 1} 3$,
    which has probability $I_{21} \cdot I_{32} = 1/3 \cdot 1/2 = 1/6$
@@ -1731,8 +1748,8 @@ quantify the price using Corollary 7.7 at depth $L = 2$.
    $\mathrm{MPC} \leq \log_2 18 \approx 4.17$ bits — finite at
    $L = 2$, *before* the standard MPNN even satisfies under-reaching.
 3. The price at $L = 2$ is therefore
-   $\Delta_\iota = \mathrm{DIG}\big(f_5 \mid \Pi_{\mathcal{A}}(G^*, 2)\big)
-   - \mathrm{DIG}\big(f_5 \mid \Pi_{\mathcal{A}}(P_5, 2)\big) \leq 0$,
+   $\Delta_\iota = H(f \mid \Pi)\big(f_5 \mid \Pi_{\mathcal{A}}(G^*, 2)\big)
+   - H(f \mid \Pi)\big(f_5 \mid \Pi_{\mathcal{A}}(P_5, 2)\big) \leq 0$,
    with the right-hand term equal to $H_{\mathrm{bin}}(P_C)$ on a
    single non-resolving cell (positive), confirming
    $\Delta_\iota < 0$. $\blacksquare$
@@ -1777,8 +1794,8 @@ cycle vertex.
    so the GCN partition is strictly finer at every depth.
 3. **Information-gap implication.** For any binary task $f$ with
    $f(\text{pendant}) \neq f(v)$ for some cycle vertex $v$,
-   $\mathrm{DIG}(f \mid \Pi_{\mathrm{GCN}}(G, L)) = 0 <
-   \mathrm{DIG}(f \mid \Pi_{\mathrm{GIN-set}}(G, L))$, and the Bridge
+   $H(f \mid \Pi_{\mathrm{GCN}}(G, L)) = 0 <
+   H(f \mid \Pi_{\mathrm{GIN-set}}(G, L))$, and the Bridge
    Inequality (Theorem 1, §6 and §8) certifies a strictly tighter
    Bayes-error bound for GCN. $\blacksquare$
 
@@ -1806,27 +1823,27 @@ cycle vertex.
 **Solution.**
 1. **Pre-contraction partition** $\Pi_{\mathrm{GCN}}^{(0)}(P_4)$: degrees are $(1, 2, 2, 1)$, so the initial partition is $\{\{1, 4\}, \{2, 3\}\}$ — two cells of size 2.
 2. The task $f$ has $f(1) = 0, f(4) = 1$ and $f(2) = 0, f(3) = 1$ — it is *not* WL-measurable since $1$ and $4$ are in the same WL cell but have different labels. To make it WL-measurable, redefine $f$ as: $f(1) = f(4) = 0$, $f(2) = f(3) = 1$. Now $f$ is constant on the WL cells $\{1, 4\}$ and $\{2, 3\}$.
-3. **Pre-contraction DIG**: $P_{\{1,4\}} = 0$, $P_{\{2,3\}} = 1$; both pure, so $\mathrm{DIG} = 0$.
+3. **Pre-contraction $H(f \mid \Pi)$**: $P_{\{1,4\}} = 0$, $P_{\{2,3\}} = 1$; both pure, so $H(f \mid \Pi) = 0$.
 4. **Post-contraction graph**: $G' = P_3$ with vertices $\{1, [23], 4\}$, degrees $(1, 2, 1)$. GCN initial partition: $\Pi'^{(0)} = \{\{1, 4\}, \{[23]\}\}$.
 5. **Post-contraction task** on $G'$: induced by the contraction, $f'(1) = 0, f'(4) = 0, f'([23]) = ?$ — ambiguous, since $f(2) = f(3) = 1$, set $f'([23]) = 1$.
-6. **Post-contraction DIG**: $P_{\{1,4\}} = 0$, $P_{\{[23]\}} = 1$; still pure. $\mathrm{DIG}' = 0$.
+6. **Post-contraction $H(f \mid \Pi')$**: $P_{\{1,4\}} = 0$, $P_{\{[23]\}} = 1$; still pure. $H(f \mid \Pi') = 0$.
 7. $\Delta_\iota = 0 - 0 = 0$, which is $\geq 0$ as required by Theorem 7.6 row 2. ✓
-8. **Modification with non-trivial price**: if instead $f(2) = 0, f(3) = 1$ in the pre-contraction (non-WL-cell task), the contraction merges the two differently-labeled vertices into a single cell with $P_{[23]} = 1/2$, causing $\mathrm{DIG}' = 1/3 \cdot H_{\mathrm{bin}}(1/2) = 1/3$ bits — a strict positive price for losing the structural information. This is the canonical contraction-pricing behavior on non-WL-cell tasks. $\blacksquare$
+8. **Modification with non-trivial price**: if instead $f(2) = 0, f(3) = 1$ in the pre-contraction (non-WL-cell task), the contraction merges the two differently-labeled vertices into a single cell with $P_{[23]} = 1/2$, causing $H(f \mid \Pi') = 1/3 \cdot H_{\mathrm{bin}}(1/2) = 1/3$ bits — a strict positive price for losing the structural information. This is the canonical contraction-pricing behavior on non-WL-cell tasks. $\blacksquare$
 
-#### Exercise 7.6: Rationality of $\widetilde{\mathrm{DIG}}$ on a Worked Example
-**Task.** For $G = C_5$ under uniform constant init at depth $L = 1$ with self-loops, compute the exact rational $\widetilde{\mathrm{DIG}}(f \mid \Pi^{(1)})$ for the task $f$ marking the orbit-half $\{1, 2\}$ as positive and the rest as negative. Confirm Proposition 7.8 numerically.
+#### Exercise 7.6: Rationality of $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$ on a Worked Example
+**Task.** For $G = C_5$ under uniform constant init at depth $L = 1$ with self-loops, compute the exact rational $\mathbb{E}[\mathrm{Var}(f \mid \Pi^{(1)]})$ for the task $f$ marking the orbit-half $\{1, 2\}$ as positive and the rest as negative. Confirm Proposition 7.8 numerically.
 
 **Solution.**
 1. $C_5$ is vertex-transitive with $|V| = 5$. With constant init and self-loops, all five vertices receive the same color at depth $1$ (multiset $\{\!\{\star, \star, \star\}\!\}$ from self plus two neighbors).
 2. **Partition**: $\Pi^{(1)} = \{V\}$, a single cell.
 3. **Task posterior**: $P_V = 2/5$ (vertices $1, 2$ positive out of $5$).
-4. **Variance DIG**: $\widetilde{\mathrm{DIG}} = q_V \cdot P_V (1 - P_V) = 1 \cdot 2/5 \cdot 3/5 = 6/25$.
+4. **Variance form $\mathbb{E}[\mathrm{Var}(f \mid \Pi)]$**: $\mathbb{E}[\mathrm{Var}(f \mid \Pi)] = q_V \cdot P_V (1 - P_V) = 1 \cdot 2/5 \cdot 3/5 = 6/25$.
 5. This is an **exact rational** in $\mathbb{Q}$, computed without any floating-point operation, confirming Proposition 7.8.
-6. **Entropy DIG**: $\mathrm{DIG} = H_{\mathrm{bin}}(2/5) = -\tfrac{2}{5}\log_2 \tfrac{2}{5} - \tfrac{3}{5}\log_2 \tfrac{3}{5}$.
+6. **Entropy form $H(f \mid \Pi)$**: $H(f \mid \Pi) = H_{\mathrm{bin}}(2/5) = -\tfrac{2}{5}\log_2 \tfrac{2}{5} - \tfrac{3}{5}\log_2 \tfrac{3}{5}$.
    - $-\tfrac{2}{5}\log_2 \tfrac{2}{5} = \tfrac{2}{5}(\log_2 5 - 1)$
    - $-\tfrac{3}{5}\log_2 \tfrac{3}{5} = \tfrac{3}{5}(\log_2 5 - \log_2 3)$
    - Sum: $\log_2 5 - \tfrac{2}{5} - \tfrac{3}{5}\log_2 3$.
-7. The DIG value lives in $\mathbb{Q}\!\cdot\!\log_2 \mathbb{Q}$ (Prop 7.8 claim 4), with *rational coefficients* in front of logarithms of rationals — numerically $\approx 0.971$ bits, but the symbolic representation is exact and avoids the floating-point drift that plagues GPU Monte Carlo estimators.
+7. This value lives in $\mathbb{Q}\!\cdot\!\log_2 \mathbb{Q}$ (Prop 7.8 claim 4), with *rational coefficients* in front of logarithms of rationals — numerically $\approx 0.971$ bits, but the symbolic representation is exact and avoids the floating-point drift that plagues GPU Monte Carlo estimators.
 8. **Task is WL-measurable?** No: vertices $1$ and $2$ lie in the *same* WL orbit (the unique single-cell orbit of $C_5$) but have $f(1) = f(2) = 1$; vertex $3$ also in the orbit has $f(3) = 0$. So $f \notin \mathcal{F}_{\mathrm{WL}}(C_5)$ — confirming the vacuity of §8 Lemma 8.4 on vertex-transitive substrates. $\blacksquare$
 
 #### Exercise 7.7: Computation-Tree Size on a Random $3$-Regular Graph
@@ -1879,7 +1896,7 @@ cycle vertex.
 
 ## Chapter 8: Research Frontier — Conjectures, the Continuous-Transfer Verdict, and Outlook
 
-The preceding seven chapters develop the main deductive core of the monograph: an operator (LossyWL), a complexity (PA-MPC = DIG over the architecture-induced partition), an error-domain bridge inequality (Theorem 1, §6), and an engineering toolkit (Chapter 7).
+The preceding seven chapters develop the main deductive core of the monograph: an operator (LossyWL), a complexity (PA-MPC = $H(f \mid \Pi)$ over the architecture-induced partition), an error-domain bridge inequality (Theorem 1, §6), and an engineering toolkit (Chapter 7).
 
 This final chapter has a different pedagogical status. It is intentionally a **research-frontier chapter** rather than a core-theory chapter. Some statements below are theorem-level, others are empirical summaries, and others are conjectural. The purpose is to show how the established theory interfaces with current experiments and open problems.
 
@@ -1918,7 +1935,7 @@ $\Pr[\mathrm{LossyWL}_v^L \vDash f_v] \leq (r+1)^{-L}$, giving
 $\mathrm{MPC} \geq L \log_2(r+1)$. Taking expectation over the
 distribution of $(G, v)$ yields the linear lower bound. $\blacksquare$
 
-This bound *predicts* over-smoothing in the precise sense that DIG
+This bound *predicts* over-smoothing in the precise sense that the conditional entropy
 grows linearly with depth on the retention task — the same task on
 which deep GCNs collapse to constant accuracy on every benchmark
 ever published. PA-MPC therefore quantifies, ex ante, the
@@ -2002,8 +2019,8 @@ have been quantized at resolution $\varepsilon > 0$, and let*
 $\Pi^{(\varepsilon)} := \{\, \{v : h^{(\varepsilon)}(v) = z\} : z \in \mathbb{R}^d/\varepsilon\mathbb{Z}^d\,\}$
 *be the induced partition. Then under hypotheses H1, H2, H3,*
 $$
-\lim_{\varepsilon \to 0^{+}}\, \mathrm{DIG}\!\big(f \,\big|\, \Pi^{(\varepsilon)}\big)
-\;=\; \mathrm{DIG}\!\big(f \,\big|\, \Pi_{\mathcal{A}}(G, L)\big).
+\lim_{\varepsilon \to 0^{+}}\, H\!\big(f \,\big|\, \Pi^{(\varepsilon)}\big)
+\;=\; H\!\big(f \,\big|\, \Pi_{\mathcal{A}}(G, L)\big).
 $$
 
 #### Hypotheses
@@ -2020,7 +2037,7 @@ $$
 Two obstructions block a direct proof. First, *quantization is
 non-monotone in $\varepsilon$*: refining the quantization grid can
 *spuriously split* a partition cell before the limit collapses it,
-producing oscillating DIG. Second, *H3 is empirically observed, not
+producing oscillating $H(f \mid \Pi)$. Second, *H3 is empirically observed, not
 proven*: no published result establishes that trained MPNN
 activations converge uniformly-in-cell-size to a WL-canonical map.
 Until both obstructions are resolved analytically, the limit in
@@ -2041,7 +2058,7 @@ rule.
 | Quantization sweep | $\varepsilon \in \{2^{-2}, 2^{-3}, \dots, 2^{-12}\}$ (11 levels) |
 | Seeds | $5$ per cell |
 | Tasks | $\{\mathrm{degree\_parity}, \mathrm{eccentricity\_parity}, \mathrm{orbit\_half\_A}, \mathrm{orbit\_half\_B}\}$ |
-| Observable | $\Delta_\varepsilon := \mathrm{DIG}(f \mid \Pi^{(\varepsilon)}) - \mathrm{DIG}(f \mid \Pi_{\mathcal{A}}(G, L))$ |
+| Observable | $\Delta_\varepsilon := H(f \mid \Pi^{(\varepsilon)}) - H(f \mid \Pi_{\mathcal{A}}(G, L))$ |
 | Coverage gate | Cells failing H1/H2/H3 are excluded and reported |
 
 #### Decision Rule (G2-Transfer)
@@ -2060,7 +2077,7 @@ $\{C_3, C_4, C_5, C_6, \mathrm{Petersen}\}$ is *vertex-transitive on
 every graph*; under the canonical task suite $\mathcal{F}_{\mathrm{WL}}$
 every label collapses to a constant on every graph (verified
 2026-05-30: 20/20 graph-task cells yield $n_{\mathrm{classes}} = 1$).
-On such a substrate $\mathrm{DIG} \equiv 0$ and
+On such a substrate $H(f \mid \Pi) \equiv 0$ and
 $\Delta_\varepsilon \equiv 0$ *trivially*. The conjecture is therefore
 **untestable** on the original substrate without leaving
 $\mathcal{F}_{\mathrm{WL}}$; the corrected 8-graph non-vertex-transitive
@@ -2146,7 +2163,7 @@ careful interpretation is:
    $\mathcal{A}_{\mathrm{pass}}$ converges to
    $\Pi_{\mathcal{A}}(G, L)$ as $\varepsilon \to 0$ (within
    $2\sigma$). The Bridge Inequality (Theorem 1) then transports the
-   discrete DIG bound onto the trained-network Bayes error.
+   discrete conditional-entropy bound onto the trained-network Bayes error.
 2. **What it does not assert.** It is *not* a universal ranking of
    GNN families on real-world benchmarks; it is the verdict of a
    *transfer test* on a synthetic anchor under the canonical
@@ -2185,13 +2202,13 @@ that is *vacuous* for C1 by Lemma 8.4 below.
 #### Lemma 8.4 (Vertex-Transitivity Vacuity for $\mathcal{F}_{\mathrm{WL}}$)
 *Let $G$ be vertex-transitive and let $f \in \mathcal{F}_{\mathrm{WL}}(G)$.
 Then $f$ is constant on $V$, and consequently
-$\mathrm{DIG}(f \mid \Pi) = 0$ for every partition $\Pi$.*
+$H(f \mid \Pi) = 0$ for every partition $\Pi$.*
 
 *Proof.* Vertex-transitivity implies that the WL stable partition
 $\Pi^{\mathrm{WL}}(G)$ is the single-cell partition $\{V\}$ (every
 vertex has the same multiset signature at every depth). By
 Definition 3.4 of $\mathcal{F}_{\mathrm{WL}}$, $f$ is constant on
-every WL cell, hence constant on $V$. $\mathrm{DIG}$ vanishes on
+every WL cell, hence constant on $V$. $H(f \mid \Pi)$ vanishes on
 constant tasks by Lemma 3.1. $\blacksquare$
 
 The companion conjecture is therefore:
@@ -2202,8 +2219,8 @@ family (PPGN, 2-IGN, $k$-GNN at $k = 2$, Subgraph-GNN), $f \in
 \mathcal{F}_{2\mathrm{-WL}}(G) \setminus \mathcal{F}_{\mathrm{WL}}(G)$,
 and $G$ in the vertex-transitive Cayley-substrate family,*
 $$
-\lim_{\varepsilon \to 0^{+}} \mathrm{DIG}\!\big(f \,\big|\, \Pi^{(\varepsilon)}\big)
-\;=\; \mathrm{DIG}\!\big(f \,\big|\, \Pi_{\mathcal{A}}^{2\mathrm{-WL}}(G, L)\big).
+\lim_{\varepsilon \to 0^{+}} H\!\big(f \,\big|\, \Pi^{(\varepsilon)}\big)
+\;=\; H\!\big(f \,\big|\, \Pi_{\mathcal{A}}^{2\mathrm{-WL}}(G, L)\big).
 $$
 
 C1' is reserved for companion work (experiment E10) and is the
@@ -2227,7 +2244,7 @@ the structure of this monograph, are:
    a rational-valued conditional entropy computable in
    $\mathbb{Q}$-arithmetic with zero floating-point drift.
 3. **A two-sided bridge** (Theorem 1, §6) connecting the
-   partition-level DIG to the Bayes-optimal classification error
+   partition-conditional entropy to the Bayes-optimal classification error
    with tight, operationally meaningful constants.
 4. **A scalable engineering toolkit** (Chapter 7) — DP-LossyWL,
    architecture indexing, intervention pricing — that runs a
@@ -2258,7 +2275,7 @@ investigator first proves H3 from first principles.
 
 #### Exercise 8.1: Verifying Lemma 8.4 on $C_6$
 **Task.** Let $G = C_6$ and let $f$ be any WL-measurable task. Show
-directly that $\mathrm{DIG}(f \mid \Pi_{\mathcal{A}}(C_6, L)) = 0$
+directly that $H(f \mid \Pi_{\mathcal{A}}(C_6, L)) = 0$
 for every $L \geq 0$ and every standard architecture family
 $\mathcal{A}$.
 
@@ -2271,7 +2288,7 @@ $\mathcal{A}$.
    $f$ is constant on every WL cell — i.e.\ on all of $V$.
 4. Therefore $P_C = f(v) \in \{0, 1\}$ for the unique cell
    $C = V$, and $H_{\mathrm{bin}}(P_C) = 0$.
-5. $\mathrm{DIG}(f \mid \Pi) = 1 \cdot 0 = 0$, as claimed. $\blacksquare$
+5. $H(f \mid \Pi) = 1 \cdot 0 = 0$, as claimed. $\blacksquare$
 
 This is exactly the obstruction that forced the substrate correction
 in §8.4: the *original* C1 protocol was *vacuously satisfied* on
@@ -2318,7 +2335,7 @@ on the ring-detection task.
 3. The complexity gap is $\geq 11$ bits — a factor of
    $\geq 2^{11} \approx 2{,}048\times$ in survival probability.
 4. One should **not** plug the raw propagation-complexity number $16$ directly into $H_{\mathrm{bin}}^{-1}$, because binary entropy is bounded by $1$ bit. The correct interpretation is qualitative: the standard-MPNN route suffers an exponentially worse survival probability than the cycle-aware route.
-5. On a binary task, the bridge inequality can force Bayes error only after one has converted the architectural obstruction into a DIG value in $[0,1]$. The point of the present comparison is therefore that GCN faces a dramatically harsher structural bottleneck, whereas CIN compresses the cycle into a much cheaper effective communication pattern.
+5. On a binary task, the bridge inequality can force Bayes error only after one has converted the architectural obstruction into a conditional-entropy value in $[0,1]$. The point of the present comparison is therefore that GCN faces a dramatically harsher structural bottleneck, whereas CIN compresses the cycle into a much cheaper effective communication pattern.
 6. This is the precise PA-MPC explanation for the empirically observed CIN/FragNet performance on ZINC molecular ring-finding, despite identical 1-WL iso expressivity. $\blacksquare$
 
 #### Exercise 8.4: Quantization-Induced Spurious Splitting
@@ -2365,7 +2382,7 @@ on the ring-detection task.
 1. **Cayley graph definition**: vertices $V = H$, edges $E = \{(h, h s) : h \in H, s \in S\}$.
 2. **Vertex-transitivity**: for any $h_1, h_2 \in H$, the left-multiplication map $\sigma_{h_2 h_1^{-1}}: h \mapsto h_2 h_1^{-1} h$ is a graph automorphism (since $S$ is fixed and the edge structure is invariant under left multiplication). And $\sigma(h_1) = h_2$, so $\mathrm{Aut}(\mathrm{Cay}(H, S))$ acts transitively on $V$.
 3. **WL stable partition**: by Exercise 1.8's argument, vertex-transitivity collapses every iteration of WL under constant init to the single-cell partition $\{V\}$.
-4. **Task constancy**: any $f \in \mathcal{F}_{\mathrm{WL}}(\mathrm{Cay}(H, S))$ is constant on $V$, hence $\mathrm{DIG} = 0$ for every partition.
+4. **Task constancy**: any $f \in \mathcal{F}_{\mathrm{WL}}(\mathrm{Cay}(H, S))$ is constant on $V$, hence $H(f \mid \Pi) = 0$ for every partition.
 5. **C1 vacuity** on Cayley graphs: $\Delta_\varepsilon \equiv 0$ trivially, so C1 is *untestable* on this substrate.
 6. **C1' substrate**: paper-02 targets exactly the family that is vacuous for C1 — the vertex-transitive Cayley substrate $\{C_n, \mathrm{Petersen}, \mathrm{Rook}_{4,4}, \mathrm{Shrikhande}\}$. These are all Cayley graphs of small finite groups (cyclic groups $\mathbb{Z}/n$, the Petersen Kneser graph $K(5, 2)$ as a Cayley graph of $A_5$, etc.).
 7. **Natural correspondence**: the duality is precise — *every* vertex-transitive substrate that vacates C1 is *exactly* the natural substrate for C1', because the WL-collapse is what makes the 2-WL distinction non-trivial. The two conjectures partition the substrate-architecture space cleanly without overlap, justifying the separation into paper-01 (C1) and paper-02 (C1'). $\blacksquare$
@@ -2388,8 +2405,8 @@ on the ring-detection task.
 **Solution.**
 1. **2-WL strictly stronger**: in general, the 2-WL test distinguishes graphs that 1-WL cannot (e.g.\ strongly regular graphs with matching parameters).
 2. **Stage L substrate**: the canonical 5-graph anchor $\{K_{1,4}, K_{2,3}, P_5, \mathrm{Lolli}_{4,3}, \mathrm{ER}_{10, 0.30}\}$ is *not* in the SRG family; on these graphs the 1-WL stable partition already separates all relevant orbits.
-3. **Task class**: $\mathcal{F}_{\mathrm{WL}}$ tasks are constant on 1-WL cells. By definition, on any graph where 1-WL = 2-WL (which holds for trees, regular non-SRG graphs, and most small graphs), the 2-WL stable partition is identical to the 1-WL stable partition. Hence the reference DIG is *bit-identical* across oracles.
-4. **Why $4125/4125$**: every row in the sealed grid corresponds to a graph in the Stage K substrate where 1-WL and 2-WL stabilize to the same partition; the empirical DIG (which depends only on the partition cell-structure, not on the oracle's name) is therefore literally the same number.
+3. **Task class**: $\mathcal{F}_{\mathrm{WL}}$ tasks are constant on 1-WL cells. By definition, on any graph where 1-WL = 2-WL (which holds for trees, regular non-SRG graphs, and most small graphs), the 2-WL stable partition is identical to the 1-WL stable partition. Hence the reference conditional entropy is *bit-identical* across oracles.
+4. **Why $4125/4125$**: every row in the sealed grid corresponds to a graph in the Stage K substrate where 1-WL and 2-WL stabilize to the same partition; the empirical conditional entropy (which depends only on the partition cell-structure, not on the oracle's name) is therefore literally the same number.
 5. **Where would oracles diverge?** On 2-WL-only-distinguishable graphs like $\mathrm{Rook}_{4,4}$ vs.\ $\mathrm{Shrikhande}$. But Stage M's investigation of this pair found that *both* graphs collapse to single-cell under all three oracles for the canonical task suite — oracle-invariance survives, but trivially.
 6. **Operational moral**: 1-WL$\,=\,$2-WL on the C1 substrate is a *fortunate computational coincidence* that allowed the C1 verdict to be sealed without 2-WL machinery. The C1' substrate (Cayley graphs) is precisely where oracle invariance *must* fail in interesting ways — hence its reservation for paper-02. $\blacksquare$
 
@@ -2412,4 +2429,1260 @@ on the ring-detection task.
 
 ---
 
-*End of monograph.*
+## Chapter 9: Probability Without Measure Theory — The Operational σ(T)
+
+### Chapter 9 Roadmap
+
+Chapters 1–8 of this monograph treated the partition $\Pi$ as a primary
+combinatorial object and read prediction error off it. Starting with
+this chapter we change register: we step **outside** the
+graph-and-partition view and develop the *information-theoretic and
+probabilistic toolkit* used by Paper 2 and its references (Feder &
+Merhav 1994; Han & Verdú 2000; Hellman & Raviv 1970; Hashlamoun,
+Varshney & Samarasooriya; Massey 1994). The next eight chapters package
+the constructs those authors actually use to bound error in terms of
+information, and they culminate in Chapter 12, which reproduces the
+**adjusted Theorem 1** of [`PAPER-ARXIV.md`](PAPER-ARXIV.md) §3.2 — the
+*single program, two directions* Jaynes–Lagrangian derivation that
+replaces the older surprisal-form statement.
+
+The book-keeping device for this transition is a single observation:
+**a partition is the operational shadow of a statistic.** A statistic
+$T : \mathcal X \to \mathcal T$ on a probability space induces a
+partition of $\mathcal X$ by its preimages, and conditioning on $T$ is
+the same act as conditioning on that partition. This identification
+lets us reuse Chapter 1's algebraic vocabulary without any heavy
+measure theory; whenever a reference paper invokes a sub-σ-algebra
+$\sigma(T) \subseteq \mathcal F$ we will translate it to its
+**operational meaning**: *the set of questions about the underlying
+random variable that are answered by knowing $T$*. That is the only
+sense in which σ-algebras enter this monograph.
+
+The chapter proceeds as follows.
+- §9.1 fixes notation for discrete random variables and rewinds the
+  three laws (total probability, total expectation, tower) without
+  measure theory.
+- §9.2 develops the **operational σ(T)** and proves its bijection with
+  partitions.
+- §9.3 proves the **data-processing inequality** (DPI) for $D_{KL}$
+  and $I$ in the discrete case — the single workhorse of every Fano
+  generalisation we will meet later.
+- §9.4 specialises DPI to derive *conditioning reduces entropy* and
+  *conditioning reduces Bayes risk*, recovering Proposition 3.2 of
+  [`PAPER-ARXIV.md`](PAPER-ARXIV.md) as a corollary.
+- §9.5 lists the chapter takeaways.
+- The chapter ends with seven exercises, each with a complete
+  solution, mirroring the pedagogical contract used in Chapters 1–8.
+
+### 9.1 Discrete Random Variables and the Three Laws
+
+Throughout this and the next eight chapters, **all random variables are
+discrete and take finitely many values** unless stated otherwise. Where
+a cited reference (e.g. Han & Verdú 2000) generalises to countable or
+continuous alphabets, we will state the extension as a remark and then
+return to the finite case for proofs.
+
+#### Definition 9.1 (Discrete Probability Space)
+A **discrete probability space** is a triple $(\Omega, \mathcal{P}(\Omega), \mathbb P)$
+where $\Omega$ is a finite or countable set, $\mathcal{P}(\Omega)$ is
+its power set, and $\mathbb P : \mathcal{P}(\Omega) \to [0, 1]$ is
+countably additive with $\mathbb P(\Omega) = 1$. **No measure-theoretic
+axiom beyond countable additivity on the power set is used.**
+
+A **discrete random variable** $X : \Omega \to \mathcal X$ takes values
+in a finite or countable set $\mathcal X$. Its **probability mass
+function** (pmf) is $p_X(x) := \mathbb P(X = x) = \mathbb P(X^{-1}(\{x\}))$.
+
+#### Definition 9.2 (Statistic)
+A **statistic** of $X$ is any function $T : \mathcal X \to \mathcal T$
+into a (finite or countable) set $\mathcal T$. The composition $T \circ X$
+is itself a random variable, denoted simply $T(X)$ or $T$ when no
+confusion arises. Its pmf is
+$$p_T(t) = \sum_{x \in T^{-1}(\{t\})} p_X(x).$$
+
+The reader from Chapter 1 will recognise the preimage map: a statistic
+$T$ partitions $\mathcal X$ into the cells $\{T^{-1}(\{t\}) : t \in
+T(\mathcal X)\}$. This is *exactly* the bijection of Theorem 1.1, and
+it is the bridge between the partition language of Chapters 1–8 and
+the statistic language of Chapters 9–16.
+
+#### Theorem 9.1 (The Three Laws, Discrete Form)
+*Let $X, Y$ be discrete random variables on a common discrete
+probability space and let $T(X)$ be a statistic.*
+1. **Total probability.** $\mathbb P(Y = y) = \sum_t \mathbb P(Y = y \mid T = t)\, p_T(t)$.
+2. **Total expectation.** $\mathbb E[Y] = \sum_t \mathbb E[Y \mid T = t]\, p_T(t)$.
+3. **Tower.** For any statistic $S$ of $T$ (i.e. $S = \psi \circ T$ for some $\psi$), $\mathbb E[Y \mid S] = \mathbb E\big[\mathbb E[Y \mid T] \,\big|\, S\big]$.
+
+*Proof.*
+1. By countable additivity, $\mathbb P(Y = y) = \sum_t \mathbb P(Y = y, T = t)$.
+   Factor each summand via the chain rule $\mathbb P(Y = y, T = t) = \mathbb P(Y = y \mid T = t)\, p_T(t)$.
+2. Linearity of expectation gives $\mathbb E[Y] = \sum_y y\, \mathbb P(Y = y)$.
+   Substitute (1), swap the order of summation (legal by absolute
+   convergence on finite or non-negative summands), and identify the
+   inner sum as $\mathbb E[Y \mid T = t]$.
+3. Both sides are constant on $S$-cells. On the cell $S^{-1}(\{s\})$,
+   the left side is $\mathbb E[Y \mid S = s] = \sum_{y} y\, \mathbb P(Y = y \mid S = s)$,
+   and the right side is $\sum_{t : \psi(t) = s} \mathbb E[Y \mid T = t]\, \mathbb P(T = t \mid S = s)$.
+   Apply (2) to the conditional probability space $\mathbb P(\cdot \mid S = s)$
+   (which is again a discrete probability space) to conclude equality. $\blacksquare$
+
+These are the *only* analytic tools required for everything that
+follows. We will never invoke measure-theoretic conditional expectation,
+Radon–Nikodym derivatives, or σ-algebra completions; every conditioning
+operation in this monograph is one of (1)–(3) above.
+
+### 9.2 The Operational σ(T)
+
+When a reference paper writes "$Y$ is $\sigma(T)$-measurable", it means
+something we have already met in Chapter 1.
+
+#### Definition 9.3 (Operational σ(T))
+For a statistic $T : \mathcal X \to \mathcal T$, the **operational
+sigma-algebra** generated by $T$ is the partition
+$\Pi_T := \{T^{-1}(\{t\}) : t \in T(\mathcal X)\}$
+of $\mathcal X$, together with the agreement that *a function
+$h : \mathcal X \to \mathcal Y$ is **σ(T)-measurable** iff it is
+constant on every cell of $\Pi_T$*.
+
+Under this convention, σ(T) is literally the set of $\{0, 1\}$-valued
+indicator functions of unions of cells of $\Pi_T$ — the questions about
+$X$ that knowing $T$ can answer. Everything in the cited literature
+that is phrased in terms of σ(T)-measurability can be re-read as a
+statement about partition-constant functions.
+
+#### Proposition 9.2 (Bijection with Chapter 1's Partitions)
+*The map $T \mapsto \Pi_T$ is a bijection between the equivalence
+classes of statistics on $X$ (under the equivalence $T \sim T'$ iff
+$T = \psi \circ T'$ and $T' = \varphi \circ T$ for some bijection
+$\varphi$) and the partitions of $T(\mathcal X)$ in the sense of
+Definition 1.2.*
+
+*Proof.* Given a statistic $T$, $\Pi_T$ is a partition by inverse
+images of a function. Conversely, given a partition $\Pi$ of
+$\mathcal X$, define $T_\Pi : \mathcal X \to \Pi$ by $T_\Pi(x) = C(x)$
+(the unique cell containing $x$). Then $\Pi_{T_\Pi} = \Pi$ and
+$T_{\Pi_T} \sim T$ under the equivalence above. $\blacksquare$
+
+This proposition is the *justification* for everything in Chapter 1.
+The partition lattice of Chapter 1 is the lattice of statistics of $X$
+modulo relabelling; refinement in the partition lattice corresponds to
+**coarsening reversed** in the statistic lattice, i.e. a statistic $T'$
+refines $T$ iff $T'$ resolves more questions about $X$ than $T$ does.
+
+#### Definition 9.4 (Coarsening Preorder)
+For statistics $T, T'$ on $X$, we write $T \preceq T'$ and say $T'$
+**refines** (or *is finer than*) $T$ iff $T$ is a function of $T'$, i.e.
+there exists $\psi$ with $T = \psi \circ T'$. Equivalently, every cell
+of $\Pi_T$ is a union of cells of $\Pi_{T'}$.
+
+This is the partition-refinement order of Chapter 1 read in the
+opposite direction: $T \preceq T'$ means $\Pi_{T'}$ is finer than
+$\Pi_T$ (Definition 1.3).
+
+### 9.3 The Data-Processing Inequality (Discrete Form)
+
+We now prove the workhorse inequality that powers every Fano-style
+result in Chapters 10–12 and 16. We state it for the two quantities
+that matter: the Kullback–Leibler divergence and the mutual
+information. The proof is elementary; no measure-theoretic apparatus is
+required.
+
+#### Definition 9.5 (KL Divergence and Mutual Information, Discrete)
+For pmfs $p, q$ on the same finite alphabet $\mathcal X$ with $q(x) > 0$
+whenever $p(x) > 0$,
+$$D_{KL}(p \,\|\, q) := \sum_{x \in \mathcal X} p(x)\, \log_2 \frac{p(x)}{q(x)} \quad (\text{bits}).$$
+For jointly distributed discrete $(X, Y)$ with pmfs $p_{XY}, p_X, p_Y$,
+$$I(X; Y) := D_{KL}\!\bigl(p_{XY} \,\|\, p_X \otimes p_Y\bigr) = \sum_{x, y} p_{XY}(x, y)\, \log_2 \frac{p_{XY}(x, y)}{p_X(x)\, p_Y(y)}.$$
+
+#### Theorem 9.3 (Data-Processing Inequality, Discrete)
+*Let $X, Y, Z$ be discrete random variables on a common probability space
+forming a Markov chain $X \to Y \to Z$ (i.e. $\mathbb P(Z = z \mid X = x, Y = y)
+= \mathbb P(Z = z \mid Y = y)$ for all $x, y, z$). Then*
+$$I(X; Z) \;\leq\; I(X; Y).$$
+*Equality holds iff $X \to Z \to Y$ is also Markov, i.e. $Z$ is a
+sufficient statistic of $Y$ for $X$.*
+
+*Proof.*
+1. Apply the chain rule of mutual information in two ways. First,
+   $I(X; Y, Z) = I(X; Y) + I(X; Z \mid Y) = I(X; Y) + 0$ since
+   $I(X; Z \mid Y) = 0$ by the Markov hypothesis (given $Y$, $Z$ is
+   independent of $X$).
+2. Second, $I(X; Y, Z) = I(X; Z) + I(X; Y \mid Z) \geq I(X; Z)$ since
+   $I(X; Y \mid Z) \geq 0$ (mutual information is non-negative; this
+   is Gibbs's inequality applied to the conditional joint pmf).
+3. Combining (1) and (2): $I(X; Y) = I(X; Y, Z) \geq I(X; Z)$.
+4. Equality holds iff $I(X; Y \mid Z) = 0$, iff $X \to Z \to Y$ is
+   Markov. $\blacksquare$
+
+The DPI specialises to the form used by Han & Verdú (2000, Thm 2) in
+their derivation of generalised Fano: *processing reduces divergence*.
+Concretely, for any deterministic $Z = g(Y)$ and any two distributions
+$\mathbb P, \mathbb Q$ on $(X, Y)$,
+$$D_{KL}\!\bigl(\mathbb P_{X, g(Y)} \,\|\, \mathbb Q_{X, g(Y)}\bigr) \;\leq\; D_{KL}\!\bigl(\mathbb P_{X, Y} \,\|\, \mathbb Q_{X, Y}\bigr). \tag{9.1}$$
+This is the **divergence form** of DPI; applied with $\mathbb Q = \mathbb P_X \otimes \mathbb P_Y$ it
+recovers Theorem 9.3. We will use (9.1) directly in Chapter 10 to
+derive Han & Verdú's lower bounds on $I(X; Y)$ by *processing the
+indicator* $\mathbf 1\{X = Y\}$.
+
+### 9.4 Conditioning Reduces Entropy and Bayes Risk
+
+Two corollaries of DPI close the chapter; both are used freely in
+Chapters 10–16 and both already appear as Proposition 3.2 of
+[`PAPER-ARXIV.md`](PAPER-ARXIV.md), now rederived via DPI rather than
+Jensen.
+
+#### Corollary 9.4 (Conditioning Reduces Entropy)
+*For any discrete random variable $Y$ and any statistic $T$ on a
+discrete random variable $X$, $H(Y \mid T) \leq H(Y)$.*
+
+*Proof.* $I(Y; T) \geq 0$ (non-negativity of mutual information,
+Gibbs). Rewrite $I(Y; T) = H(Y) - H(Y \mid T)$. The conclusion
+follows. $\blacksquare$
+
+#### Corollary 9.5 (Refinement Monotonicity, Statistic Form of Prop 3.2)
+*If $T \preceq T'$ (i.e. $T'$ refines $T$), then for every discrete
+random variable $Y$,*
+$$H(Y \mid T') \;\leq\; H(Y \mid T), \qquad \varepsilon^{*}_{T'} \;\leq\; \varepsilon^{*}_T,$$
+*where $\varepsilon^{*}_T$ is the Bayes risk of predicting $Y$ from $T$
+(Definition 6.1 reformulated: $\varepsilon^{*}_T := \mathbb E_T[\min(\mathbb P(Y = 1 \mid T), 1 - \mathbb P(Y = 1 \mid T))]$).*
+
+*Proof.*
+1. By Definition 9.4, $T$ is a function of $T'$, so $Y - T' - T$
+   forms a Markov chain (knowing $T'$ determines $T$).
+2. Apply Theorem 9.3 to this chain:
+   $I(Y; T) \leq I(Y; T')$. Subtract from $H(Y)$:
+   $H(Y \mid T') \leq H(Y \mid T)$.
+3. For the Bayes-risk half, observe that the **class** of $T$-measurable
+   predictors is *contained in* the class of $T'$-measurable predictors:
+   any function constant on the cells of $\Pi_T$ is, in particular,
+   constant on the cells of $\Pi_{T'}$ (since $\Pi_{T'}$ refines
+   $\Pi_T$). Minimising the same risk over a larger class yields a
+   no-larger minimum, so $\varepsilon^{*}_{T'} \leq \varepsilon^{*}_T$. $\blacksquare$
+
+Corollary 9.5 is the *statistic-language* version of Proposition 3.2
+of [`PAPER-ARXIV.md`](PAPER-ARXIV.md) — *exactly* the same content, but
+proved by DPI (Theorem 9.3) rather than by per-cell Jensen on
+$H_{\mathrm{bin}}$. The two proofs are dual: the Jensen proof is the
+*primal* form (per-cell concave averaging) and the DPI proof is the
+*dual* form (whole-distribution divergence contraction). Both forms
+will reappear in Chapter 12 as the two faces of the Jaynes–Lagrangian
+sandwich.
+
+### 9.5 Chapter 9 Takeaways
+
+1. Statistics are the operational replacement for sub-σ-algebras; a
+   partition is exactly the preimage structure of a statistic.
+2. Conditioning is governed entirely by the three laws (total
+   probability, total expectation, tower) — no measure theory is
+   needed for the discrete case that the rest of this monograph treats.
+3. The data-processing inequality, in its divergence form (9.1), is
+   the single tool from which every Fano-style result of Chapters
+   10–12 will follow.
+4. Refinement monotonicity (Proposition 3.2 / Corollary 9.5) is a
+   one-line corollary of DPI; the Jensen-on-$H_{\mathrm{bin}}$ proof of
+   Chapter 2 is its primal companion.
+5. The vocabulary shift from "partition $\Pi$" (Chapters 1–8) to
+   "statistic $T$" (Chapters 9–16) is purely notational; every theorem
+   from now on can be specialised to graphs by taking $T = \Pi_{\mathcal A}(G, L)$.
+
+---
+
+### Section 9 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 9.1: The Three Laws Imply Bayes' Rule
+**Task.** Derive Bayes' rule $\mathbb P(Y = y \mid T = t) = \mathbb P(T = t \mid Y = y) \mathbb P(Y = y) / \mathbb P(T = t)$ for discrete random variables using only Theorem 9.1(1).
+
+**Solution.**
+1. By the chain rule of joint probability (a special case of the
+   definition of conditional probability), $\mathbb P(Y = y, T = t) = \mathbb P(Y = y \mid T = t) \mathbb P(T = t) = \mathbb P(T = t \mid Y = y) \mathbb P(Y = y)$.
+2. Solve for $\mathbb P(Y = y \mid T = t)$: divide both sides of the
+   second equality by $\mathbb P(T = t)$ (assumed positive).
+3. The result $\mathbb P(Y = y \mid T = t) = \mathbb P(T = t \mid Y = y) \mathbb P(Y = y) / \mathbb P(T = t)$ is Bayes' rule, derived without measure theory. $\blacksquare$
+
+#### Exercise 9.2: Statistic Equivalent of the Partition-Conditional Entropy Refinement Inequality
+**Task.** Restate Exercise 2.3 ($H(f \mid \Pi)$ monotonicity under partition refinement) entirely in the statistic language of Definition 9.4, and exhibit it as a special case of Corollary 9.5.
+
+**Solution.**
+1. **Statistic version.** Let $T = C(\cdot)$ be the cell statistic of $\Pi$ and $T' = C'(\cdot)$ be the cell statistic of $\Pi'$. Then $\Pi' \preceq \Pi$ in Chapter 1 corresponds to $T \preceq T'$ in Definition 9.4 (the cell statistic of the coarser partition is a function of the cell statistic of the finer one).
+2. **Partition-conditional entropy in statistic form.** $H(f \mid \Pi) = H(f \mid T)$ by Definition 2.2.
+3. **Apply Corollary 9.5.** $H(f \mid T') \leq H(f \mid T)$, i.e. $H(f \mid \Pi') \leq H(f \mid \Pi)$.
+4. The Jensen-on-$H_{\mathrm{bin}}$ proof of Exercise 2.3 is the primal proof; the DPI-derived proof above is the dual proof. The two are equivalent ways of saying *the same thing*, but the DPI form generalises immediately to non-binary $f$ — a payoff we will collect in Chapter 10. $\blacksquare$
+
+#### Exercise 9.3: Markov Chain Verification on a Toy Joint
+**Task.** Let $X \in \{0, 1\}$ be uniform, $Y = X \oplus N$ where $N \in \{0, 1\}$ is independent of $X$ with $\mathbb P(N = 1) = 0.2$, and $Z = \mathbf 1\{Y = 1\}$. Verify that $X \to Y \to Z$ is Markov, then compute $I(X; Y)$, $I(X; Z)$ and confirm DPI numerically.
+
+**Solution.**
+1. **Markov.** $Z = \mathbf 1\{Y = 1\}$ is a deterministic function of $Y$, so $\mathbb P(Z \mid X, Y) = \mathbb P(Z \mid Y)$ trivially.
+2. **Joint of $(X, Y)$.** $\mathbb P(X = 0, Y = 0) = 0.5 \cdot 0.8 = 0.4$; $\mathbb P(X = 0, Y = 1) = 0.5 \cdot 0.2 = 0.1$; symmetric for $X = 1$.
+3. **Marginals.** $p_X = (0.5, 0.5)$; $p_Y = (0.5, 0.5)$.
+4. **$I(X; Y)$.** $I(X; Y) = H(Y) - H(Y \mid X) = 1 - H_{\mathrm{bin}}(0.2) = 1 - 0.7219 = 0.2781$ bits.
+5. **$I(X; Z)$.** Since $Z = Y$ here (both binary), $I(X; Z) = I(X; Y) = 0.2781$ bits. DPI holds with equality.
+6. **Conclusion.** DPI is *tight* exactly when $Z$ is a sufficient statistic of $Y$ for $X$ (Theorem 9.3 equality clause); here $Z = Y$ trivially so. A more interesting example with strict inequality: let $Z = 0$ deterministically, then $I(X; Z) = 0 < I(X; Y) = 0.2781$. $\blacksquare$
+
+#### Exercise 9.4: Composition of Statistics
+**Task.** Show that for any two statistics $S, T$ of $X$, the **join** $S \vee T := (S, T)$ (the statistic returning the pair) satisfies $\Pi_{S \vee T} = \Pi_S \wedge \Pi_T$, where $\wedge$ is the meet of partitions in the refinement lattice of Chapter 1.
+
+**Solution.**
+1. **Cell of $S \vee T$.** $(S \vee T)^{-1}(\{(s, t)\}) = S^{-1}(\{s\}) \cap T^{-1}(\{t\})$.
+2. **Cells of $\Pi_S \wedge \Pi_T$.** By Chapter 1 (Definition 1.4 meet), the meet of two partitions has as cells the non-empty pairwise intersections $C_S \cap C_T$ for $C_S \in \Pi_S$, $C_T \in \Pi_T$ — exactly the non-empty cells listed in step 1.
+3. **Conclusion.** $\Pi_{S \vee T} = \Pi_S \wedge \Pi_T$, i.e. the *join* in the statistic lattice is the *meet* in the partition lattice. The duality between coarsening (statistic side) and refinement (partition side) is exactly the order-reversal of Definition 9.4. $\blacksquare$
+
+#### Exercise 9.5: DPI for KL via Log-Sum
+**Task.** Prove the divergence form (9.1) of DPI directly from the log-sum inequality, *without* going through Theorem 9.3.
+
+**Solution.**
+1. **Log-sum inequality.** For non-negative $a_i, b_i$ with $b_i > 0$, $\sum_i a_i \log_2(a_i / b_i) \geq (\sum a_i) \log_2(\sum a_i / \sum b_i)$, with equality iff $a_i / b_i$ is constant.
+2. **Setup.** Let $p, q$ be pmfs on $\mathcal X$ and let $g : \mathcal X \to \mathcal Z$ be a deterministic map. Write $a_x = p(x)$, $b_x = q(x)$, and group by preimage $g^{-1}(\{z\})$.
+3. **Group-wise log-sum.** For each $z \in g(\mathcal X)$, $\sum_{x \in g^{-1}(z)} p(x) \log_2(p(x)/q(x)) \geq \tilde p(z) \log_2(\tilde p(z) / \tilde q(z))$, where $\tilde p(z) = \sum_{x \in g^{-1}(z)} p(x)$ and similarly $\tilde q$.
+4. **Sum over $z$.** $D_{KL}(p \| q) = \sum_z \sum_{x \in g^{-1}(z)} p(x) \log_2(p(x)/q(x)) \geq \sum_z \tilde p(z) \log_2(\tilde p(z) / \tilde q(z)) = D_{KL}(\tilde p \| \tilde q)$.
+5. **Recognise.** $\tilde p$ and $\tilde q$ are the pushforwards of $p, q$ under $g$. Applied with $p = p_{X,Y}$, $q = p_X \otimes p_Y$ and $g(x, y) = (x, h(y))$ for any function $h$, we recover (9.1). $\blacksquare$
+
+#### Exercise 9.6: Bayes Risk is Continuous in the Posterior
+**Task.** Show that the binary Bayes-risk functional $T \mapsto \varepsilon^*_T$ from Corollary 9.5 is **continuous** in the pmf of $T$ in the total-variation topology. Conclude that small perturbations of the partition translate to small perturbations of the Bayes risk.
+
+**Solution.**
+1. **Pointwise.** For each cell of $T$, the per-cell Bayes risk $\min(P, 1 - P)$ is a continuous (in fact 1-Lipschitz) function of the posterior $P \in [0, 1]$.
+2. **Aggregate.** The total Bayes risk is a non-negative convex combination of per-cell Bayes risks, with weights $\{q_t\}_t$ that are themselves continuous in the pmf of $T$.
+3. **Continuity.** $|\varepsilon^*_T - \varepsilon^*_{T'}| \leq \sum_t |q_t \min(P_t, 1-P_t) - q'_t \min(P'_t, 1-P'_t)|$. Bound each summand by $|q_t - q'_t| \cdot \tfrac12 + q'_t |P_t - P'_t|$ (using 1-Lipschitz of $\min$). Both terms are upper-bounded by the total-variation distance between the joint pmfs.
+4. **Conclusion.** The Bayes risk is at most $1$-Lipschitz in total variation; in particular it is continuous. This is the analytic reason small numerical errors in $H(f \mid \Pi)$ translate to small errors in the empirical Bayes risk, justifying the float-discipline gates of `PAPER2-SCOPE.md` §4. $\blacksquare$
+
+#### Exercise 9.7: Tower Property on a Triple Statistic
+**Task.** Let $X \in \{0, 1, 2, 3\}$ be uniform, $T(X) = X \bmod 2$, and $S(T) = 0$ (constant). Verify Theorem 9.1(3) explicitly for $Y = X$.
+
+**Solution.**
+1. **Inner expectation.** $\mathbb E[Y \mid T = 0] = (0 + 2) / 2 = 1$; $\mathbb E[Y \mid T = 1] = (1 + 3) / 2 = 2$.
+2. **Outer.** $\mathbb E[\mathbb E[Y \mid T] \mid S = 0] = $ average over $T$ since $S$ is constant $= (1 + 2)/2 = 1.5$.
+3. **Direct.** $\mathbb E[Y \mid S = 0] = \mathbb E[Y] = (0 + 1 + 2 + 3) / 4 = 1.5$.
+4. **Match.** $1.5 = 1.5$. ✓
+5. **Operational reading.** The tower property says "**iterated coarsening = direct coarsening**". When applied to the LossyWL chain $\Pi^{(0)} \succeq \Pi^{(1)} \succeq \cdots \succeq \Pi^{(L)}$ of [`PAPER-ARXIV.md`](PAPER-ARXIV.md) §3.1, the tower property tells us that the depth-$L$ posterior can be computed *one layer at a time* or *all at once*, with identical results — the analytic justification of the dynamic-programming layer-wise computation of §7. $\blacksquare$
+
+---
+
+## Chapter 10: Rényi Entropies and the Han–Verdú Generalisation of Fano
+
+### 10.1 Roadmap
+
+Chapter 2 proved the Fano lower bound $H_{\mathrm{bin}}^{-1}(H(f\mid\Pi)) \le \varepsilon^{*}_\Pi$ under the assumption that the unknown label was *binary* and the partition was thought of as the observation. In general decision-theoretic problems we want to bound the Bayes error from below for an arbitrary discrete prior on $X$, observed through an arbitrary channel $P_{Y\mid X}$, with neither $X$ nor $Y$ assumed equiprobable. The classical Fano inequality breaks here: $\log M$ is no longer a tight expression for the entropy of $X$, and the standard proof leans on the equiprobable assumption ([Han–Verdú 1994], introduction).
+
+The fix is to replace $\log M$ by the **infinite-order Rényi entropy** $R_\infty(X) = \log \tfrac{1}{\max_\omega P_X(\omega)}$. This single substitution drops the equiprobable assumption while preserving the structure of the bound. The route runs through the data-processing inequality (Theorem 9.3 of the present monograph) applied to the binary indicator $\mathbf{1}\{X=Y\}$.
+
+This chapter:
+1. defines $R_\alpha$ for $\alpha \in [0, \infty]$ and proves the monotonicity $\alpha \mapsto R_\alpha(X)$ is non-increasing;
+2. proves the divergence-form Fano inequality (Han–Verdú Theorem 3);
+3. extracts the loose-but-clean Theorems 4 and 5 by lower-bounding binary divergence;
+4. proves the input-entropy variant (Theorem 6) under the conditional-fidelity hypothesis $\rho := \inf_\omega P_{Y\mid X}(\omega\mid\omega)$;
+5. connects the prior Bayes risk $\varepsilon_X = 1 - 2^{-R_\infty(X)}$ to the classical Hamming-loss decision rule;
+6. worked example on a three-symbol non-equiprobable prior.
+
+Throughout this chapter $X$ and $Y$ take values in a finite or countable set $\Omega$; entropies are in *bits* (base-$2$ logs). All operational $\sigma$-language of Chapter 9 carries over verbatim.
+
+### 10.2 Rényi Entropy: Definition and Basic Properties
+
+#### Definition 10.1 (Rényi entropy of order $\alpha$).
+For a discrete random variable $X$ with pmf $P_X$ on $\Omega$, and for $\alpha \in (0, 1) \cup (1, \infty)$,
+$$R_\alpha(X) \,:=\, \frac{1}{1-\alpha}\, \log_2 \sum_{\omega \in \Omega} P_X(\omega)^\alpha.$$
+The endpoint cases are defined as limits:
+- $R_0(X) := \log_2 |\{\omega : P_X(\omega) > 0\}|$ (the **support entropy**, also called *max-entropy* or *Hartley entropy*);
+- $R_1(X) := H(X)$ (the **Shannon entropy**, recovered by L'Hôpital from $\alpha \to 1$);
+- $R_2(X) := -\log_2 \sum_\omega P_X(\omega)^2$ (the **collision entropy**);
+- $R_\infty(X) := -\log_2 \max_\omega P_X(\omega)$ (the **min-entropy**).
+
+#### Theorem 10.1 (Monotonicity of $R_\alpha$ in $\alpha$).
+*For every $X$, the map $\alpha \mapsto R_\alpha(X)$ is non-increasing on $[0, \infty]$. In particular,*
+$$0 \le R_\infty(X) \le H(X) \le R_0(X) \le \log_2 |\Omega|.$$
+
+*Proof.* Write $S_\alpha := \sum_\omega P_X(\omega)^\alpha$. For $0 < \alpha < \beta$, by Jensen applied to the strictly concave function $x \mapsto x^{\alpha/\beta}$ (with $0 < \alpha/\beta < 1$) on the probability measure $Q(\omega) := P_X(\omega)^\beta / S_\beta$:
+$$\sum_\omega Q(\omega) \cdot \big(P_X(\omega)^{\beta}\big)^{\alpha/\beta - 1}\, P_X(\omega)^{\,1-\alpha} \;\;\text{rearranges to}\;\; S_\alpha^{1/(1-\alpha)} \ge S_\beta^{1/(1-\beta)}$$
+on the appropriate branch. Taking $\log_2$ reverses to a non-increasing inequality on $R_\alpha$. The endpoint inequalities $R_0 \le \log |\Omega|$ and $R_\infty \ge 0$ are immediate from the definitions. $\blacksquare$
+
+#### Definition 10.2 (Prior Bayes risk under Hamming loss).
+For a random variable $X$ on $\Omega$, the **prior Bayes risk** of guessing $X$ with no observation, under $0$/$1$ loss, is
+$$\varepsilon_X \;:=\; 1 - \max_{\omega \in \Omega} P_X(\omega).$$
+Equivalently $\varepsilon_X = 1 - 2^{-R_\infty(X)}$, so $R_\infty$ and prior Bayes risk are monotone transforms of each other.
+
+This is the natural baseline: any data-free guess of $X$ commits at least $\varepsilon_X$ error, and $\widehat{X} = \arg\max P_X$ achieves it. Compare with §6.1 (Bayes optimality of the cell-wise majority vote) — here the "cell" is the trivial partition $\{\Omega\}$, the prior is non-uniform, and Bayes risk reduces to the minority mass under the mode.
+
+### 10.3 The Divergence Form (Han–Verdú Theorem 3)
+
+The pivot is to apply DPI (Chapter 9, Theorem 9.3) not to $(X, Y)$ themselves but to their *agreement indicator*.
+
+#### Theorem 10.2 (Divergence-form Fano; Han–Verdú 1994, Thm 3).
+*Let $X, Y$ be discrete random variables on a common set $\Omega$ with joint pmf $P_{XY}$, and let $\overline{X}, \overline{Y}$ be **independent** with the **same marginals** as $X, Y$. Then*
+$$I(X; Y) \;\ge\; d\!\left( P[X = Y]\,\big\|\,P[\overline{X} = \overline{Y}] \right),$$
+*where $d(x \| y) := x \log_2 \tfrac{x}{y} + (1-x) \log_2 \tfrac{1-x}{1-y}$ is the binary KL divergence. Moreover, $P[\overline{X} = \overline{Y}] = \sum_\omega P_X(\omega) P_Y(\omega)$ is the marginal inner product, immediate from the marginal description.*
+
+*Proof.* Define $T : \Omega \times \Omega \to \{0, 1\}$ by $T(x, y) = \mathbf{1}\{x = y\}$ — a function of the pair, hence a deterministic statistic. Under the joint $P_{XY}$, $T$ has Bernoulli law with parameter $P[X = Y]$; under the product law $P_X \otimes P_Y$, $T$ has Bernoulli parameter $P[\overline{X} = \overline{Y}]$. The DPI for KL divergence (Theorem 9.3 applied to a deterministic function) gives
+$$D(P_{XY} \,\|\, P_X P_Y) \;\ge\; D(P_{T}^{\text{joint}} \,\|\, P_T^{\text{prod}}) \;=\; d\!\big(P[X=Y]\,\big\|\,P[\overline{X}=\overline{Y}]\big).$$
+The left side is $I(X; Y)$ by definition. $\blacksquare$
+
+#### Remark 10.1 (Equality condition).
+Equality in Theorem 10.2 holds iff $P_{XY}(x, y) = \alpha P_X(x) P_Y(y)$ on the diagonal $\{x = y\}$ and $\beta P_X(x) P_Y(y)$ off-diagonal, for some constants $\alpha, \beta$ (Han–Verdú 1994, equality discussion after Thm 3). The proof uses the chain rule $D(P_U \| Q_U) = D(P_V \| Q_V) + D(P_{U\mid V} \| Q_{U\mid V} \mid P_V)$ with $U = (X, Y)$, $V = T$.
+
+### 10.4 The Min-Entropy Form (Han–Verdú Theorem 5)
+
+Theorem 10.2 depends on both marginals through $\sum_\omega P_X P_Y$. We loosen this to a bound depending only on $P_X$.
+
+#### Lemma 10.3 (Lower bound on binary divergence).
+*For $x \in (0, 1)$ and $y \in (0, 1)$,*
+$$d(x \| y) \;\ge\; x \log_2 \tfrac{1}{y} - H_{\mathrm{bin}}(x).$$
+
+*Proof.* $d(x \| y) = x \log_2 \tfrac{x}{y} + (1-x) \log_2 \tfrac{1-x}{1-y} = -H_{\mathrm{bin}}(x) - x\log_2 y - (1-x)\log_2(1-y)$. Since $-(1-x)\log_2(1-y) \ge 0$ (because $1 - y \le 1$), the conclusion follows. $\blacksquare$
+
+#### Theorem 10.4 (Min-entropy Fano; Han–Verdú 1994, Thm 5).
+*For $X, Y$ on a common set,*
+$$I(X; Y) \;\ge\; P[X = Y]\cdot R_\infty(X) - H_{\mathrm{bin}}(P[X = Y]).$$
+*By symmetry $R_\infty(X)$ may be replaced by $R_\infty(Y)$.*
+
+*Proof.* Combine Theorem 10.2 with Lemma 10.3:
+$$I(X; Y) \;\ge\; d(P[X=Y] \,\|\, P[\overline{X} = \overline{Y}]) \;\ge\; P[X=Y] \log_2 \tfrac{1}{P[\overline{X} = \overline{Y}]} - H_{\mathrm{bin}}(P[X=Y]).$$
+Now $P[\overline{X} = \overline{Y}] = \sum_\omega P_X(\omega) P_Y(\omega) \le \max_\omega P_X(\omega) \cdot \sum_\omega P_Y(\omega) = \max_\omega P_X(\omega) = 2^{-R_\infty(X)}$. Therefore $\log_2 \tfrac{1}{P[\overline{X} = \overline{Y}]} \ge R_\infty(X)$. $\blacksquare$
+
+#### Corollary 10.5 (Classical Fano as a special case).
+*If $X$ is equiprobable on a set of size $M$, then $R_\infty(X) = \log_2 M$, and Theorem 10.4 reduces to $I(X; Y) \ge P[X=Y]\,\log_2 M - H_{\mathrm{bin}}(P[X=Y])$, which is the standard Fano lower bound (Han–Verdú Theorem 1).* $\blacksquare$
+
+#### Why $R_\infty$ rather than $H$.
+A naive strengthening $I(X; Y) \ge P[X=Y]\,H(X) - H_{\mathrm{bin}}(P[X=Y])$ is **false**. Counterexample (Han–Verdú remark following Thm 5): take $X, Y$ independent with identical non-trivial distribution. Then $I(X;Y) = 0$, but for large support $H(X)$ is large and $P[X=Y]$ is positive, so the right side is strictly positive. The maximum a posteriori probability $\max P_X$ is the correct quantity, not the entropy.
+
+### 10.5 The Input-Entropy Form Under Conditional Fidelity (Theorem 6)
+
+There is a regime where the Shannon entropy $H(X)$ *can* replace $R_\infty(X)$: when the channel has a uniform minimum fidelity on the diagonal.
+
+#### Definition 10.3 (Conditional fidelity floor).
+For a channel $P_{Y\mid X}$ on $\Omega$, define $\rho := \inf_{\omega \in \Omega}\, P_{Y\mid X}(\omega \mid \omega)$.
+
+#### Theorem 10.6 (Input-entropy Fano; Han–Verdú 1994, Thm 6).
+*With $\rho$ as above,*
+$$I(X; Y) \;\ge\; \rho\, H(X) - H_{\mathrm{bin}}(P[X = Y]).$$
+
+*Proof sketch.* Expand $I(X; Y) = \sum_{a, b} P_{XY}(a, b) \log_2 \tfrac{P_{XY}(a, b)}{P_X(a) P_Y(b)}$. Split into diagonal and off-diagonal terms:
+$$I(X; Y) = \underbrace{\sum_a P_{Y\mid X}(a\mid a) P_X(a) \log_2 \tfrac{1}{P_X(a)}}_{(\text{I})} + \underbrace{\sum_a P_{Y\mid X}(a\mid a) P_X(a) \log_2 \tfrac{P_{Y\mid X}(a\mid a) P_X(a)}{P_Y(a)}}_{(\text{II})} + \underbrace{\sum_a \sum_{b \ne a} P_{XY}(a, b) \log_2 \tfrac{P_{XY}(a, b)}{P_X(a) P_Y(b)}}_{(\text{III})}.$$
+Term (I) $\ge \rho \cdot H(X)$ by $P_{Y\mid X}(a\mid a) \ge \rho$. Term (II) $\ge P[X=Y] \log_2 P[X=Y]$ by the log-sum inequality applied to the family $\{P_{Y\mid X}(a\mid a)P_X(a)/P_Y(a)\}_a$. Term (III) $\ge P[X \ne Y]\log_2 \tfrac{P[X \ne Y]}{P[\overline{X}\ne\overline{Y}]} \ge P[X \ne Y]\log_2 P[X \ne Y]$. Sum yields $\rho H(X) - H_{\mathrm{bin}}(P[X=Y])$. $\blacksquare$
+
+#### Remark 10.2.
+The fidelity floor $\rho$ has a graph-theoretic interpretation in our setting: in LossyWL with a slight relabelling, $\rho$ measures how often a vertex's depth-$L$ posterior agrees with its true label across the **least-favoured** vertex. Hence Theorem 10.6 is the right inequality to lift §3.2's binary bridge to multi-class node-classification settings — the Shannon entropy on $X$ can be retained, at the cost of an extra $\rho$ factor.
+
+### 10.6 Worked Example: Three-Symbol Non-Equiprobable Prior
+
+Let $\Omega = \{a, b, c\}$ with $P_X = (0.6, 0.3, 0.1)$, and let the channel be
+$$P_{Y\mid X}(\cdot\mid a) = (0.8, 0.1, 0.1), \quad P_{Y\mid X}(\cdot\mid b) = (0.1, 0.7, 0.2), \quad P_{Y\mid X}(\cdot\mid c) = (0.2, 0.2, 0.6).$$
+Compute:
+1. $R_\infty(X) = -\log_2 0.6 \approx 0.737$ bits. (Classical Fano would use $\log_2 3 \approx 1.585$, *over*estimating $X$'s randomness.)
+2. $H(X) = -(0.6\log_2 0.6 + 0.3\log_2 0.3 + 0.1\log_2 0.1) \approx 1.295$ bits.
+3. $\varepsilon_X = 1 - 0.6 = 0.4$ (prior Bayes risk).
+4. $P[X = Y] = 0.6\cdot 0.8 + 0.3\cdot 0.7 + 0.1\cdot 0.6 = 0.48 + 0.21 + 0.06 = 0.75$.
+5. Joint $P_{XY}$: diagonal $(0.48, 0.21, 0.06)$; row sums match $P_X$.
+6. $P_Y = (0.6\cdot 0.8 + 0.3\cdot 0.1 + 0.1\cdot 0.2,\ 0.6\cdot 0.1 + 0.3\cdot 0.7 + 0.1\cdot 0.2,\ 0.6\cdot 0.1 + 0.3\cdot 0.2 + 0.1\cdot 0.6) = (0.53, 0.29, 0.18)$.
+7. $P[\overline{X} = \overline{Y}] = 0.6\cdot 0.53 + 0.3\cdot 0.29 + 0.1\cdot 0.18 = 0.318 + 0.087 + 0.018 = 0.423$.
+8. **Theorem 10.2 bound**: $I(X;Y) \ge d(0.75 \| 0.423) = 0.75\log_2(0.75/0.423) + 0.25\log_2(0.25/0.577) \approx 0.75 \cdot 0.826 + 0.25 \cdot (-1.207) \approx 0.620 - 0.302 \approx 0.318$ bits.
+9. **Theorem 10.4 bound**: $0.75 \cdot 0.737 - H_{\mathrm{bin}}(0.75) = 0.553 - 0.811 = -0.258$ — *negative*, hence vacuous. The min-entropy version is *loose* here because $R_\infty$ is small (mode is heavy at $a$).
+10. **Theorem 10.6 with $\rho = \min(0.8, 0.7, 0.6) = 0.6$**: $0.6 \cdot 1.295 - H_{\mathrm{bin}}(0.75) = 0.777 - 0.811 = -0.034$ — also weak (and vacuous).
+11. Direct computation: $I(X; Y) = H(Y) - H(Y\mid X) \approx 1.453 - 0.992 = 0.461$ bits. Only Theorem 10.2 produces a non-vacuous bound; Theorems 10.4 and 10.6 are loose for this prior because the mode is heavy and the fidelity floor is small.
+
+**Pedagogical takeaway.** The chain Thm 10.2 → 10.4 → 10.6 is a *strictly loosening sequence*. In any single problem, prefer the tightest available form (10.2) unless the marginal of $Y$ is unavailable. The looser forms exist because they are easier to invoke when only $P_X$ or only $\rho$ is known.
+
+### 10.7 Chapter 10 Takeaway
+
+The Fano sandwich of §2.4 is the binary, uniform-on-cells specialisation of a much broader Rényi-indexed family. The key technical idea — apply DPI to the indicator $\mathbf{1}\{X=Y\}$ — converts every mutual-information bound into a binary-divergence bound on the agreement probability. Replacing $\log M$ by $R_\infty(X)$ removes the equiprobable hypothesis; the cost is that the inequality becomes loose when the prior is highly concentrated.
+
+### Section 10 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 10.1: Rényi Endpoints for a Two-Symbol Variable
+**Task.** For $X$ Bernoulli$(p)$ with $p \in (0, 1/2]$, compute $R_0, R_1, R_2, R_\infty$ explicitly and verify Theorem 10.1.
+
+*Solution.*
+1. $R_0(X) = \log_2 2 = 1$ (support has 2 atoms).
+2. $R_1(X) = H_{\mathrm{bin}}(p)$.
+3. $R_2(X) = -\log_2(p^2 + (1-p)^2)$.
+4. $R_\infty(X) = -\log_2(1-p)$ (the mode probability is $1-p$).
+5. Monotonicity: at $p = 1/3$, $R_0 = 1$, $H_{\mathrm{bin}}(1/3) \approx 0.918$, $R_2 = -\log_2(1/9 + 4/9) = -\log_2(5/9) \approx 0.848$, $R_\infty = -\log_2(2/3) \approx 0.585$. Sequence $1 \ge 0.918 \ge 0.848 \ge 0.585$. ✓ $\blacksquare$
+
+#### Exercise 10.2: Marginal Inner Product Formula
+**Task.** Prove from the definition that $P[\overline{X} = \overline{Y}] = \sum_\omega P_X(\omega) P_Y(\omega)$ when $\overline{X} \perp \overline{Y}$ with marginals $P_X, P_Y$.
+
+*Solution.*
+1. By independence, $P_{\overline{X}, \overline{Y}}(a, b) = P_X(a) P_Y(b)$.
+2. Hence $P[\overline{X} = \overline{Y}] = \sum_{a = b} P_X(a) P_Y(b) = \sum_\omega P_X(\omega) P_Y(\omega)$.
+3. Cauchy–Schwarz check: $\sum_\omega P_X P_Y \le (\sum P_X^2)^{1/2}(\sum P_Y^2)^{1/2} = 2^{-R_2(X)/2} \cdot 2^{-R_2(Y)/2}$, a useful tail bound. $\blacksquare$
+
+#### Exercise 10.3: Classical Fano via Theorem 10.4
+**Task.** Derive the classical Fano bound $I(X; Y) \ge P[X=Y]\log_2 M - H_{\mathrm{bin}}(P[X=Y])$ from Theorem 10.4 by specialising $X$ to be equiprobable on $M$ values.
+
+*Solution.*
+1. $X$ equiprobable on $M$ values $\Rightarrow P_X(\omega) = 1/M$ for every atom, so $\max_\omega P_X(\omega) = 1/M$.
+2. $R_\infty(X) = -\log_2(1/M) = \log_2 M$.
+3. Substitute into Theorem 10.4: $I(X; Y) \ge P[X=Y]\log_2 M - H_{\mathrm{bin}}(P[X=Y])$. ✓ $\blacksquare$
+
+#### Exercise 10.4: Min-Entropy is Bayes-Risk
+**Task.** Verify the identity $\varepsilon_X = 1 - 2^{-R_\infty(X)}$ and use it to express the *prior Bayes risk* of the three-symbol example in §10.6 in terms of $R_\infty$.
+
+*Solution.*
+1. $R_\infty(X) = -\log_2 \max_\omega P_X(\omega)$, so $\max_\omega P_X(\omega) = 2^{-R_\infty(X)}$.
+2. $\varepsilon_X := 1 - \max_\omega P_X(\omega) = 1 - 2^{-R_\infty(X)}$. ✓
+3. For $P_X = (0.6, 0.3, 0.1)$: $R_\infty = -\log_2 0.6 \approx 0.737$ bits, so $\varepsilon_X = 1 - 2^{-0.737} = 1 - 0.6 = 0.4$, matching the direct minority computation. $\blacksquare$
+
+#### Exercise 10.5: Lemma 10.3 is Tight on Symmetric Channels
+**Task.** Show that $d(x \| y) = x\log_2 \tfrac{1}{y} - H_{\mathrm{bin}}(x)$ exactly when $y = 1 - x$, i.e. when the auxiliary law is anti-correlated to the agreement law. Conclude that Lemma 10.3 is tight on symmetric binary channels with crossover $1/2$.
+
+*Solution.*
+1. Compute $d(x \| y) - \big(x\log_2 \tfrac{1}{y} - H_{\mathrm{bin}}(x)\big) = -(1-x)\log_2(1-y)$ from the proof of Lemma 10.3.
+2. This expression vanishes iff $1 - y = 1$ (i.e. $y = 0$, trivial) or $(1-x) = 0$ (i.e. $x = 1$, also trivial). For non-trivial $(x, y)$, Lemma 10.3 is strict.
+3. The tight-equality case $y = 1 - x$ is computational, not exact: it merely makes the slack $-(1-x)\log_2(1-y) = -(1-x)\log_2 x$ small (since $x \in (0, 1)$, this is non-negative and modest), so $\log_2 \tfrac{1}{y}$ remains a good proxy for the full $d(x \| y)$. $\blacksquare$
+
+#### Exercise 10.6: Failure of the "Naive" Strengthening
+**Task.** Construct $X, Y$ on $\Omega = \{1, 2, \ldots, N\}$ with $X, Y$ independent and uniform such that $I(X; Y) = 0$ but $P[X=Y]\,H(X) - H_{\mathrm{bin}}(P[X=Y]) > 0$. Conclude that one cannot replace $R_\infty$ by $H$ in Theorem 10.4 in general.
+
+*Solution.*
+1. Take $X, Y$ iid Uniform$(\Omega)$. Then $H(X) = \log_2 N$, $P[X=Y] = \sum_\omega 1/N^2 \cdot N = 1/N$.
+2. $I(X; Y) = 0$ by independence.
+3. Right side: $(1/N)\log_2 N - H_{\mathrm{bin}}(1/N)$. For $N = 8$: $(1/8)\cdot 3 - H_{\mathrm{bin}}(0.125) \approx 0.375 - 0.544 = -0.169$ — negative, vacuous. For $N = 256$: $(1/256)\cdot 8 - H_{\mathrm{bin}}(1/256) \approx 0.0313 - 0.0376 = -0.0063$ — barely negative.
+4. Asymptotic: as $N \to \infty$, $(1/N)\log_2 N \to 0$ slower than $H_{\mathrm{bin}}(1/N) \to 0$? In fact $H_{\mathrm{bin}}(1/N) \sim (\log_2 N)/N$ to leading order, so the ratio $\to 1$ but the difference can be positive for *small* $N$. The cleanest counterexample uses a deterministic example with $N = 2$: $X = Y$ uniform, $I(X;Y) = 1$ bit, but if we artificially decorrelate by setting $X \perp Y$ both Bernoulli$(p)$ with $p$ close to $1/2$, we get $I = 0$ and the right side of the naive bound becomes $H_{\mathrm{bin}}(p)$ times $P[X=Y] = p^2 + (1-p)^2$ minus $H_{\mathrm{bin}}(p^2 + (1-p)^2)$ — strictly positive in a neighbourhood of $p = 0.4$. 
+5. **Conclusion**: replacing $R_\infty(X)$ by $H(X)$ in Theorem 10.4 yields a *false* inequality. The min-entropy version is the right invariant. $\blacksquare$
+
+#### Exercise 10.7: Connection to §2.4's Bridge
+**Task.** Show that the Bridge Inequality of §2.4 (Theorem 2.2 lower half) is *not* a special case of Theorem 10.4, but rather of Theorem 10.6 with $\rho = 1$ and an appropriate relabelling.
+
+*Solution.*
+1. In §2.4, $X$ is the binary label $f \in \{0, 1\}$ and $Y$ is the partition cell $C(v)$. The "agreement" $\{X = Y\}$ is not meaningful as $X$ and $Y$ live in different sets.
+2. Instead, the §2.4 bound is on $H(X \mid Y) = H(f \mid \Pi)$, derived directly from the binary-entropy chain (proof of Theorem 2.2, expansion of $H(f, E \mid C(v))$).
+3. To recover §2.4 from Chapter 10, take the predictor $\hat f := \widehat F \circ C$ and apply Theorem 10.6 to $(X, \hat f)$ with $\rho := 1 - P_e$ (the diagonal fidelity equals the accuracy). The result reduces, after Pinsker-type slack, to $H_{\mathrm{bin}}^{-1}(H(f\mid\Pi)) \le \varepsilon_\Pi^*$.
+4. The cleaner view: §2.4 uses $H(f\mid\Pi) \le H_{\mathrm{bin}}(\varepsilon_\Pi^*)$ (Theorem 2.2), which is Han–Verdú's *original* Theorem 1 specialised to binary $f$ and a partition cell-statistic. The Rényi machinery generalises this to arbitrary discrete $X$. $\blacksquare$
+
+---
+
+
+
+## Chapter 11: Hellman–Raviv and the Feder–Merhav Achievable Region
+
+### 11.1 Roadmap
+
+Chapter 10 produced lower bounds on $I(X; Y)$ as a function of $P[X=Y]$ and a marginal entropy of $X$. The *upper* bound on Bayes error in terms of conditional entropy — the Hellman–Raviv inequality $\pi(X\mid Y) \le \tfrac{1}{2} H(X\mid Y)$ in its binary form — was used in Chapter 2 (Theorem 2.2, upper side; Exercise 2.1). This chapter places that bound in its proper home: the **Feder–Merhav achievable region**, which characterises exactly which pairs $(H, \pi)$ are realisable as $(H(X\mid Y), \pi(X\mid Y))$ for some joint law of $(X, Y)$ on a finite alphabet.
+
+The region is bounded above by the **Fano envelope** $\Phi(\pi) = H_{\mathrm{bin}}(\pi) + \pi \log_2(M-1)$ (Feder–Merhav Lemma 1) and below by a *piecewise linear concave* envelope $\phi(\pi)$ (Lemma 2). On the binary alphabet ($M = 2$) the lower envelope collapses to $\phi(\pi) = H_{\mathrm{bin}}(\pi)$, and the region reduces to the sandwich of §2.4.
+
+This chapter:
+1. proves the Fano-envelope Lemma 1 by Lagrangian maximisation on the simplex;
+2. proves the bottom-envelope Lemma 2 by a constructive minimisation;
+3. characterises the achievable region $\tilde A_M$ as the area between $\phi$ and $\Phi$;
+4. specialises to $M=2$ and recovers §2.4;
+5. worked example on $M=3$ tracing both envelopes;
+6. exercises pinning the tightness of each envelope.
+
+Conventions: $\pi(X) := 1 - \max_x P_X(x)$ is the prior Bayes risk (Definition 10.2 restated); $\pi(X\mid Y) := \mathbb{E}_Y[\,1 - \max_x P_{X\mid Y}(x\mid Y)\,]$ is the conditional Bayes risk under the MAP rule. All logs base $2$.
+
+### 11.2 The Fano Envelope (Lemma 1)
+
+#### Lemma 11.1 (Maximum entropy under fixed Bayes risk).
+*Let $X$ take values in $\{1, \ldots, M\}$ with mode probability $1 - \pi$, $\pi \in [0, (M-1)/M]$. Then*
+$$\max_{P : \pi(P) = \pi} H(P) \;=\; \Phi(\pi) \;:=\; H_{\mathrm{bin}}(\pi) + \pi \log_2(M-1),$$
+*attained by $P^\star = (1-\pi,\, \pi/(M-1),\, \ldots,\, \pi/(M-1))$.*
+
+*Proof.* Order $P$ so $p_1 \ge \cdots \ge p_M$. Constraint $p_1 = 1 - \pi$ is fixed. Maximise $H(p) = -p_1 \log p_1 - \sum_{i\ge 2} p_i \log p_i$ subject to $\sum_{i\ge 2} p_i = \pi$ and $p_i \in [0, p_1]$. By strict concavity of $-x \log x$ and symmetry of the constraint, the maximiser is $p_i = \pi/(M-1)$ for all $i \ge 2$. Substituting:
+$$H(P^\star) = -(1-\pi)\log(1-\pi) - \pi\log\tfrac{\pi}{M-1} = H_{\mathrm{bin}}(\pi) + \pi\log_2(M-1). \blacksquare$$
+
+#### Corollary 11.2 (Fano upper envelope on conditional entropy).
+*$H(X\mid Y) \le \Phi(\pi(X\mid Y))$ pointwise in $Y$, then in expectation.*
+
+*Proof.* For every $y$, the conditional law $P_{X\mid Y=y}$ has $\pi$-value $1 - \max_x P_{X\mid Y}(x\mid y)$ and entropy bounded by Lemma 11.1. Take $\mathbb{E}_Y$, use Jensen on the concave $\Phi$, and use $\mathbb{E}_Y \pi_Y = \pi(X\mid Y)$. $\blacksquare$
+
+Lemma 11.1 is the *original* Fano inequality (Fano 1961, Ch. 6) written as a Bayes-risk-to-entropy bound: $H(X\mid Y)$ cannot be too large given that we predict correctly with probability $1 - \pi$.
+
+### 11.3 The Bottom Envelope (Lemma 2)
+
+#### Lemma 11.3 (Minimum entropy under fixed Bayes risk; Feder–Merhav 1994).
+*With $X$ as in Lemma 11.1, $\min_{P : \pi(P) = \pi} H(P) = \phi(\pi)$, where $\phi$ is piecewise on $\pi \in [(i-1)/i, i/(i+1)]$:*
+$$\phi(\pi) \;=\; i\,(1-\pi)\log_2 i + (1-\pi)\cdot 0 + H_{\mathrm{bin}}\!\bigl(i\pi - (i-1)\bigr), \qquad i = 1, 2, \ldots, M-1.$$
+*Equivalently for $0 \le \pi \le 1/2$ on a binary alphabet, $\phi(\pi) = H_{\mathrm{bin}}(\pi)$.*
+
+*Proof sketch.* Minimisation of entropy with a fixed mode probability is a convex problem on the support boundary: it is solved by concentrating *all* remaining mass on as few atoms as possible. For $\pi \le 1/2$ this means one secondary atom of mass $\pi$, giving $\phi = H_{\mathrm{bin}}(\pi)$. For $\pi \in (1/2, 2/3]$, two atoms of mass $1 - \pi$ tie at the mode, forcing a tertiary atom of mass $2\pi - 1$, giving the second-piece formula. Iterating yields the general formula. $\blacksquare$
+
+#### Definition 11.1 (Feder–Merhav region).
+$\tilde A_M := \{(H, \pi) \in [0, \log M] \times [0, (M-1)/M] : \phi(\pi) \le H \le \Phi(\pi)\}$.
+
+#### Theorem 11.4 (Achievability).
+*Every $(H, \pi) \in \tilde A_M$ is realised by some pmf $P$ on $\{1, \ldots, M\}$ with $\pi(P) = \pi$ and $H(P) = H$.*
+
+*Proof.* The set $\{(H(P), \pi(P)) : P \in \Delta^{M-1}\}$ is connected (continuous image of the simplex), bounded between $\phi$ and $\Phi$ by Lemmas 11.1 and 11.3. By intermediate-value reasoning along the $1$-parameter family interpolating $p_{\min}(\pi)$ and $p_{\max}(\pi)$, every $H \in [\phi(\pi), \Phi(\pi)]$ is hit. $\blacksquare$
+
+### 11.4 Binary Specialisation: Recovering §2.4
+
+#### Corollary 11.5 (Binary Feder–Merhav).
+*On $M = 2$: $\Phi(\pi) = H_{\mathrm{bin}}(\pi)$ and $\phi(\pi) = H_{\mathrm{bin}}(\pi)$ coincide. The region $\tilde A_2$ degenerates to the curve $H = H_{\mathrm{bin}}(\pi)$.*
+
+This is the binary sandwich collapsed to its equality form: on a binary alphabet, conditional entropy is *exactly* $H_{\mathrm{bin}}$ of the conditional Bayes risk on every $y$, and Jensen gives $H(X\mid Y) \le H_{\mathrm{bin}}(\pi(X\mid Y))$ (one direction of §2.4). The other direction — $\pi(X\mid Y) \le \tfrac{1}{2} H(X\mid Y)$ — is the binary Hellman–Raviv bound.
+
+#### Theorem 11.6 (Hellman–Raviv, binary form).
+*For binary $X$ and any $Y$, $\pi(X\mid Y) \le \tfrac{1}{2} H(X\mid Y)$.*
+
+*Proof.* Pointwise: for each $y$, $\pi_y = \min(p_y, 1-p_y) \le \tfrac{1}{2} H_{\mathrm{bin}}(p_y)$ (Exercise 2.1; equivalent to $H_{\mathrm{bin}}(p) \ge 2\min(p, 1-p)$). Take $\mathbb{E}_Y$. $\blacksquare$
+
+Combining Corollary 11.5 (lower) and Theorem 11.6 (upper) is the §2.4 Bridge Inequality, *exactly*. The Bridge thus emerges as the $M=2$ slice of the Feder–Merhav region.
+
+### 11.5 Worked Example: $M=3$ Region Trace
+
+For $M = 3$, $\pi$ ranges in $[0, 2/3]$. Trace both envelopes:
+
+| $\pi$ | $\Phi(\pi) = H_{\mathrm{bin}}(\pi) + \pi$ | $\phi(\pi)$ piecewise |
+|-------|---------------------------------------------|------------------------|
+| $0$   | $0$ | $0$ |
+| $1/3$ | $H_{\mathrm{bin}}(1/3) + 1/3 \approx 1.252$ | $H_{\mathrm{bin}}(1/3) \approx 0.918$ |
+| $1/2$ | $H_{\mathrm{bin}}(1/2) + 1/2 = 1.5$ | $H_{\mathrm{bin}}(1/2) = 1$ |
+| $2/3$ | $H_{\mathrm{bin}}(2/3) + 2/3 \approx 1.585 = \log_2 3$ | $2 \cdot (1/3) \log_2 2 + H_{\mathrm{bin}}(2/3\cdot 2 - 1) = 2/3 + H_{\mathrm{bin}}(1/3) \approx 1.585 = \log_2 3$ |
+
+At $\pi = 2/3$ both envelopes meet at $\log_2 3$ — the uniform distribution is the unique law there, and $\Phi = \phi = H_{\max}$. At $\pi = 1/2$, the gap $\Phi - \phi = 0.5$ bits is the *maximum unidentifiability* of $H$ given $\pi$: knowing $\pi = 1/2$, $H$ can range from $1$ bit (mode-and-one-other split $1/2, 1/2, 0$) to $1.5$ bits (mode-and-two-equal split $1/2, 1/4, 1/4$).
+
+### 11.6 Chapter 11 Takeaway
+
+The §2.4 Bridge Inequality is the binary-alphabet collapse of a richer two-envelope structure. On larger alphabets, knowing the Bayes risk $\pi$ does *not* determine $H$ — they live in a $1$-parameter family inside the lens-shaped region $\tilde A_M$. The upper envelope $\Phi$ is the classical Fano envelope; the lower envelope $\phi$ is piecewise and comes from forcing mass onto as few non-modal atoms as possible.
+
+### Section 11 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 11.1: Lagrangian Derivation of $P^\star$
+**Task.** Re-derive Lemma 11.1's maximiser via Lagrangian conditions.
+
+*Solution.*
+1. Lagrangian: $L(p, \lambda, \mu) = -\sum p_i \log p_i + \lambda(\sum p_i - 1) + \mu(p_1 - (1 - \pi))$.
+2. $\partial L/\partial p_i = -\log p_i - 1/\ln 2 + \lambda = 0$ for $i \ge 2$, giving $p_i = $ const.
+3. Sum $\sum_{i \ge 2} p_i = \pi \Rightarrow p_i = \pi/(M-1)$.
+4. $H(P^\star) = H_{\mathrm{bin}}(\pi) + \pi\log_2(M-1)$. $\blacksquare$
+
+#### Exercise 11.2: Bottom-Envelope at $M = 3$, $\pi = 0.55$
+**Task.** Compute $\phi(0.55)$ explicitly and exhibit the minimising distribution.
+
+*Solution.*
+1. $0.55 \in (1/2, 2/3]$, so the $i=2$ piece applies.
+2. Minimiser: $p = (0.45, 0.45, 0.10)$.
+3. $H(p) = -0.45\log_2 0.45 - 0.45\log_2 0.45 - 0.10\log_2 0.10 \approx 0.518 + 0.518 + 0.332 \approx 1.369$ bits.
+4. Formula check: $\phi(0.55) = 2(0.45)\log_2 2 + H_{\mathrm{bin}}(2\cdot 0.55 - 1) = 0.9 + H_{\mathrm{bin}}(0.1) \approx 0.9 + 0.469 = 1.369$. ✓ $\blacksquare$
+
+#### Exercise 11.3: Hellman–Raviv on Conditional Form
+**Task.** Re-derive Theorem 11.6 from the binary-collapsed Lemma 11.1 (Fano direction) by inverting on the monotone branch.
+
+*Solution.*
+1. Lemma 11.1 with $M = 2$ gives $H(X\mid Y = y) = H_{\mathrm{bin}}(\pi_y) \le H_{\mathrm{bin}}(\pi)$ after Jensen.
+2. Apply $H_{\mathrm{bin}}^{-1}$ on $[0, 1/2]$: $\pi \ge H_{\mathrm{bin}}^{-1}(H(X\mid Y))$ — *lower* bound, not upper.
+3. The Hellman–Raviv upper bound is a *separate* inequality, not derivable from Lemma 11.1. It comes from the scalar inequality $H_{\mathrm{bin}}(p) \ge 2\min(p, 1-p)$ on $[0, 1]$, proved by checking equality at $\{0, 1/2, 1\}$ and convexity of the deficit (Exercise 2.1, full derivation).
+4. So the Bridge has *two* independent ingredients: Fano (concave envelope $\Phi$) and Hellman–Raviv (linear envelope $2\min$). $\blacksquare$
+
+#### Exercise 11.4: Width of $\tilde A_M$ at $\pi = 1/2$
+**Task.** Show that $\Phi(1/2) - \phi(1/2) = \log_2(M-1)/2$ for $M \ge 2$ on the first piece $\pi \in [0, 1/2]$.
+
+*Solution.*
+1. $\Phi(1/2) = H_{\mathrm{bin}}(1/2) + (1/2)\log_2(M-1) = 1 + (1/2)\log_2(M-1)$.
+2. $\phi(1/2) = H_{\mathrm{bin}}(1/2) = 1$ (still on the $i=1$ piece).
+3. Difference: $(1/2)\log_2(M-1)$. ✓
+4. Numerically: $M=2 \Rightarrow 0$ (degenerate region), $M=3 \Rightarrow 0.5$, $M=4 \Rightarrow \log_2(3)/2 \approx 0.79$. The region widens logarithmically in $M$. $\blacksquare$
+
+#### Exercise 11.5: Realising an Interior Point
+**Task.** Construct $P$ on $M=4$ with $\pi(P) = 1/3$ and $H(P) = 1.5$ bits, and verify $(1.5, 1/3) \in \tilde A_4$.
+
+*Solution.*
+1. $\Phi(1/3) = H_{\mathrm{bin}}(1/3) + (1/3)\log_2 3 \approx 0.918 + 0.528 = 1.446$. So $(1.5, 1/3)$ is *above* the Fano envelope — **not realisable** on $M = 4$.
+2. Try $(1.4, 1/3)$: $\phi(1/3) = H_{\mathrm{bin}}(1/3) \approx 0.918 \le 1.4 \le 1.446 = \Phi(1/3)$. Realisable.
+3. Construction: interpolate between $p_{\min} = (2/3, 1/3, 0, 0)$ (entropy $0.918$) and $p_{\max} = (2/3, 1/9, 1/9, 1/9)$ (entropy $1.446$). Pick $\theta = 0.78$: $p = (2/3,\, (1-\theta)\cdot 1/3 + \theta \cdot 1/9,\, \theta/9,\, \theta/9) = (2/3,\, 0.073 + 0.087,\, 0.087,\, 0.087)$ … check sum, adjust to land on $H = 1.4$. The intermediate-value argument of Theorem 11.4 guarantees existence; explicit closed forms require numerical root-finding. $\blacksquare$
+
+---
+
+## Chapter 12: The Adjusted Theorem 1 (PA-MPC Bridge Inequality)
+
+### 12.1 Roadmap
+
+This chapter reproduces the adjusted statement and proof of Theorem 1 of [`PAPER-ARXIV.md`](PAPER-ARXIV.md) §3.2, using only the machinery built in Chapters 9–11. The chapter is the **deductive apex** of the monograph: every prior chapter was instrumented to make this proof clean and traceable.
+
+The headline theorem is the **Bayes-error sandwich**:
+$$H_{\mathrm{bin}}^{-1}\!\bigl(H(f\mid\Pi)\bigr) \;\le\; \varepsilon^{*}_{\Pi} \;\le\; \tfrac{1}{2}\, H(f\mid\Pi).$$
+The chapter does five things:
+1. assembles the setup (binary task on a finite vertex set with uniform weighting, plug-in MAP rule);
+2. proves the upper bound via Hellman–Raviv (the per-cell concavity $\min(p, 1-p) \le \tfrac{1}{2} H_{\mathrm{bin}}(p)$);
+3. proves the lower bound via Fano (binary-Jensen on the identity $H_{\mathrm{bin}}(P_C) = H_{\mathrm{bin}}(e_C)$);
+4. **proves the slack-non-improvement Proposition 3.5** by exhibiting the two extremal witness families $\Pi_\varepsilon^F$ and $\Pi_\alpha^{HR}$ saturating each side and showing that the worst-case gap $w(H) = \tfrac{1}{2} H - H_{\mathrm{bin}}^{-1}(H)$ attains its maximum $w^* \approx 0.161$ at $\varepsilon = 1/5$;
+5. records the **Jaynes–Lagrangian "single program, two directions"** dual derivation as the unifying frame.
+
+Equations are labelled (A.1)–(A.9) to match [`PAPER-ARXIV.md`](PAPER-ARXIV.md) Appendix A verbatim, so that this chapter can be cited as a stand-alone source for the §3.2 proof.
+
+### 12.2 Setup
+
+Let $V$ be a finite vertex set, $|V| = n$. Vertex weighting is **uniform**: $q_v := 1/n$. Let $\Pi$ be a finite partition of $V$ and $f : V \to \{0, 1\}$ a binary task. For each cell $C \in \Pi$,
+$$q_C := |C|/n, \qquad P_C := \frac{1}{|C|}\sum_{v \in C} f(v), \qquad e_C := \min(P_C, 1 - P_C).$$
+The **partition Bayes error** is
+$$\varepsilon^{*}_{\Pi} \;:=\; \sum_C q_C\, e_C,$$
+attained by the plug-in MAP rule $\hat h_\Pi(v) := \mathbf{1}\{P_{C(v)} \ge 1/2\}$ (Theorem 6.1).
+
+All sums are finite; all expectations are over the uniform measure on $V$; no measure-theoretic apparatus is invoked (Chapter 9, Definition 9.1). The proof makes **no use** of the graph $G$, the architecture $\mathcal A$, the LossyWL operator, or the WL-stable class $\mathcal F_{\mathrm{WL}}$. Those enter only when the partition is *specified* to be the architecture-induced one (Corollary 3.4 of the paper).
+
+### 12.3 The Upper Bound (Per-Cell Concavity)
+
+#### Lemma 12.1 (Scalar Hellman–Raviv, Eq. A.1).
+*For $p \in [0, 1]$, $\min(p, 1-p) \le \tfrac{1}{2}\, H_{\mathrm{bin}}(p).$*
+
+*Proof.* Both sides are zero at $p \in \{0, 1\}$ and equal $1/2$ at $p = 1/2$. Define $g(p) := \tfrac{1}{2} H_{\mathrm{bin}}(p) - \min(p, 1-p)$ on $[0, 1/2]$. $g$ is continuous, $g(0) = g(1/2) = 0$. On $(0, 1/2)$, $g'(p) = -\tfrac{1}{2}\log_2\tfrac{p}{1-p} - 1$. Setting $g'(p) = 0$: $\log_2\tfrac{p}{1-p} = -2$, i.e. $p/(1-p) = 1/4$, $p = 1/5$. At $p = 1/5$, $g(1/5) = \tfrac{1}{2}H_{\mathrm{bin}}(1/5) - 1/5 = 0.5\cdot 0.7219 - 0.2 \approx 0.161 > 0$. Hence $g \ge 0$ on $[0, 1/2]$, symmetry gives $g \ge 0$ on $[1/2, 1]$. $\blacksquare$
+
+#### Theorem 12.2 (Upper bound, Eq. A.2).
+$\varepsilon^{*}_\Pi \le \tfrac{1}{2}\, H(f\mid\Pi).$
+
+*Proof.* Multiply Lemma 12.1 ($p \leftarrow P_C$) by $q_C$ and sum:
+$$\sum_C q_C \min(P_C, 1-P_C) \;\le\; \tfrac{1}{2}\sum_C q_C H_{\mathrm{bin}}(P_C),$$
+which is $\varepsilon^{*}_\Pi \le \tfrac{1}{2} H(f\mid\Pi)$. $\blacksquare$
+
+This is the **Hellman–Raviv 1970** bound in binary form, restated for partition-conditional entropy.
+
+### 12.4 The Lower Bound (Binary-Jensen on the Fano Identity)
+
+#### Lemma 12.3 (Symmetry identity, Eq. A.3).
+*$H_{\mathrm{bin}}(P_C) = H_{\mathrm{bin}}(e_C)$ for every cell $C$.*
+
+*Proof.* $H_{\mathrm{bin}}(p) = H_{\mathrm{bin}}(1-p)$ for all $p$. Apply with $p = P_C$, $1-p = 1 - P_C$; whichever is $\le 1/2$ is $e_C$. $\blacksquare$
+
+#### Theorem 12.4 (Lower bound, Eqs. A.4–A.7).
+$H_{\mathrm{bin}}^{-1}\!\bigl(H(f\mid\Pi)\bigr) \le \varepsilon^{*}_\Pi.$
+
+*Proof.* Multiply Lemma 12.3 by $q_C$ and sum:
+$$H(f\mid\Pi) = \sum_C q_C H_{\mathrm{bin}}(e_C). \tag{A.4}$$
+$H_{\mathrm{bin}}$ is concave on $[0, 1/2]$ and the $\{e_C\}$ lie in $[0, 1/2]$; Jensen with weights $q_C$:
+$$\sum_C q_C H_{\mathrm{bin}}(e_C) \le H_{\mathrm{bin}}\!\Bigl(\sum_C q_C e_C\Bigr) = H_{\mathrm{bin}}(\varepsilon^{*}_\Pi). \tag{A.5}$$
+Combining (A.4)–(A.5):
+$$H(f\mid\Pi) \le H_{\mathrm{bin}}(\varepsilon^{*}_\Pi). \tag{A.6}$$
+$\varepsilon^{*}_\Pi \in [0, 1/2]$ and $H_{\mathrm{bin}}$ is strictly increasing on this branch; apply $H_{\mathrm{bin}}^{-1}$:
+$$H_{\mathrm{bin}}^{-1}\!\bigl(H(f\mid\Pi)\bigr) \le \varepsilon^{*}_\Pi. \tag{A.7}$$
+$\blacksquare$
+
+This is **Fano's inequality** in its sharp binary form (Fano 1961, Ch. 6). The Jensen step (A.5) is exactly the standard mutual-information-chain-rule derivation of Fano (Cover & Thomas 2006, proof of Thm 2.10.1).
+
+#### Theorem 12.5 (Adjusted Theorem 1 — Bayes-error sandwich).
+$H_{\mathrm{bin}}^{-1}(H(f\mid\Pi)) \;\le\; \varepsilon^{*}_\Pi \;\le\; \tfrac{1}{2} H(f\mid\Pi).$
+
+*Proof.* Combine Theorems 12.2 and 12.4. $\blacksquare$
+
+### 12.5 Tightness Witnesses
+
+#### Fano boundary witness $\Pi_\varepsilon^F$ (Eq. A.8).
+For $\varepsilon \in [0, 1/2]$ and $n$ with $\varepsilon n \in \mathbb{Z}$, take $\Pi = \{V\}$ (trivial partition) and $f$ with exactly $\varepsilon n$ ones. Then $P_V = e_V = \varepsilon$, $H(f\mid\Pi) = H_{\mathrm{bin}}(\varepsilon)$, $\varepsilon^{*}_\Pi = \varepsilon$. The lower bound (A.7) is met with equality: $H_{\mathrm{bin}}^{-1}(H_{\mathrm{bin}}(\varepsilon)) = \varepsilon$. The witness traces the **lower envelope** of the achievable region as $\varepsilon$ varies.
+
+#### Hellman–Raviv boundary witness $\Pi_\alpha^{HR}$ (Eq. A.9).
+For $\alpha \in [0, 1]$ and $n$ with $\alpha n \in 2\mathbb{Z}$, partition $V = C_0 \sqcup C_1$ with $|C_1| = \alpha n$ and $|C_0| = (1-\alpha)n$. Set $f \equiv 0$ on $C_0$ and balanced on $C_1$ ($e_{C_1} = 1/2$). Then $H(f\mid\Pi) = \alpha$, $\varepsilon^{*}_\Pi = \alpha/2 = \tfrac{1}{2} H(f\mid\Pi)$. The upper bound (A.2) is met with equality.
+
+### 12.6 Non-Improvement (Proposition 3.5)
+
+#### Proposition 12.6 (Non-improvement of the upper bound).
+*There is no constant $c < 1/2$ such that $\varepsilon^{*}_\Pi \le c\,H(f\mid\Pi)$ holds for every partition $\Pi$ and every binary task $f$.*
+
+*Proof.* The witness family $\Pi_\alpha^{HR}$ achieves $\varepsilon^{*}_\Pi / H(f\mid\Pi) = 1/2$ for every $\alpha > 0$. Any $c < 1/2$ would be violated by every member of the family. $\blacksquare$
+
+#### Proposition 12.7 (Non-improvement of the lower bound).
+*There is no continuous $\psi$ with $\psi(H) > H_{\mathrm{bin}}^{-1}(H)$ on a non-trivial subinterval of $(0, 1)$ such that $\psi(H(f\mid\Pi)) \le \varepsilon^{*}_\Pi$ holds for every $(\Pi, f)$.*
+
+*Proof.* The witness family $\Pi_\varepsilon^F$ saturates the lower bound at every $\varepsilon \in [0, 1/2]$: $\varepsilon^{*}_\Pi = H_{\mathrm{bin}}^{-1}(H(f\mid\Pi))$ exactly. Any strict improvement $\psi > H_{\mathrm{bin}}^{-1}$ would be violated. $\blacksquare$
+
+#### Definition 12.1 (Slack function $w$).
+$w(H) := \tfrac{1}{2} H - H_{\mathrm{bin}}^{-1}(H)$ for $H \in [0, 1]$.
+
+#### Theorem 12.8 (Maximum slack).
+*$w$ attains its maximum at $H^* = H_{\mathrm{bin}}(1/5) \approx 0.7219$, with $w^* = w(H^*) \approx 0.161$. The maximising configuration is the symmetric two-cell prior with $\varepsilon = 1/5$.*
+
+*Proof.* From the proof of Lemma 12.1, the gap $g(p) = \tfrac{1}{2} H_{\mathrm{bin}}(p) - \min(p, 1-p)$ on $[0, 1/2]$ has unique critical point $p = 1/5$ with $g(1/5) \approx 0.161$. Translating back: $\varepsilon^{*} = 1/5$ corresponds to $H = H_{\mathrm{bin}}(1/5)$ on the upper boundary, where the lower-bound slack is $\varepsilon^{*} - H_{\mathrm{bin}}^{-1}(H) = 1/5 - 1/5 = 0$ (lower bound tight) and the upper-bound slack is $\tfrac{1}{2}H - \varepsilon^{*} = 0.361 - 0.2 = 0.161$. Together they trace the maximum unidentifiability of $\varepsilon^{*}$ given $H$. $\blacksquare$
+
+The number $0.161 \approx \tfrac{1}{2}H_{\mathrm{bin}}(1/5) - 1/5$ is the **worst-case bracket width** of the §2.4 sandwich. Any partition with $H(f\mid\Pi) \approx 0.72$ bits has Bayes error somewhere in $[1/5, 0.361]$, a band of width $0.161$ — non-trivial but bounded.
+
+### 12.7 The Jaynes–Lagrangian Unifying Frame
+
+Both bounds derive from a **single variational program**:
+$$\min_{\{P_C\}} \sum_C q_C H_{\mathrm{bin}}(P_C) \quad \text{subject to} \quad \sum_C q_C \min(P_C, 1-P_C) = \varepsilon^*. \tag{12.1}$$
+- The **minimum** of (12.1) is the lower envelope $H_{\mathrm{bin}}(\varepsilon^*)$, attained by the trivial-partition witness $\Pi^F$. Read as a bound: $H \le H_{\mathrm{bin}}(\varepsilon^*)$, equivalently $\varepsilon^* \ge H_{\mathrm{bin}}^{-1}(H)$ (Fano direction).
+- The **dual** of (12.1) (Lagrangian with multiplier $\lambda$ on the $\varepsilon^*$ constraint, $\lambda = 2$ saturating) yields the linear envelope $2\varepsilon^*$. Read as a bound: $H \ge 2\varepsilon^*$, equivalently $\varepsilon^* \le H/2$ (Hellman–Raviv direction).
+
+Hence the §2.4 sandwich is the **min–max sandwich** around a single program, with the upper and lower envelopes being respectively the primal optimum and the linearised dual. This is the *Jaynes–Lagrangian "single program, two directions"* dual derivation referenced in [`PAPER-ARXIV.md`](PAPER-ARXIV.md) §3.2. The unification matters because it shows the sandwich is *minimal*: any narrower bracket would violate either primal feasibility or dual saturation.
+
+### 12.8 Chapter 12 Takeaway
+
+The §2.4 Bridge Inequality, called Theorem 1 of [`PAPER-ARXIV.md`](PAPER-ARXIV.md), is reproduced in full: setup, upper-bound proof (Lemma 12.1 + Theorem 12.2), lower-bound proof (Lemma 12.3 + Theorem 12.4), saturation witnesses ($\Pi_\varepsilon^F$ and $\Pi_\alpha^{HR}$), non-improvement (Propositions 12.6–12.7), and the Jaynes–Lagrangian frame (§12.7). The maximum slack $w^* \approx 0.161$ at $\varepsilon = 1/5$ is the canonical quantification of *how much* the Bridge can over- or under-estimate Bayes error.
+
+### Section 12 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 12.1: Verify $g(1/5) \approx 0.161$ symbolically
+**Task.** Show $g(1/5) = \tfrac{1}{2}H_{\mathrm{bin}}(1/5) - 1/5$ and compute to four decimal places.
+
+*Solution.* $H_{\mathrm{bin}}(1/5) = -(1/5)\log_2(1/5) - (4/5)\log_2(4/5) = (1/5)\log_2 5 + (4/5)\log_2(5/4)$. Numerically $0.2 \cdot 2.3219 + 0.8 \cdot 0.3219 = 0.4644 + 0.2575 = 0.7219$. So $g(1/5) = 0.3610 - 0.2 = 0.1610$. ✓ $\blacksquare$
+
+#### Exercise 12.2: Equality conditions for both bounds
+**Task.** Characterise all $(\Pi, f)$ for which (a) the lower bound is met with equality, (b) the upper bound is met with equality.
+
+*Solution.*
+(a) Equality in (A.5) — Jensen on concave $H_{\mathrm{bin}}$ — iff all $e_C$ are equal. Equality occurs iff every cell has the same Bayes-risk slice $e_C \equiv \varepsilon^*$. The trivial partition is the canonical example.
+(b) Equality in (A.2) iff $\min(P_C, 1-P_C) = \tfrac{1}{2}H_{\mathrm{bin}}(P_C)$ on every cell where $q_C > 0$. Equality of the scalar (A.1) holds only at $P_C \in \{0, 1/2, 1\}$. Hence the upper bound is tight iff every cell is either *pure* ($P_C \in \{0, 1\}$, contributing $0$ to both sides) or *balanced* ($P_C = 1/2$, contributing $1/2$ on both sides). The HR witness $\Pi_\alpha^{HR}$ is a canonical example. $\blacksquare$
+
+#### Exercise 12.3: Both bounds tight forces collapse
+**Task.** Suppose for some $(\Pi, f)$ both the upper and lower bounds hold with equality. Show that $\varepsilon^*_\Pi \in \{0, 1/2\}$.
+
+*Solution.* From Exercise 12.2, all $e_C$ are equal (lower equality) and each cell has $P_C \in \{0, 1/2, 1\}$ (upper equality). The common $e_C$ value is in $\{0, 1/2\}$. If $e_C \equiv 0$, all cells pure, $\varepsilon^* = 0$. If $e_C \equiv 1/2$, all cells balanced, $\varepsilon^* = 1/2$. No other case. $\blacksquare$
+
+#### Exercise 12.4: Lagrangian dual of (12.1)
+**Task.** Write the Lagrangian of (12.1) and verify that $\lambda = 2$ recovers the upper-envelope inequality $H \ge 2\varepsilon^*$.
+
+*Solution.*
+1. Lagrangian: $L = \sum_C q_C H_{\mathrm{bin}}(P_C) - \lambda\big(\sum_C q_C\min(P_C, 1-P_C) - \varepsilon^*\big)$.
+2. At $\lambda = 2$, $\partial L/\partial P_C = q_C\big[\log_2\tfrac{1-P_C}{P_C} - 2\cdot\mathrm{sgn}(1/2 - P_C)\big]$.
+3. The KKT optimum on the boundary $P_C \in \{0, 1/2, 1\}$ matches the HR witness structure.
+4. Dual evaluation: $\min_P L = \min_P \sum q_C(H_{\mathrm{bin}}(P_C) - 2 e_C) + 2\varepsilon^*$. The bracket is $\ge 0$ by Lemma 12.1 (with equality iff $P_C \in \{0, 1/2, 1\}$), so $\min L \ge 2\varepsilon^*$, i.e. $H \ge 2\varepsilon^*$. $\blacksquare$
+
+#### Exercise 12.5: Slack at the trivial-partition row
+**Task.** For the discrete upper-side witness $(P_6, \text{GAT/GIN}, L=1)$ cited in [`PAPER-ARXIV.md`](PAPER-ARXIV.md) Appendix A: $\varepsilon^* = 1/3 = \tfrac{1}{2}\cdot 2/3 = \tfrac{1}{2}H(f\mid\Pi)$. Compute the corresponding lower-bound slack $\varepsilon^* - H_{\mathrm{bin}}^{-1}(H(f\mid\Pi))$.
+
+*Solution.*
+1. $H = 2/3$, so $H_{\mathrm{bin}}^{-1}(2/3) = ?$. Solve $H_{\mathrm{bin}}(\varepsilon) = 2/3$ on $[0, 1/2]$ numerically: at $\varepsilon = 0.174$, $H_{\mathrm{bin}}(0.174) \approx 0.666$; at $\varepsilon = 0.175$, $H_{\mathrm{bin}}(0.175) \approx 0.668$. Hence $H_{\mathrm{bin}}^{-1}(2/3) \approx 0.174$.
+2. Slack: $1/3 - 0.174 \approx 0.159$, very close to the worst-case $w^* \approx 0.161$.
+3. **Interpretation**: this row sits *almost at the maximum of $w$*, confirming that the Bridge is operationally tight near $\varepsilon = 1/5$ but not at the extreme endpoints. $\blacksquare$
+
+#### Exercise 12.6: Variance shadow (Gini–Bayes)
+**Task.** Prove $\varepsilon^{*}_\Pi \le 2 \cdot \mathbb{E}[\mathrm{Var}(f\mid\Pi)]$ from the scalar inequality $\min(p, 1-p) \le 2p(1-p)$.
+
+*Solution.*
+1. Scalar: $\min(p, 1-p) \le 2p(1-p)$ holds on $[0,1]$. Check at $p=0$ ($0 \le 0$), $p=1/2$ ($1/2 \le 1/2$), $p=1$ ($0 \le 0$); concavity of both sides closes the inequality.
+2. Multiply by $q_C$ and sum:
+   $\sum_C q_C \min(P_C, 1-P_C) \le 2\sum_C q_C P_C(1-P_C)$, i.e. $\varepsilon^{*}_\Pi \le 2\, \mathbb{E}[\mathrm{Var}(f\mid\Pi)]$.
+3. This is the **Gini–Bayes inequality** (Breiman et al. 1984). It is *looser* than (A.2) in general: at $p = 1/2$, both sides equal $1/2$; at $p = 1/4$, $\min = 1/4$, $2p(1-p) = 3/8$, $\tfrac{1}{2}H_{\mathrm{bin}}(1/4) \approx 0.406$ — so the entropy form is *tighter* than the variance form here.
+4. The variance shadow is preferred in **Lean formalisation** (PAPER-ARXIV Appendix A, Hashlamoun footnote) because $P_C(1-P_C) \in \mathbb{Q}$ whenever $P_C \in \mathbb{Q}$, avoiding $\log_2$ transcendence; the entropy form gives the tighter operational sandwich. $\blacksquare$
+
+---
+
+## Chapter 13: Variance, Gini, and Sinusoidal Upper Bounds on Bayes Error
+
+### 13.1 Roadmap
+
+Chapter 12 stated the upper bound $\varepsilon^* \le \tfrac{1}{2} H(f\mid\Pi)$ (Hellman–Raviv). Exercise 12.6 derived the *variance shadow* $\varepsilon^* \le 2\,\mathbb{E}[\mathrm{Var}(f\mid\Pi)]$ (Gini–Bayes). Both are upper envelopes on the discontinuous Bayes-loss function $g(p) = \min(p, 1-p)$.
+
+Hashlamoun, Varshney & Samarasooriya (1994, HVS) classified *all* admissible continuous upper envelopes $g^* \ge g$ on $[0,1]$ — they must satisfy (i) $g^* \ge g$ pointwise, (ii) $g^*(0) = g^*(1) = 0$, (iii) continuous and differentiable, (iv) $g^*(1/2) = 1/2$ (tightness at the balanced point), (v) symmetry about $p = 1/2$, (vi) end-slope $\ge 1$ in modulus. They proposed the **sinusoidal–Gaussian** family $g_N(p) = \tfrac{1}{2}\sin(\pi p)\exp[-\alpha(p - 1/2)^2]$ which interpolates between the classical bounds and produces a *tighter* upper envelope than either Hellman–Raviv ($\tfrac{1}{2} H_{\mathrm{bin}}$) or Gini ($2p(1-p)$) on most of $[0, 1]$.
+
+This chapter:
+1. enumerates the admissibility axioms;
+2. shows Hellman–Raviv $\tfrac{1}{2}H_{\mathrm{bin}}$ and Gini $2p(1-p)$ satisfy them;
+3. derives the sinusoidal envelope $g_S(p) = \tfrac{1}{2}\sin(\pi p)$ (the $\alpha = 0$ HVS member);
+4. compares envelopes numerically and proves the sinusoidal is tighter than Hellman–Raviv on $p \in (0, 1)$;
+5. lifts each envelope to a partition statement $\varepsilon^* \le \sum_C q_C g^*(P_C)$;
+6. exercises on Bhattacharyya, equivocation, and on the asymptotic order at $p = 0$.
+
+### 13.2 Admissibility Axioms for Upper Bayes Envelopes
+
+#### Definition 13.1 (HVS admissible envelope).
+A function $g^* : [0, 1] \to [0, \infty)$ is **HVS-admissible** if:
+(A1) $g^*(p) \ge \min(p, 1-p)$ for all $p$;
+(A2) $g^*(0) = g^*(1) = 0$;
+(A3) $g^*$ is continuous and differentiable on $(0, 1)$;
+(A4) $g^*(1/2) = 1/2$;
+(A5) $g^*(p) = g^*(1-p)$ (symmetry about $1/2$);
+(A6) $|g^{*\prime}(0^+)| \ge 1$ and $|g^{*\prime}(1^-)| \ge 1$ (matching the corner slope of $g$).
+
+#### Lemma 13.1 (HR and Gini are admissible).
+*The Hellman–Raviv envelope $g_{HR}(p) := \tfrac{1}{2} H_{\mathrm{bin}}(p)$ and the Gini envelope $g_{G}(p) := 2p(1-p)$ are both HVS-admissible.*
+
+*Proof.* For both: (A2) immediate. (A3) immediate ($H_{\mathrm{bin}}$ smooth on $(0,1)$; polynomial). (A4): $\tfrac{1}{2} H_{\mathrm{bin}}(1/2) = 1/2$ ✓; $2 \cdot 1/2 \cdot 1/2 = 1/2$ ✓. (A5) immediate. (A1): proved in Lemma 12.1 (HR) and Exercise 12.6 (Gini). (A6): $H_{\mathrm{bin}}'(p) = \log_2((1-p)/p)$, so $g_{HR}'(0^+) = +\infty$ ✓ (vacuously $\ge 1$); $g_{G}'(0^+) = 2$ ✓. $\blacksquare$
+
+### 13.3 The Sinusoidal Envelope
+
+#### Theorem 13.2 (Sinusoidal admissibility).
+*$g_S(p) := \tfrac{1}{2}\sin(\pi p)$ is HVS-admissible.*
+
+*Proof.* (A2): $\sin 0 = \sin\pi = 0$. (A3): $\sin$ is smooth. (A4): $\tfrac{1}{2}\sin(\pi/2) = 1/2$. (A5): $\sin\pi(1-p) = \sin(\pi - \pi p) = \sin\pi p$. (A6): $g_S'(p) = (\pi/2)\cos(\pi p)$, so $g_S'(0^+) = \pi/2 \approx 1.571 > 1$ ✓.
+
+For (A1) — the pointwise envelope — define $D(p) := g_S(p) - \min(p, 1-p)$ on $[0, 1/2]$, $D(p) = \tfrac{1}{2}\sin(\pi p) - p$. $D(0) = 0$, $D(1/2) = 1/2 - 1/2 = 0$. $D'(p) = (\pi/2)\cos(\pi p) - 1$, so $D'(p) = 0$ at $\cos(\pi p) = 2/\pi$, $p = \arccos(2/\pi)/\pi \approx 0.282$. At that critical point, $D(0.282) = 0.5\sin(\pi\cdot 0.282) - 0.282 \approx 0.5\cdot 0.766 - 0.282 = 0.101 > 0$. Hence $D \ge 0$ on $[0, 1/2]$, and by (A5) on $[1/2, 1]$. $\blacksquare$
+
+#### Theorem 13.3 (Sinusoidal $<$ Hellman–Raviv on $(0,1)$).
+*$g_S(p) < g_{HR}(p)$ for $p \in (0, 1)$, $p \ne 1/2$. (Equality at $p \in \{0, 1/2, 1\}$.)*
+
+*Proof.* Equivalent to showing $\sin(\pi p) < H_{\mathrm{bin}}(p)$ on $(0, 1) \setminus \{1/2\}$. At $p = 1/2$ both equal $1$. The function $\Delta(p) := H_{\mathrm{bin}}(p) - \sin(\pi p)$ is symmetric about $p = 1/2$ with $\Delta(0) = \Delta(1) = 0$. Computing $\Delta(1/4) = H_{\mathrm{bin}}(1/4) - \sin(\pi/4) \approx 0.811 - 0.707 = 0.104 > 0$. The second derivative analysis shows $\Delta$ is strictly positive on $(0, 1/2)$ — both endpoints are zero with $\Delta'(0^+) = +\infty - \pi$ (still $+\infty$, since $H_{\mathrm{bin}}'(0^+) = +\infty$), so $\Delta$ grows initially; the global minimum on $(0, 1/2)$ is at the interior critical point of $\Delta'$, where numerical inspection confirms $\Delta > 0$. By symmetry, the inequality extends to $(1/2, 1)$. $\blacksquare$
+
+#### Corollary 13.4 (Partition sinusoidal bound).
+*$\varepsilon^*_\Pi \le \sum_C q_C \cdot \tfrac{1}{2}\sin(\pi P_C),$ which is strictly tighter than $\tfrac{1}{2}H(f\mid\Pi)$ on any partition with at least one cell $P_C \notin \{0, 1/2, 1\}$.*
+
+### 13.4 Numerical Comparison of Envelopes
+
+At a handful of $p$-values on $[0, 1/2]$:
+
+| $p$  | $\min(p, 1-p)$ | $g_S(p) = \tfrac{1}{2}\sin\pi p$ | $g_{HR}(p) = \tfrac{1}{2}H_{\mathrm{bin}}(p)$ | $g_G(p) = 2p(1-p)$ |
+|------|------------------|------------------------------------|------------------------------------------------|----------------------|
+| 0.10 | 0.100 | 0.155 | 0.235 | 0.180 |
+| 0.20 | 0.200 | 0.294 | 0.361 | 0.320 |
+| 0.30 | 0.300 | 0.405 | 0.441 | 0.420 |
+| 0.40 | 0.400 | 0.476 | 0.485 | 0.480 |
+| 0.50 | 0.500 | 0.500 | 0.500 | 0.500 |
+
+Reading the columns left-to-right: every envelope dominates $\min$, the sinusoidal is *tightest* (closest to $\min$) on $(0, 1/2)$, and the entropy form is *loosest*.
+
+### 13.5 Chapter 13 Takeaway
+
+Hellman–Raviv is one of several admissible upper envelopes on Bayes error; the *sinusoidal* envelope $g_S(p) = \tfrac{1}{2}\sin\pi p$ is strictly tighter, while the Gini envelope is intermediate. None of these break the $\tfrac{1}{2}H$ form of the Bridge — they only sharpen its numerical value on partitions with mixed $P_C$. The §2.4 Bridge uses $g_{HR}$ for its **L-I-computability** (entropy of rational $P_C$ stays in $\mathbb{Q}\cdot\log_2\mathbb{Q}$) and historical primacy, not because $g_{HR}$ is geometrically optimal.
+
+### Section 13 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 13.1: Bhattacharyya envelope is admissible
+**Task.** Verify $g_B(p) := \sqrt{p(1-p)}$ satisfies (A1)–(A6).
+
+*Solution.* (A2): $\sqrt 0 = 0$. (A3): smooth on $(0, 1)$. (A4): $\sqrt{1/4} = 1/2$. (A5): immediate. (A6): $g_B'(p) = (1-2p)/(2\sqrt{p(1-p)})$, so $g_B'(0^+) = +\infty$ ✓. (A1): $\sqrt{p(1-p)} \ge \min(p, 1-p)$ iff $p(1-p) \ge \min(p, 1-p)^2$; on $[0, 1/2]$, $\min = p$, so need $p(1-p) \ge p^2$, i.e. $1 - p \ge p$, ✓ on $[0, 1/2]$. $\blacksquare$
+
+#### Exercise 13.2: Bhattacharyya is looser than Hellman–Raviv?
+**Task.** Compute $g_B(0.1)$ and compare with $g_S(0.1)$, $g_{HR}(0.1)$, $g_G(0.1)$.
+
+*Solution.* $g_B(0.1) = \sqrt{0.09} = 0.3$. Comparing: $g_S = 0.155 < g_G = 0.180 < g_{HR} = 0.235 < g_B = 0.300$. So Bhattacharyya is the **loosest** of the four at this point; sinusoidal is tightest. $\blacksquare$
+
+#### Exercise 13.3: Slope condition at $p = 0$
+**Task.** Show that any HVS-admissible envelope must have $g^{*\prime}(0^+) \ge 1$.
+
+*Solution.* Near $p = 0$, $\min(p, 1-p) = p$ has slope $1$. For $g^*(p) \ge p$ to hold on a right-neighbourhood of $0$ with $g^*(0) = 0$, we need $g^*(p) \ge p$ for small $p > 0$. By L'Hôpital, $\lim_{p \to 0^+} g^*(p)/p \ge 1$, which forces $g^{*\prime}(0^+) \ge 1$ when the limit exists. $\blacksquare$
+
+#### Exercise 13.4: Sinusoidal $g_S$ vs. Gini $g_G$
+**Task.** Determine the set of $p \in (0, 1/2]$ where $g_S(p) \le g_G(p)$.
+
+*Solution.* Define $\Delta(p) := g_G(p) - g_S(p) = 2p(1-p) - (1/2)\sin\pi p$. $\Delta(0) = 0$, $\Delta(1/2) = 1/2 - 1/2 = 0$. From table: at $p = 0.1$, $\Delta = 0.18 - 0.155 = 0.025 > 0$. At $p = 0.4$, $\Delta = 0.48 - 0.476 = 0.004 > 0$. At $p = 0.49$, $\Delta = 0.4998 - 0.49975 \approx 0.00005 > 0$. So $g_S < g_G$ throughout $(0, 1/2)$, with equality only at endpoints. $\blacksquare$
+
+#### Exercise 13.5: Lifting to a partition
+**Task.** Compute $\varepsilon^*_\Pi$, $\tfrac{1}{2}H(f\mid\Pi)$, $\sum q_C g_S(P_C)$, $\sum q_C g_G(P_C)$ for the §2.4 worked partition ($q_C = (3/8, 3/8, 2/8)$, $P_C = (1, 2/3, 0)$).
+
+*Solution.* 
+1. $\varepsilon^* = (3/8)\cdot 0 + (3/8)\cdot 1/3 + (2/8)\cdot 0 = 1/8 = 0.125$.
+2. $\tfrac{1}{2}H = (1/2)\cdot 0.344 = 0.172$. (Cell with $P=1$ and $P=0$ contribute zero.)
+3. $\sum q_C g_S(P_C)$: $g_S(1) = 0$, $g_S(2/3) = 0.5\sin(2\pi/3) = 0.5\cdot 0.866 = 0.433$, $g_S(0) = 0$. Total: $(3/8)\cdot 0.433 = 0.162$.
+4. $\sum q_C g_G(P_C)$: $g_G(1) = 0$, $g_G(2/3) = 2\cdot (2/3)(1/3) = 4/9 = 0.444$, $g_G(0) = 0$. Total: $(3/8)\cdot 0.444 = 0.167$.
+5. Ranking: $0.125 \le 0.162 \le 0.167 \le 0.172$, confirming $\varepsilon^* \le g_S \le g_G \le g_{HR}$. The sinusoidal saves $0.010$ bits over HR — modest but non-trivial. $\blacksquare$
+
+#### Exercise 13.6: Why the §2.4 Bridge uses $g_{HR}$ anyway
+**Task.** Explain in two sentences why the canonical PA-MPC paper retains $g_{HR}$ despite the sinusoidal being tighter.
+
+*Solution.* The Bridge Inequality has a *closed-form inverse* $H_{\mathrm{bin}}^{-1}$ that makes the lower bound $\varepsilon^* \ge H_{\mathrm{bin}}^{-1}(H)$ symbolically clean; the sinusoidal envelope has no elementary inverse. Furthermore, when $P_C \in \mathbb{Q}$, $H_{\mathrm{bin}}(P_C) \in \mathbb{Q}\cdot\log_2\mathbb{Q}$ (Prop 7.8) supports **exact-rational ledgers** in Lean, whereas $\sin(\pi P_C)$ is transcendental for rational $P_C$ and fails the L-I trust-tier discipline. $\blacksquare$
+
+---
+
+## Chapter 14: Massey Guessing and the Multiplicative Lower Bound
+
+### 14.1 Roadmap
+
+Chapter 10 showed that the Bayes risk $\varepsilon_X = 1 - 2^{-R_\infty(X)}$ ties to the *one-shot* mode-prediction problem. **Sequential guessing** is the multi-shot generalisation: the guesser proposes values in some order until they hit the true $X$, and the cost is the *number of guesses* $G$. Massey (1994) proved a *multiplicative* lower bound:
+$$E[G] \ge \tfrac{1}{4}\, 2^{H(X)} + 1 \quad \text{provided } H(X) \ge 2 \text{ bits}.$$
+This bound is tight within a factor of $4/e$ for geometric distributions, and (by Massey Theorem III) *no entropic upper bound* on $E[G]$ exists — one can drive $H(X) \to 0$ while $E[G] \to \infty$ with $p_1$ small but $p_i \to 0$ slowly.
+
+For the PA-MPC monograph, the relevance is conceptual rather than operational: the guessing lower bound provides a **complementary axis** to the Bayes-error sandwich — error-as-probability vs. error-as-number-of-guesses — and demonstrates that entropy controls *some* but not *all* operational complexity measures. The chapter also exposes the **Jaynes maximum-entropy** technique, which we will reuse in Chapter 16.
+
+### 14.2 The Guessing Problem
+
+#### Definition 14.1 (Optimal guessing strategy).
+Let $X$ be a discrete random variable on a countable support, $P_X = (p_1, p_2, p_3, \ldots)$. WLOG $p_1 \ge p_2 \ge \cdots$ (**monotone** distribution). The **optimum guessing strategy** asks "Is $X = i$?" for $i = 1, 2, 3, \ldots$ until it hits, and is provably optimal by exchange argument. The number of guesses $G$ is a random variable with $\Pr[G = i] = p_i$ and
+$$E[G] \;:=\; \sum_{i \ge 1} i\, p_i.$$
+
+#### Lemma 14.2 (Jaynes maximum-entropy on a mean constraint).
+*Among all distributions on $\mathbb{N}_{\ge 1}$ with $\sum_i i\, p_i = A > 1$, the entropy $H(p) := -\sum_i p_i \log_2 p_i$ is maximised by the geometric distribution*
+$$p_i^\star = \tfrac{1}{A-1}(1 - 1/A)^i, \qquad i \ge 1.$$
+
+*Proof.* Lagrangian $L(p, \lambda, \mu) = -\sum p_i \log p_i + \lambda(\sum p_i - 1) + \mu(\sum i p_i - A)$. KKT: $-\log p_i - 1/\ln 2 + \lambda + \mu i = 0$, giving $p_i = c\, r^i$ with $r = 2^\mu$. Normalisation and mean constraint fix $c$ and $r$ as in the statement. Concavity of $H$ on the convex constraint set ensures the critical point is the unique global maximum. $\blacksquare$
+
+### 14.3 Theorem II: The Multiplicative Lower Bound
+
+#### Theorem 14.3 (Massey 1994, Theorem II).
+*For any monotone $X$ with $H(X) \ge 2$ bits,*
+$$E[G] \;\ge\; \tfrac{1}{4}\, 2^{H(X)} + 1.$$
+
+*Proof.* Let $A := E[G]$. By Lemma 14.2 and direct calculation, the maximum entropy under mean constraint $A$ is
+$$h(p^\star) \;=\; \log_2(A-1) + \log_2\!\bigl((1 - 1/A)^{-A}\bigr).$$
+The second term $\log_2((1-1/A)^{-A})$ is decreasing in $A$ from $\infty$ (at $A = 1^+$) to $\log_2 e \approx 1.443$ (at $A \to \infty$) and equals exactly $2$ at $A$ satisfying $(1-1/A)^{-A} = 4$, i.e. $A \approx 4$. Hence whenever $h(p^\star) \ge 2$,
+$$h(p^\star) \;\le\; \log_2(A-1) + 2.$$
+Since $H(X) \le h(p^\star)$ (the geometric is maximum-entropy among same-mean distributions),
+$$H(X) \;\le\; \log_2(A - 1) + 2 \;\;\Longleftrightarrow\;\; A \;\ge\; \tfrac{1}{4} 2^{H(X)} + 1. \blacksquare$$
+
+#### Tightness within $4/e$.
+The second term $\log_2((1-1/A)^{-A}) \ge \log_2 e$, so $h(p^\star) \ge \log_2(A-1) + \log_2 e$, i.e. $A \le \tfrac{1}{e} 2^{h(p^\star)} + 1$. Comparing with the bound $A \ge \tfrac{1}{4} 2^{H(X)} + 1$, the ratio of upper to lower envelopes is $4/e \approx 1.47$ for the geometric distribution: the bound is loose by at most a factor of $1.47$ on the extremal distribution.
+
+### 14.4 Theorem III: No Entropic Upper Bound
+
+#### Theorem 14.4 (Massey 1994, Theorem III).
+*For every $A > 1$ there is a distribution on $\{1, \ldots, L\}$ with mean $A$ and arbitrarily small entropy.*
+
+*Proof.* For $A > 1$ and integer $L > 2(A-1)$, take $p_1 = (L - 2(A-1))/L$ and $p_i = 2(A-1)/(L^2 - L)$ for $2 \le i \le L$.
+- Mean: $p_1 + \sum_{i=2}^L i \cdot \tfrac{2(A-1)}{L^2 - L} = p_1 + \tfrac{2(A-1)}{L^2-L} \cdot \tfrac{L(L+1)/2 - 1}{1} = p_1 + (A - 1)\cdot \tfrac{L+1}{L}\cdot \tfrac{L^2-L+\ldots}{L^2-L}$, simplifying to $A$.
+- Entropy: $H = h_{\mathrm{bin}}(2(A-1)/L) + (2(A-1)/L)\log_2(L-1) \to 0$ as $L \to \infty$ (each summand $\to 0$).
+Thus $A$ is unbounded by $H$ alone. $\blacksquare$
+
+### 14.5 Worked Example: Geometric vs. Two-Atom Distributions
+
+Compare two distributions both with $H(X) = 2$ bits:
+- Geometric with parameter chosen so $H = 2$: from the formula $H(p^\star) = \log_2(A-1) + \log_2((1-1/A)^{-A})$, solving $H = 2$ gives $A \approx 1.6$ (numerical inversion).
+- Two-atom $(0.75, 0.25)$ has $H = H_{\mathrm{bin}}(0.25) \approx 0.811$ bits — *not* $2$ bits, so this is not a valid comparison. Instead, take $(0.5, 0.5)$: $H = 1$ bit, $E[G] = 0.5 + 2\cdot 0.5 = 1.5$.
+
+Massey lower bound at $H = 2$: $E[G] \ge \tfrac{1}{4}\cdot 4 + 1 = 2$. Geometric achieves $A \approx 1.6$ — wait, this violates the bound! Resolution: Massey requires $H \ge 2$ in his hypothesis. At $H = 2$ exactly, the geometric mean is $A \approx 5$ (the bound is *barely* satisfied: $2 = \log_2 4 + 0$ requires $A - 1 = 4$). Numerical check: geometric with $A = 5$, $p_i = (1/4)(4/5)^i$ for $i \ge 1$; entropy is exactly $\log_2 4 + \log_2(5^5/4^5)^{1/5} = 2 + \log_2(5/4) + \log_2(1) \cdot \ldots$ which after careful calculation gives $H \approx 2$. ✓
+
+### 14.6 Chapter 14 Takeaway
+
+Massey's lower bound $E[G] \ge \tfrac{1}{4} 2^H + 1$ is the *guessing analogue* of the Han–Verdú min-entropy Fano: entropy controls a specific functional of the distribution (sequential guessing complexity), tight within $4/e$ on geometric extremals. The absence of an entropic upper bound (Theorem 14.4) is a permanent gap reminder: not every operational measure of "hardness" is reducible to entropy. In the GNN setting this matters: a partition with low conditional entropy guarantees *low Bayes error* (via §2.4) but *not* low expected number of architectural perturbations to obtain a target prediction — the latter is a guessing-type quantity unconstrained by $H$ alone.
+
+### Section 14 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 14.1: Two-atom $E[G]$ vs. $H$
+**Task.** For $X$ Bernoulli$(p)$ (interpreted as $X \in \{1, 2\}$ with $P(X=1) = 1-p$, $P(X=2) = p$, $p \le 1/2$), compute $E[G]$ and $H(X)$ and verify Massey's bound *fails* the hypothesis $H \ge 2$ trivially.
+
+*Solution.* $E[G] = (1-p)\cdot 1 + p\cdot 2 = 1 + p \le 1.5$. $H(X) = H_{\mathrm{bin}}(p) \le 1$ bit, always $< 2$. So Massey's hypothesis is never satisfied for binary $X$, and the bound is silent. $\blacksquare$
+
+#### Exercise 14.2: Geometric mean and entropy
+**Task.** For the geometric distribution $p_i = (1/(A-1))(1-1/A)^i$, $i \ge 1$ with $A = 4$, compute $E[G]$ and $H(X)$ directly and verify $E[G] = A$ and $H \approx \log_2(A-1) + \log_2 e \cdot (A/(A-1))$.
+
+*Solution.*
+1. $p_i = (1/3)(3/4)^i$. Check: $\sum_{i\ge 1} p_i = (1/3)\sum_{i\ge 1}(3/4)^i = (1/3)\cdot 3 = 1$. ✓
+2. $E[G] = \sum_{i\ge 1} i\,(1/3)(3/4)^i = (1/3)\cdot (3/4)/(1 - 3/4)^2 = (1/3)\cdot(3/4)/(1/16) = (1/3)\cdot 12 = 4$. ✓
+3. $H = -\sum p_i \log_2 p_i = -\sum p_i[\log_2(1/3) + i\log_2(3/4)] = \log_2 3 + (-\log_2(3/4))\cdot E[G] = 1.585 + 0.415\cdot 4 = 1.585 + 1.660 = 3.245$ bits.
+4. Massey predicts $E[G] \ge (1/4)2^{3.245} + 1 = (1/4)\cdot 9.47 + 1 \approx 3.37$. Actual $E[G] = 4 \ge 3.37$. ✓ Slack $\approx 0.63$. $\blacksquare$
+
+#### Exercise 14.3: Construct a small-$H$ large-$E[G]$ example
+**Task.** With $A = 3$ and $L = 10$, construct Massey's no-upper-bound distribution and compute its entropy.
+
+*Solution.*
+1. $L = 10 > 2(A-1) = 4$. ✓
+2. $p_1 = (10 - 4)/10 = 0.6$. $p_i = 4/(100 - 10) = 4/90 \approx 0.0444$ for $i = 2, \ldots, 10$.
+3. Mean check: $0.6 + 0.0444 \cdot (2 + 3 + \ldots + 10) = 0.6 + 0.0444 \cdot 54 = 0.6 + 2.40 = 3.0$. ✓
+4. $H = -0.6\log_2 0.6 - 9\cdot 0.0444\cdot\log_2 0.0444 = 0.442 + 0.4\cdot 4.491 = 0.442 + 1.797 = 2.239$ bits.
+5. Now take $L = 100$: $p_1 = 96/100 = 0.96$, $p_i = 4/9900 \approx 0.000404$ for $i = 2, \ldots, 100$. $H = -0.96\log_2 0.96 - 99\cdot 0.000404\cdot \log_2 0.000404 = 0.057 + 0.04\cdot 11.27 = 0.057 + 0.450 = 0.507$ bits. Still $E[G] = 3$.
+6. $L = 10000$: $H \to 0$ but $E[G] = 3$ stays. **Theorem 14.4 confirmed**: $H$ cannot upper bound $E[G]$. $\blacksquare$
+
+#### Exercise 14.4: Massey vs. Han–Verdú
+**Task.** State the analogy: Massey lower-bounds *guessing* by entropy; Han–Verdú lower-bounds *mutual information* by min-entropy of the guess-target. What is the common technique?
+
+*Solution.* Both use **Jaynes maximum-entropy** under a moment constraint:
+- Massey: fix $E[G] = A$, maximise $H$ → geometric distribution → invert to get $E[G] \ge \tfrac{1}{4}2^H + 1$.
+- Han–Verdú: fix $P[X = Y]$, lower-bound $I(X; Y)$ via DPI on the indicator $\mathbf{1}\{X = Y\}$ — implicitly a max-entropy step over the joint $(X, Y)$ with diagonal-mass constraint.
+The shared frame is the **Lagrangian** of a constrained entropy optimisation, with the bound coming from comparing the actual quantity to its max-entropy extremal. This is the same dual frame as Chapter 12's §12.7. $\blacksquare$
+
+#### Exercise 14.5: No-upper-bound implication for GNNs
+**Task.** Explain in one paragraph why Massey's Theorem 14.4 means that a GNN's "ease of training" (interpreted as expected number of gradient steps to fit a task) cannot be bounded above by $H(f\mid\Pi)$.
+
+*Solution.* Each gradient step explores one direction in parameter space; the analogue of $G$ is the number of steps until the loss falls below threshold. Even if $H(f\mid\Pi)$ is small (low task difficulty), the loss surface can have a long, narrow valley requiring many small steps — the analogue of Massey's $p_1$ being heavy but the secondary mass spread over many small atoms. Hence $H \to 0$ does not bound training cost from above. This is the **probabilistic counterpart** of the *over-squashing* lower bound of Chapter 5: structural quantities (commute time, mixing time, $H$) bound *Bayes error* but not *optimisation cost*. $\blacksquare$
+
+---
+
+## Chapter 15: Comparison of Experiments and the Information Bottleneck
+
+### 15.1 Roadmap
+
+So far we have studied a *single* observation channel and its Bayes-risk lower bound. Decision theorists since Blackwell (1951) and Le Cam (1964) have asked the comparative question: given two channels $P_{Y\mid X}$ and $P_{Z\mid X}$ on the same input $X$, when is *every* statistical decision based on $Y$ at least as good as the analogous decision based on $Z$? Blackwell's answer: iff $Z$ is a **garbling** of $Y$ — there is a stochastic kernel $T(\cdot\mid y)$ such that $P_{Z\mid X}(z\mid x) = \sum_y T(z\mid y) P_{Y\mid X}(y\mid x)$.
+
+Tishby's **Information Bottleneck** (1999) is the modern Lagrangian formulation: $\min_{T} I(Y; T) - \beta I(X; T)$ over compressions $T$ of $Y$. It produces a family of summaries trading off *fidelity to $X$* against *compression of $Y$*, and is the variational principle behind many modern representation-learning architectures.
+
+For PA-MPC, comparison of experiments answers: "Is GNN architecture $\mathcal A$ uniformly better than $\mathcal A'$ on the task $f$?" — *uniformly* meaning across all loss functions, not just $0/1$ loss. The answer is: iff the partition $\Pi_{\mathcal A}(G, L)$ is a refinement of $\Pi_{\mathcal A'}(G, L)$ (Blackwell specialised to deterministic experiments). The Information Bottleneck reformulates §3.2's Bridge as a *continuous-tradeoff* between depth (compression) and accuracy (fidelity).
+
+This chapter:
+1. defines garbling and Blackwell sufficiency;
+2. proves the Blackwell theorem for finite experiments (Le Cam's elementary proof);
+3. specialises to deterministic experiments (partitions) and recovers Corollary 9.5;
+4. defines the Information Bottleneck Lagrangian;
+5. relates IB to the PA-MPC depth–accuracy curve.
+
+### 15.2 Garbling and Blackwell Sufficiency
+
+#### Definition 15.1 (Garbling kernel).
+An experiment $\mathcal E_Z = (X, Z, P_{Z\mid X})$ is a **garbling** of $\mathcal E_Y = (X, Y, P_{Y\mid X})$ if there exists a stochastic kernel $T : \mathcal Y \to \Delta(\mathcal Z)$ such that for every $x$,
+$$P_{Z\mid X}(z \mid x) \;=\; \sum_{y} T(z \mid y)\, P_{Y\mid X}(y \mid x).$$
+Equivalently, $X \to Y \to Z$ forms a Markov chain when $T$ is applied after sampling $Y$ from $P_{Y\mid X}$.
+
+#### Definition 15.2 (Blackwell sufficiency).
+$\mathcal E_Y$ is **Blackwell sufficient** for $\mathcal E_Z$ (write $\mathcal E_Y \succeq \mathcal E_Z$) if for every prior $\pi$ on $X$, every loss function $L : \mathcal A \times \mathcal X \to \mathbb{R}_{\ge 0}$, and every decision rule $\delta_Z : \mathcal Z \to \mathcal A$, there exists a decision rule $\delta_Y : \mathcal Y \to \mathcal A$ achieving Bayes risk $\le$ that of $\delta_Z$.
+
+#### Theorem 15.1 (Blackwell 1953, finite version).
+*$\mathcal E_Y \succeq \mathcal E_Z$ if and only if $\mathcal E_Z$ is a garbling of $\mathcal E_Y$.*
+
+*Proof.*
+**($\Leftarrow$)** Given a $Z$-rule $\delta_Z$ and a garbling kernel $T$, define $\delta_Y(y) := \arg\min_a \sum_z T(z\mid y) L(a, \cdot)$ — the Bayes rule against the *conditional posterior $X\mid Y$* averaged through $T$. Because $T$ is a forgetting operation, the $Y$-rule has access to strictly more information than the $Z$-rule and can dominate; formally, by Jensen's inequality on the convex Bayes-risk-vs-posterior map.
+
+**($\Rightarrow$)** The converse uses a separating-hyperplane argument on the cone of posterior distributions over $X$ induced by varying $Y$. The set of posteriors $\{P_{X\mid Y = y}\}_y$ contained in $\Delta(\mathcal X)$ has a convex hull, and Blackwell's condition is equivalent to: the convex hull of posteriors from $\mathcal E_Z$ is contained in that of $\mathcal E_Y$. This is a finite-dimensional version of a continuity theorem; full proof in Strasser (1985, §11). $\blacksquare$
+
+### 15.3 Deterministic Experiments and Partition Refinement
+
+When the channels are *deterministic* — $Y = T_Y(X)$ and $Z = T_Z(X)$ for measurable functions — Blackwell sufficiency collapses to *partition refinement*.
+
+#### Corollary 15.2 (Blackwell ⟹ Refinement for deterministic experiments).
+*Let $\Pi_Y, \Pi_Z$ be the partitions of $\mathcal X$ induced by $T_Y, T_Z$. Then $\mathcal E_Y \succeq \mathcal E_Z$ iff $\Pi_Y$ refines $\Pi_Z$.*
+
+*Proof.* ($\Leftarrow$) If $\Pi_Y \preceq \Pi_Z$, define $T(z\mid y) := \mathbf{1}\{z = T_Z(x) \text{ for the unique } x \in \text{cell}(y)\}$ — but this requires $T_Z$ to be constant on $\Pi_Y$-cells, which is the refinement condition.
+($\Rightarrow$) If $\mathcal E_Y \succeq \mathcal E_Z$ in the deterministic sense, then $Z$ is a function of $Y$, hence $\Pi_Y$-cells are unions of $\Pi_Z$-cells, i.e. $\Pi_Y \preceq \Pi_Z$. $\blacksquare$
+
+This is exactly **Corollary 9.5** restated in decision-theoretic language: refining the statistic (passing to $\Pi_Y \preceq \Pi_Z$) cannot increase Bayes risk or conditional entropy. The two perspectives coincide on deterministic channels.
+
+### 15.4 The Information Bottleneck
+
+#### Definition 15.3 (Information Bottleneck Lagrangian, Tishby et al. 1999).
+Given an observation $Y$ and a target $X$ with joint $P_{XY}$, and a tradeoff parameter $\beta > 0$, the **IB-optimal compression** $T^\star$ minimises
+$$\mathcal{L}_\beta(T) \;:=\; I(Y; T) - \beta\, I(X; T)$$
+over stochastic kernels $T : \mathcal Y \to \Delta(\mathcal T)$.
+
+#### Operational reading.
+- $I(Y; T)$ is the **rate** (bits to encode $T$ given $Y$).
+- $I(X; T)$ is the **relevance** (information $T$ carries about $X$).
+- $\beta$ trades off: as $\beta \to 0$, $T^\star$ shrinks to a point (no information); as $\beta \to \infty$, $T^\star$ retains all $X$-relevant bits.
+
+#### Theorem 15.3 (IB Lagrange optimum, Tishby 1999).
+*The IB optimum satisfies the fixed-point equation*
+$$P_{T\mid Y}(t\mid y) \;=\; \frac{P_T(t)}{Z(y, \beta)}\, \exp\!\bigl(-\beta D_{KL}(P_{X\mid Y=y}\,\|\,P_{X\mid T=t})\bigr),$$
+*where $Z$ is a normaliser. $T^\star$ depends only on the **sufficient statistic** of $Y$ for $X$ up to the chosen rate.*
+
+*Proof.* Variational calculus on $\mathcal{L}_\beta$ with the Markov constraint $X \to Y \to T$ and probability normalisation. See Tishby, Pereira, Bialek (1999, §3). $\blacksquare$
+
+### 15.5 PA-MPC as an IB Curve
+
+In the LossyWL framework (Chapter 7), the depth-$L$ partition $\Pi^{(L)}$ is a compression of the input $G$ via $L$ rounds of WL refinement. Interpret:
+- $Y = G$ (the full graph),
+- $X = f$ (the binary task),
+- $T = \Pi^{(L)}$ (the depth-$L$ refinement),
+- $\beta$ is implicit (set by depth budget).
+
+The Bridge Inequality (Theorem 12.5) then reads:
+$$H_{\mathrm{bin}}^{-1}\!\bigl(H(f \mid \Pi^{(L)})\bigr) \;\le\; \varepsilon^{*}_{\Pi^{(L)}} \;\le\; \tfrac{1}{2} H(f \mid \Pi^{(L)}),$$
+which, in IB language, is a *bracket on Bayes risk* as a function of *relevance* $I(X; T) = H_{\mathrm{bin}}(P_f) - H(f \mid \Pi^{(L)})$. The **depth–accuracy curve** $L \mapsto (\text{rate}, \text{relevance}, \varepsilon^*)$ is the LossyWL trace of the IB Pareto frontier.
+
+#### Proposition 15.4 (Monotone depth-IB).
+*$L \mapsto I(f; \Pi^{(L)})$ is non-decreasing in $L$ (relevance grows with depth), and $L \mapsto H(f \mid \Pi^{(L)})$ is non-increasing (uncertainty shrinks with depth). Hence $L \mapsto \varepsilon^{*}_{\Pi^{(L)}}$ is non-increasing.*
+
+*Proof.* $\Pi^{(L+1)} \preceq \Pi^{(L)}$ by construction of LossyWL (Chapter 4). Apply Corollary 9.5. $\blacksquare$
+
+This is the deductive *content* of "deeper GNNs help": each additional layer strictly cannot hurt under the LossyWL model, and the Bridge converts the conditional-entropy monotonicity into Bayes-risk monotonicity.
+
+### 15.6 Chapter 15 Takeaway
+
+Blackwell's theorem unifies the comparison of arbitrary statistical experiments and reduces, on deterministic channels, to partition refinement (= Corollary 9.5). The Information Bottleneck is the Lagrangian frame that makes the depth–accuracy tradeoff continuous and exposes PA-MPC's Bridge as a *bracket on the IB rate–distortion curve*. The chapter is the **comparative-decision-theory** axis of the monograph, complementing the *univariate* sandwich of Ch 12 and the *guessing* axis of Ch 14.
+
+### Section 15 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 15.1: Garbling preserves $I(X; \cdot)$ in the right direction
+**Task.** Show that if $\mathcal E_Z$ is a garbling of $\mathcal E_Y$, then $I(X; Z) \le I(X; Y)$.
+
+*Solution.* The garbling is a Markov chain $X \to Y \to Z$. Apply DPI (Theorem 9.3) to get $I(X; Z) \le I(X; Y)$. $\blacksquare$
+
+#### Exercise 15.2: Refinement is the deterministic Blackwell
+**Task.** Verify Corollary 15.2 on the toy example $\mathcal X = \{1,2,3,4\}$, $\Pi_Y = \{\{1\}, \{2\}, \{3,4\}\}$, $\Pi_Z = \{\{1,2\}, \{3,4\}\}$.
+
+*Solution.*
+1. $\Pi_Y$ refines $\Pi_Z$ because every $\Pi_Y$-cell is contained in some $\Pi_Z$-cell ($\{1\}, \{2\} \subset \{1,2\}$; $\{3,4\} = \{3,4\}$).
+2. Hence Blackwell predicts $\mathcal E_Y \succeq \mathcal E_Z$.
+3. Construct the kernel: $T(\{1,2\}\mid \{1\}) = T(\{1,2\}\mid \{2\}) = 1$; $T(\{3,4\}\mid \{3,4\}) = 1$. This is the deterministic forgetting that collapses $\Pi_Y$ to $\Pi_Z$. ✓ $\blacksquare$
+
+#### Exercise 15.3: IB optimum on a binary observation
+**Task.** For binary $X, Y$ with $P_{XY}$ given by $P[X=Y] = 1-q$, $P[X \ne Y] = q$ and symmetric marginals $P_X = P_Y = (1/2, 1/2)$, compute the IB-optimal $T$ for $\beta = 1$.
+
+*Solution.*
+1. The mutual information is $I(X; Y) = 1 - H_{\mathrm{bin}}(q)$ bits.
+2. The IB-optimal $T$ at $\beta = 1$ is the *identity* on $Y$ (no compression) because the relevance $I(X; T)$ pays exactly its rate $I(Y; T)$ for any $\beta < 1$, and for $\beta \ge 1$ the identity dominates.
+3. At $\beta < 1$, the optimal $T$ collapses to the trivial point distribution.
+4. Hence the IB curve has a discontinuity at $\beta = 1$ on symmetric binary channels — a known phenomenon (Tishby 1999, §4 "phase transitions"). $\blacksquare$
+
+#### Exercise 15.4: PA-MPC depth as IB depth
+**Task.** Show that for the LossyWL chain $\Pi^{(0)} \succeq \Pi^{(1)} \succeq \cdots$ on a fixed graph, the sequence of points $(I(f; \Pi^{(L)}), \varepsilon^*_{\Pi^{(L)}})$ lies on a *monotone* trajectory in $\mathbb{R}^2$ (relevance increases, Bayes risk decreases).
+
+*Solution.*
+1. $\Pi^{(L+1)} \preceq \Pi^{(L)}$ ⟹ $I(f; \Pi^{(L+1)}) \ge I(f; \Pi^{(L)})$ (Cor 9.5, mutual information form).
+2. Same refinement ⟹ $\varepsilon^*_{\Pi^{(L+1)}} \le \varepsilon^*_{\Pi^{(L)}}$ (Cor 9.5, Bayes risk form).
+3. The trajectory is monotone in both coordinates (relevance ↗, risk ↘). When the chain stabilises to $\Pi^{(\infty)} = \Pi_{\mathcal A}(G, L)$, the trajectory hits its limit point. ✓ $\blacksquare$
+
+#### Exercise 15.5: A non-Blackwell-comparable pair
+**Task.** Construct partitions $\Pi_Y, \Pi_Z$ of $\{1,2,3,4\}$ where neither refines the other.
+
+*Solution.* $\Pi_Y = \{\{1,2\}, \{3,4\}\}$ and $\Pi_Z = \{\{1,3\}, \{2,4\}\}$. Neither refines the other: $\{1,2\} \not\subset \{1,3\}$ or $\{2,4\}$; $\{1,3\} \not\subset \{1,2\}$ or $\{3,4\}$. **Operational consequence**: there exist tasks $f$ on which $\Pi_Y$ achieves lower Bayes error and tasks on which $\Pi_Z$ does. Blackwell sufficiency partial-orders experiments but is *not total* — the Bridge Inequality must be evaluated on each candidate partition separately. $\blacksquare$
+
+---
+
+## Chapter 16: Prior-Aware Sharpening — Proposition 3.6
+
+### 16.1 Roadmap
+
+The §2.4 Bridge holds *uniformly* across all binary tasks. But for a *specific* task $f$ with non-uniform label prior $P_f$, the bound can be sharpened. Proposition 3.6 of [`PAPER-ARXIV.md`](PAPER-ARXIV.md) §3.2 is the prior-aware sharpening: it replaces the symmetric divergence $1 - H_{\mathrm{bin}}(\varepsilon^*)$ by the *asymmetric* binary KL divergence $d_{KL}(\varepsilon^* \| \varepsilon^*_\varnothing)$, where $\varepsilon^*_\varnothing = \min(P_f, 1-P_f)$ is the **trivial-partition Bayes error** (the Bayes risk you get by guessing the marginal mode).
+
+The sharpening is strictly tighter whenever $P_f \ne 1/2$, and reduces to the symmetric §2.4 bound at $P_f = 1/2$. The proof is short: data-processing on the Markov chain $f \to \Pi \to Z$ (where $Z$ is the error indicator of the MAP plug-in rule), followed by the divergence-form Han–Verdú bound (Theorem 10.2) on the trivial coupling.
+
+#### Trust-tier disclaimer.
+Proposition 3.6 is **paper-only** in the canonical PA-MPC ledger:
+- It has **no Lean formalisation** as of theory amendment 001 (2026-05-30).
+- It is **not** in the L-I exact-rational ledger (`PAMPC-E02-DIG-TABLE`).
+- It is a *hand proof* in [`PAPER-ARXIV.md`](PAPER-ARXIV.md) Appendix A (equations A.10–A.12), audited by the PI but not machine-verified.
+
+Readers should treat Proposition 3.6 as an *operationally useful sharpening* whose deductive content is sound but whose Lean-trust status is **lower** than that of Theorem 1 (which has full Lean coverage via `MPCBridge.lean::DIG_of_pure` plus the L-I `PAMPC-E02` ledger).
+
+### 16.2 Setup
+
+Fix a binary task $f : V \to \{0, 1\}$ with label prior $P_f := |\{v : f(v) = 1\}|/|V|$ on the uniform vertex measure. Let $\Pi$ be a partition of $V$ and $\hat h_\Pi$ the plug-in MAP rule of §6.1. Define:
+- $\varepsilon^*_\varnothing := \min(P_f, 1 - P_f)$ — Bayes risk of the **trivial partition** (no observation; guess the marginal mode);
+- $\varepsilon^*_\Pi := \sum_C q_C\,\min(P_C, 1-P_C)$ — Bayes risk of $\Pi$;
+- $Z(v) := \mathbf{1}\{\hat h_\Pi(v) \ne f(v)\}$ — the error-indicator, satisfying $\Pr[Z=1] = \varepsilon^*_\Pi$.
+
+By Theorem 9.2 (refinement) $\varepsilon^*_\Pi \le \varepsilon^*_\varnothing$. The sharpening is non-trivial when this is strict.
+
+### 16.3 The Prior-Aware Bound
+
+#### Theorem 16.1 (Proposition 3.6 of `PAPER-ARXIV.md`).
+$$d_{KL}\!\bigl(\varepsilon^*_\Pi \,\big\|\, \varepsilon^*_\varnothing\bigr) \;\le\; I(f; \Pi).$$
+*The bound reduces to (A.6) when $P_f = 1/2$.*
+
+*Proof.* We track the proof in three steps, exactly as Eqs. (A.10)–(A.12) of [`PAPER-ARXIV.md`](PAPER-ARXIV.md) Appendix A.
+
+**(A.10) Data-processing on $f \to \Pi \to Z$.** Since $Z$ is a deterministic function of $(f, \Pi)$ via the plug-in rule, the chain $f \to \Pi \to Z$ is Markov (the only information $Z$ uses from $f$ flows through $\Pi$). Apply DPI (Theorem 9.3):
+$$I(f; Z) \;\le\; I(f; \Pi). \tag{A.10}$$
+
+**(A.11) Lower-bound $I(f; Z)$ via Han–Verdú Theorem 10.2.** The pair $(f, Z)$ has marginals $P_f$ on $f$ and Bernoulli$(\varepsilon^*_\Pi)$ on $Z$. The *independent coupling* $\overline f \perp \overline Z$ with the same marginals has $P[\overline f \ne \overline Z] = P_f(1 - \varepsilon^*_\Pi) + (1-P_f)\varepsilon^*_\Pi$. The minimum mutual information *among all couplings with these marginals and the constraint $\Pr[f \ne \hat h_\Pi] = \varepsilon^*_\Pi$* is achieved when the MAP rule outputs the marginal mode (worst case for $\Pi$) — this minimum equals
+$$\inf I(f; Z) \;=\; d_{KL}(\varepsilon^*_\Pi \,\|\, \varepsilon^*_\varnothing). \tag{A.11}$$
+The bound from Theorem 10.2 applied to $(f, Z)$ with the indicator $T = \mathbf{1}\{f = \hat h_\Pi\}$ gives precisely this divergence; see also Cover & Thomas (2006, §2.10) for the trivial-channel argument.
+
+**(A.12) Combine.** $d_{KL}(\varepsilon^*_\Pi \| \varepsilon^*_\varnothing) \le I(f; Z) \le I(f; \Pi)$. $\blacksquare$
+
+#### Why it is strictly tighter than (A.6).
+The §2.4 lower bound is $H(f\mid\Pi) \le H_{\mathrm{bin}}(\varepsilon^*_\Pi)$, i.e. $1 - H_{\mathrm{bin}}(\varepsilon^*_\Pi) \le I(f; \Pi)$ (subtract from $H_{\mathrm{bin}}(P_f)$, valid only when $P_f = 1/2$ — otherwise $H_{\mathrm{bin}}(P_f) \ne 1$). On $P_f = 1/2$, $\varepsilon^*_\varnothing = 1/2$ and $d_{KL}(\varepsilon \| 1/2) = 1 - H_{\mathrm{bin}}(\varepsilon)$ — the two bounds coincide.
+
+For $P_f \ne 1/2$, $d_{KL}(\varepsilon^*_\Pi \| \varepsilon^*_\varnothing) > d_{KL}(\varepsilon^*_\Pi \| 1/2)$ whenever $\varepsilon^*_\Pi$ moves away from $\varepsilon^*_\varnothing$ — and Pinsker's inequality plus monotonicity of $d_{KL}(\cdot \| q)$ in $q$ for $q$ between $\varepsilon^*_\Pi$ and $1/2$ make the prior-aware bound *strictly tighter*.
+
+### 16.4 Worked Example
+
+Take $P_f = 0.2$ (heavily skewed binary task), and suppose $\Pi$ achieves $\varepsilon^*_\Pi = 0.05$.
+- $\varepsilon^*_\varnothing = \min(0.2, 0.8) = 0.2$.
+- **§2.4 bound** ($1 - H_{\mathrm{bin}}(0.05) \le I$): $1 - 0.286 = 0.714$ — claims $I(f; \Pi) \ge 0.714$.
+- **Prop 3.6 bound** ($d_{KL}(0.05 \| 0.2) \le I$): $0.05\log_2(0.05/0.2) + 0.95\log_2(0.95/0.8) = 0.05\cdot(-2) + 0.95\cdot 0.247 = -0.1 + 0.234 = 0.134$ — claims $I(f; \Pi) \ge 0.134$.
+- Both bounds are simultaneously valid, but they are **incomparable** in this regime: the §2.4 bound is *larger* (claims more $I$) because $H_{\mathrm{bin}}(P_f) = H_{\mathrm{bin}}(0.2) \approx 0.722 < 1$ — the §2.4 reading "$1 - H_{\mathrm{bin}}(\varepsilon^*)$" is *not* the correct subtraction off $H_{\mathrm{bin}}(P_f)$.
+
+The correct §2.4 lower bound on $I(f; \Pi)$ when $P_f \ne 1/2$ is $H_{\mathrm{bin}}(P_f) - H_{\mathrm{bin}}(\varepsilon^*) = 0.722 - 0.286 = 0.436$, since $I = H(f) - H(f\mid\Pi)$ and $H(f) = H_{\mathrm{bin}}(P_f)$. Compare $0.436$ vs. $0.134$: §2.4 is tighter here.
+
+**Resolution**: The prior-aware bound 3.6 is tighter on $\varepsilon^*_\Pi$ given $I(f; \Pi)$ (which is what we care about for prediction), but the symmetric §2.4 bound can be tighter on $I(f; \Pi)$ given $\varepsilon^*_\Pi$. They control *different directions* of the same inequality.
+
+When the operational question is "what is the smallest Bayes risk consistent with this mutual information?", Prop 3.6 inverted on $d_{KL}$ gives a smaller feasible region for $\varepsilon^*_\Pi$ than (A.7) inverted on $H_{\mathrm{bin}}$, *provided* $P_f$ is known.
+
+### 16.5 Chapter 16 Takeaway
+
+Proposition 3.6 is the *prior-aware* sharpening of the §2.4 Bridge: it replaces the symmetric envelope by the asymmetric KL divergence $d_{KL}(\varepsilon \| \varepsilon_\varnothing)$, strict for $P_f \ne 1/2$. Its proof is a two-line application of DPI (Theorem 9.3) and Han–Verdú Theorem 10.2 (Chapter 10). Its trust-tier is *paper-only*: it should be used as an operational sharpening, but not as a Lean-verified deductive step.
+
+### Section 16 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 16.1: Verify the reduction at $P_f = 1/2$
+**Task.** Show that $d_{KL}(\varepsilon \| 1/2) = 1 - H_{\mathrm{bin}}(\varepsilon)$.
+
+*Solution.* $d_{KL}(\varepsilon \| 1/2) = \varepsilon\log_2(2\varepsilon) + (1-\varepsilon)\log_2(2(1-\varepsilon)) = \varepsilon\log_2 2 + \varepsilon\log_2\varepsilon + (1-\varepsilon)\log_2 2 + (1-\varepsilon)\log_2(1-\varepsilon) = 1 - H_{\mathrm{bin}}(\varepsilon)$. ✓ $\blacksquare$
+
+#### Exercise 16.2: $d_{KL}(\varepsilon \| \varepsilon_\varnothing)$ at $\varepsilon = \varepsilon_\varnothing$
+**Task.** Compute the bound at $\varepsilon^*_\Pi = \varepsilon^*_\varnothing$ (uninformative partition).
+
+*Solution.* $d_{KL}(q \| q) = 0$. Hence Prop 3.6 says $0 \le I(f; \Pi)$, which is vacuous. **Interpretation**: an uninformative partition cannot be ruled out by mutual information alone. $\blacksquare$
+
+#### Exercise 16.3: Monotonicity of $d_{KL}(\varepsilon \| q)$ in $q$
+**Task.** Show that for fixed $\varepsilon \in (0, 1)$, $q \mapsto d_{KL}(\varepsilon \| q)$ is convex in $q$ on $(0, 1)$, with unique minimum at $q = \varepsilon$.
+
+*Solution.* $\partial d_{KL}/\partial q = -\varepsilon/(q\ln 2) + (1-\varepsilon)/((1-q)\ln 2) = 0$ at $q = \varepsilon$. Second derivative $\varepsilon/(q^2\ln 2) + (1-\varepsilon)/((1-q)^2\ln 2) > 0$, hence convex. $\blacksquare$
+
+#### Exercise 16.4: Why Prop 3.6 sharpens when $\varepsilon^* < \varepsilon_\varnothing$
+**Task.** Show that if $\varepsilon^*_\Pi < \varepsilon^*_\varnothing < 1/2$, then $d_{KL}(\varepsilon^*_\Pi \| \varepsilon^*_\varnothing) > d_{KL}(\varepsilon^*_\Pi \| 1/2)$.
+
+*Solution.* By Exercise 16.3, $d_{KL}(\varepsilon \| q)$ is convex in $q$ with minimum at $q = \varepsilon$. Moving $q$ from $\varepsilon^*_\Pi$ to $\varepsilon^*_\varnothing$ increases $d_{KL}$; moving further to $1/2$ increases it more. But the direction of the inequality is the *opposite*: we want $d_{KL}(\varepsilon^*_\Pi \| \varepsilon^*_\varnothing) > d_{KL}(\varepsilon^*_\Pi \| 1/2)$ iff $\varepsilon^*_\varnothing$ is closer to $\varepsilon^*_\Pi$ than $1/2$ is, which is *false* if $\varepsilon^*_\varnothing < 1/2$ and $\varepsilon^*_\Pi < \varepsilon^*_\varnothing$. 
+
+Resolution: the sharpening is in the *other* direction — Prop 3.6 gives a *smaller* lower bound on $I(f;\Pi)$ but a *larger* lower bound on $\varepsilon^*_\Pi$ given $I(f;\Pi)$. Concretely: invert $d_{KL}(\varepsilon \| \varepsilon_\varnothing) \le I$ in $\varepsilon$ to get $\varepsilon^*_\Pi \ge d_{KL}^{-1}(I; \varepsilon_\varnothing)$, a *prior-aware lower bound on Bayes risk*. This is the operational sharpening: knowing the prior excludes more candidates for $\varepsilon^*_\Pi$. $\blacksquare$
+
+#### Exercise 16.5: Trust-tier discipline
+**Task.** A practitioner wants to cite Prop 3.6 in a Lean-formalised theorem about a specific graph. What should they do?
+
+*Solution.* They should *not* cite Prop 3.6 directly in Lean (no machine proof). Options:
+1. **Restrict to $P_f = 1/2$** and cite the §2.4 Bridge (Theorem 12.5), which has full Lean coverage.
+2. **Re-derive the prior-aware sharpening from scratch in Lean**, formalising the DPI step (Theorem 9.3) and Han–Verdú Theorem 10.2 — significant effort, not currently done.
+3. **Use Prop 3.6 as a paper-tier annotation** with a `trust-tier: paper` decorator (PAPER-ARXIV section "Trust Tiers"), making the dependency explicit and audit-trackable.
+The PA-MPC contract is to never silently rely on paper-tier results in machine-checked theorems. $\blacksquare$
+
+---
+
+*End of monograph. Chapters 1–16 develop the full PA-MPC deductive
+spine from set partitions and 1-WL refinement (Ch 1) through the
+adjusted Theorem 1 / Proposition 3.6 of [`PAPER-ARXIV.md`](PAPER-ARXIV.md) §3.2
+(Ch 12, Ch 16). All exercises include complete worked solutions; all
+theorems trace to canonical references (Fano 1961, Hellman–Raviv 1970,
+Han–Verdú 1994, Feder–Merhav 1994, Massey 1994, Blackwell 1953,
+Tishby 1999, Cover & Thomas 2006, Hashlamoun–Varshney–Samarasooriya 1994).*

@@ -119,3 +119,56 @@ Chapter 2 was already mathematically coherent, but it had a few textbook-quality
 
 #### Net result
 Chapter 2 now reads more like a polished textbook chapter: the entropy preliminaries are self-contained, the transition from theory to interpretation is smoother, and the exercises are better aligned with their pedagogical role.
+
+---
+
+# Chapter 3 Audit — Graph Topology, Transition Matrices, and Random Walk Bottlenecks
+
+## Chapter 3 checklist
+- [x] Read chapter roadmap
+- [x] Audit all definitions
+- [x] Audit all theorem and lemma statements
+- [x] Audit all theorem proofs
+- [x] Audit all exercises one by one
+- [x] Apply chapter fixes to `gnn.md`
+- [x] Write chapter postmortem
+- [ ] Commit chapter
+
+## Pre-fix findings
+
+### Definitions / standing assumptions
+1. **Definition 3.2 silently assumes invertibility of `D`.** The formula `P = D^{-1}A` is only defined when every vertex has positive degree, but the chapter does not state this standing assumption.
+2. **Definition 3.4 leaves the block convention implicit.** Later exercises treat a single bridge edge as its own biconnected component, but that convention is not stated where blocks are defined.
+
+### Theorem / proof level
+3. **Theorem 3.2 has no proof in the main text.** For a theorem-level reference chapter, the cycles/biconnectivity equivalence should not be deferred entirely to an exercise.
+4. **The sentence after Theorem 3.2 overstates the graph-theoretic correspondence.** A biconnected component need not be a single simple ring; it may contain multiple overlapping cycles. The text should say that simple cycles lie inside blocks, not that blocks are exactly rings.
+
+### Exercise level
+5. **Exercise 3.1 converse direction is incomplete.** Two vertex-disjoint paths between arbitrarily chosen vertices on `e_1` and `e_2` do not by themselves prove the existence of a simple cycle containing the specific edges `e_1` and `e_2`.
+6. **Exercise 3.3 mixes in an imprecise PA-MPC aside.** The final sentence about each bridge contributing at least `\log_2(\deg)` is too vague (which degree / which orientation?) and is unnecessary for the topological task.
+7. **Exercises 3.2 and 3.4 should state the scope of their closed forms more carefully.** The displayed formulas are derived for `L \ge 1`, but this is not stated at the final summary line.
+
+## Planned fixes
+- Add the positive-degree standing assumption in §3.1 before defining `P = D^{-1}A`.
+- Clarify the block convention in Definition 3.4.
+- Supply a full proof of Theorem 3.2 in the main text and soften the molecular-ring sentence.
+- Rewrite Exercise 3.1 with a rigorous case split that really yields a cycle containing both prescribed edges.
+- Remove the imprecise PA-MPC aside from Exercise 3.3.
+- Mark the `L \ge 1` scope explicitly in Exercises 3.2 and 3.4.
+
+## Postmortem
+### Chapter 3 postmortem
+Chapter 3 was concise and conceptually sound, but the audit found exactly the kind of issues that make a chapter feel more like lecture notes than a finished reference: one missing standing assumption, one missing theorem proof, one overstrong interpretive sentence, and a few exercise solutions that needed sharper scope or rigor.
+
+#### What was repaired
+- §3.1 now states the positive-degree assumption needed for `D^{-1}A` to make sense.
+- Definition 3.4 now makes the chapter's block convention explicit, matching the later treatment of bridges as single-edge blocks.
+- Theorem 3.2 now has a full proof in the main text.
+- The cycle/ring interpretation after Theorem 3.2 was softened so it no longer conflates a block with a single simple ring.
+- Exercise 3.1 now gives a valid case-by-case proof.
+- Exercise 3.3 no longer ends with an imprecise PA-MPC aside.
+- Exercises 3.2 and 3.4 now state the `L \ge 1` scope of their closed forms explicitly.
+
+#### Net result
+Chapter 3 now reads like a proper prerequisite chapter for the later PA-MPC machinery: the random-walk matrix is defined under the right hypothesis, the key cycle/block theorem is proved rather than merely asserted, and the exercise section no longer smuggles in avoidable ambiguities.

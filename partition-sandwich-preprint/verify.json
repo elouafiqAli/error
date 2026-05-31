@@ -1,0 +1,14 @@
+{
+  "lower_iv_passed": true,
+  "max_eps_star": 0.5,
+  "max_slack_lower_iv": 2.7755575615628914e-16,
+  "max_slack_upper": 0.16096404744368137,
+  "n_range": [
+    4,
+    32
+  ],
+  "n_violations": 0,
+  "samples": 1000,
+  "seed": 20260531,
+  "upper_iv_passed": true
+}

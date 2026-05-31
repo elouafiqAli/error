@@ -1,0 +1,143 @@
+\begin{thebibliography}{21}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Antos \& Kontoyiannis(2001)Antos and
+  Kontoyiannis]{antos2001convergence}
+Andr{\'a}s Antos and Ioannis Kontoyiannis.
+\newblock Convergence properties of functional estimates for discrete
+  distributions.
+\newblock \emph{Random Structures and Algorithms}, 19\penalty0 (3--4):\penalty0
+  163--193, 2001.
+
+\bibitem[Arvind et~al.(2015)Arvind, K{\"o}bler, Rattan, and
+  Verbitsky]{arvind2015power}
+V.~Arvind, Johannes K{\"o}bler, Gaurav Rattan, and Oleg Verbitsky.
+\newblock On the power of color refinement.
+\newblock \emph{Lecture Notes in Computer Science}, 9210:\penalty0 339--350,
+  2015.
+\newblock Proc.\ FCT 2015.
+
+\bibitem[B{\"o}ker et~al.(2023)B{\"o}ker, Levie, Huang, Villar, and
+  Morris]{boker2024finegrained}
+Jan B{\"o}ker, Ron Levie, Ningyuan Huang, Soledad Villar, and Christopher
+  Morris.
+\newblock Fine-grained expressivity of graph neural networks.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2023.
+
+\bibitem[Breiman et~al.(1984)Breiman, Friedman, Olshen, and
+  Stone]{breiman1984cart}
+Leo Breiman, Jerome~H. Friedman, Richard~A. Olshen, and Charles~J. Stone.
+\newblock \emph{Classification and Regression Trees}.
+\newblock Wadsworth, 1984.
+
+\bibitem[Cover \& Thomas(2006)Cover and Thomas]{cover2006eit}
+Thomas~M. Cover and Joy~A. Thomas.
+\newblock \emph{Elements of Information Theory}.
+\newblock Wiley, 2 edition, 2006.
+
+\bibitem[Devroye et~al.(1996)Devroye, Gy{\"o}rfi, and Lugosi]{devroye1996ptpr}
+Luc Devroye, L{\'a}szl{\'o} Gy{\"o}rfi, and G{\'a}bor Lugosi.
+\newblock \emph{A Probabilistic Theory of Pattern Recognition}.
+\newblock Springer, 1996.
+
+\bibitem[Fano(1961)]{fano1961}
+Robert~M. Fano.
+\newblock \emph{Transmission of Information: A Statistical Theory of
+  Communications}.
+\newblock MIT Press, 1961.
+
+\bibitem[Feder \& Merhav(1994)Feder and Merhav]{feder1994}
+Meir Feder and Neri Merhav.
+\newblock Relations between entropy and error probability.
+\newblock \emph{IEEE Transactions on Information Theory}, 40\penalty0
+  (1):\penalty0 259--266, 1994.
+
+\bibitem[Gersho \& Gray(1991)Gersho and Gray]{gersho1991vq}
+Allen Gersho and Robert~M. Gray.
+\newblock \emph{Vector Quantization and Signal Compression}.
+\newblock Kluwer Academic, 1991.
+
+\bibitem[Han \& Verd{\'u}(1994)Han and Verd{\'u}]{hanverdu1994}
+Te~Sun Han and Sergio Verd{\'u}.
+\newblock Generalizing the {Fano} inequality.
+\newblock \emph{IEEE Transactions on Information Theory}, 40\penalty0
+  (4):\penalty0 1247--1251, 1994.
+
+\bibitem[Hashlamoun et~al.(1994)Hashlamoun, Varshney, and
+  Samarasooriya]{hashlamoun1994}
+Wael~A. Hashlamoun, Pramod~K. Varshney, and V.~N.~S. Samarasooriya.
+\newblock A tight upper bound on the {Bayesian} probability of error.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 16\penalty0 (2):\penalty0 220--224, 1994.
+
+\bibitem[Hellman \& Raviv(1970)Hellman and Raviv]{hellmanraviv1970}
+Martin~E. Hellman and Josef Raviv.
+\newblock Probability of error, equivocation, and the {Chernoff} bound.
+\newblock \emph{IEEE Transactions on Information Theory}, 16\penalty0
+  (4):\penalty0 368--372, 1970.
+
+\bibitem[Ho \& Verd{\'u}(2010)Ho and Verd{\'u}]{ho2010interplay}
+Siu-Wai Ho and Sergio Verd{\'u}.
+\newblock On the interplay between conditional entropy and error probability.
+\newblock \emph{IEEE Transactions on Information Theory}, 56\penalty0
+  (12):\penalty0 5930--5942, 2010.
+
+\bibitem[J{\'e}gou et~al.(2011)J{\'e}gou, Douze, and Schmid]{jegou2011pq}
+Herv{\'e} J{\'e}gou, Matthijs Douze, and Cordelia Schmid.
+\newblock Product quantization for nearest neighbor search.
+\newblock \emph{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}, 33\penalty0 (1):\penalty0 117--128, 2011.
+
+\bibitem[Kovalevskij(1968)]{kovalevskij1968}
+V.~A. Kovalevskij.
+\newblock The problem of character recognition from the point of view of
+  mathematical statistics.
+\newblock \emph{Reading Automata}, pp.\  3--30, 1968.
+\newblock English translation, Spartan Books, New York.
+
+\bibitem[Morris et~al.(2019)Morris, Ritzert, Fey, Hamilton, Lenssen, Rattan,
+  and Grohe]{morris2019wl}
+Christopher Morris, Martin Ritzert, Matthias Fey, William~L. Hamilton, Jan~Eric
+  Lenssen, Gaurav Rattan, and Martin Grohe.
+\newblock {Weisfeiler} and {Leman} go neural: Higher-order graph neural
+  networks.
+\newblock In \emph{AAAI Conference on Artificial Intelligence}, 2019.
+
+\bibitem[Morris et~al.(2020)Morris, Rattan, and Mutzel]{morris2020kwl}
+Christopher Morris, Gaurav Rattan, and Petra Mutzel.
+\newblock {Weisfeiler} and {Leman} go sparse: Towards scalable higher-order
+  graph embeddings.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2020.
+
+\bibitem[Santhi \& Vardy(2006)Santhi and Vardy]{santhi2006agnostic}
+Nandakishore Santhi and Alexander Vardy.
+\newblock On an improvement over {R{\'e}nyi}'s equivocation bound.
+\newblock \emph{44th Annual Allerton Conference on Communication, Control, and
+  Computing}, 2006.
+
+\bibitem[Sason \& Verd{\'u}(2018)Sason and Verd{\'u}]{sason2018arimoto}
+Igal Sason and Sergio Verd{\'u}.
+\newblock Arimoto--{R{\'e}nyi} conditional entropy and {Bayesian} {M}-ary
+  hypothesis testing.
+\newblock \emph{IEEE Transactions on Information Theory}, 64\penalty0
+  (1):\penalty0 4--25, 2018.
+
+\bibitem[Tebbe \& Dwyer~III(1968)Tebbe and Dwyer~III]{tebbe1968uncertainty}
+D.~L. Tebbe and S.~J. Dwyer~III.
+\newblock Uncertainty and the probability of error.
+\newblock \emph{IEEE Transactions on Information Theory}, 14\penalty0
+  (3):\penalty0 516--518, 1968.
+
+\bibitem[Xu et~al.(2019)Xu, Hu, Leskovec, and Jegelka]{xu2019gin}
+Keyulu Xu, Weihua Hu, Jure Leskovec, and Stefanie Jegelka.
+\newblock How powerful are graph neural networks?
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2019.
+
+\end{thebibliography}

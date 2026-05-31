@@ -443,19 +443,49 @@ imbalanced (24.8 % positives), and the realised slack is even tighter (0.090).
 Script: `e3_wl_bracket.py` · figures: `figures/e3_<dataset>_funnel.pdf` (5 files) ·
 json: `results/e3.json`
 
-For each graph, run the 1-WL refinement {L = 0, 1, ..., 5} starting from vertex
-degree, hash each refinement step, and compute the bracket
+For each graph, run the 1-WL refinement {L = 0, 1, ..., L_max} starting from vertex
+degree, hash each refinement step with `blake2b`, and compute the bracket
 `[lower, upper]` around `eps*` from the colour partition at depth L.
 
-| dataset    | |V|     | |E|      | pi*   | eps*(L=max) | lower    | upper    | gates |
-|------------|--------:|---------:|------:|------------:|---------:|---------:|-------|
-| twitch_en  |   7 126 |   35 324 | 0.546 | 0.0267      | 0.00732  | 0.0312   | PASS  |
-| cora       |   2 708 |    5 278 | 0.302 | 0.0288      | 0.00753  | 0.0320   | PASS  |
-| citeseer   |   3 327 |    4 552 | 0.211 | 0.0736      | 0.0374   | 0.1151   | PASS  |
-| pubmed     |  19 717 |   88 651 | 0.399 | 0.0509      | 0.0204   | 0.0720   | PASS  |
-| ogbn_arxiv | 169 343 | ~1.1 M   | 0.161 | 0.00213     | 0.000469 | 0.00293  | PASS  |
+**Binarisation.** Twitch-EN ships a native binary label (mature-content
+flag). Cora / CiteSeer / PubMed / ogbn-arxiv are multi-class and we project
+to `(y == argmax_class)` — "largest class vs the rest". This choice
+*minimises* the trivial-baseline error `min(π, 1−π) = 1 − max_class_freq`,
+so absolute `eps*` numbers below are the most flattering binarisation;
+a balanced (e.g. median-frequency) binarisation would inflate them. The
+bracket itself is binarisation-agnostic — re-running with a different
+projection is a one-line change.
 
-Per-graph gates: `monotone_H`, `monotone_eps`, `bracket_holds`, `width_le_W_STAR` — all four True for all five graphs.
+| dataset    | |V|     | |E| (exact) | π     | trivial  | eps*(L=Lmax) | lower    | upper    | x vs trivial |
+|------------|--------:|------------:|------:|---------:|-------------:|---------:|---------:|-------------:|
+| twitch_en  |   7 126 |      35 324 | 0.546 | 0.4544   | 0.0267       | 0.00732  | 0.0312   | 17.0×        |
+| cora       |   2 708 |       5 278 | 0.302 | 0.3021   | 0.0288       | 0.00753  | 0.0320   | 10.5×        |
+| citeseer   |   3 327 |       4 552 | 0.211 | 0.2107   | 0.0736       | 0.0374   | 0.1151   |  2.9×        |
+| pubmed     |  19 717 |      44 324 | 0.399 | 0.3994   | 0.0509       | 0.0204   | 0.0720   |  7.8×        |
+| ogbn_arxiv | 169 343 |   1 157 799 | 0.161 | 0.1613   | 0.00213      | 0.000469 | 0.00293  | 75.9×        |
+
+(For ogbn-arxiv, Lmax = 3; for the others, Lmax = 5 with WL saturating earlier.)
+
+**Gates.** Two categories — keep them distinct:
+
+| gate              | type            | what it actually checks                          |
+|-------------------|-----------------|--------------------------------------------------|
+| `monotone_H`      | **graph-level** | WL refiner *is* a refinement (H non-increasing). |
+| `monotone_eps`    | **graph-level** | implied by monotone_H + binary labels.           |
+| `bracket_holds`   | kernel sanity   | property of `bracket_from_cells`, not of graph.  |
+| `width_le_W_STAR` | kernel sanity   | Corollary 2 theorem holding numerically.         |
+
+All four PASS on all five graphs (the kernel sanity gates would only fire
+on a bug in `common.py`; we keep them as belt-and-braces).
+
+**Headline (revised).** On ogbn-arxiv (169 343 vertices, 1 157 799 undirected
+edges) the L = 3 bracket `[4.7 × 10⁻⁴, 2.9 × 10⁻³]` is **75.9× better than the
+trivial majority predictor** (`min(π, 1−π) = 0.1613`), computed in 3.6 s on a
+single CPU core with no GNN trained. The absolute width of the bracket
+($2.5 \times 10^{-3}$) is small in nominal terms but reflects the imbalanced
+binarisation; on the balanced-ish CiteSeer the improvement is only 2.9× —
+the closest analogue to a "hard" task in this menu, and the row where the
+bracket actively bounds rather than collapsing.
 
 **GPU budget for the trained-MPNN companion experiment (not required for the bracket alone):**
 - CPU-only (this run): seconds per graph for all five sizes, including ogbn-arxiv 169k.
@@ -463,9 +493,10 @@ Per-graph gates: `monotone_H`, `monotone_eps`, `bracket_holds`, `width_le_W_STAR
   - Twitch-EN/Cora/CiteSeer/PubMed: free on a Colab T4.
   - ogbn-arxiv: ≈ 1 GPU-hour on a T4, or skip — the bracket already gives `eps* ∈ [4.7e-4, 2.9e-3]` *without ever instantiating a GNN*.
 
-Headline: on the 169k-vertex ogbn-arxiv graph, the bracket pins down `eps*` to
-`[4.7e-4, 2.9e-3]` at L=3 in seconds — three orders of magnitude cheaper than
-any reasonable MPNN baseline.
+**Reproducibility note.** Twitch-EN raw files are downloaded from the
+MUSAE GitHub repo pinned to commit `6c52e105…` (not `master`), so the URL
+is stable even if the upstream default branch is renamed. Files cache
+under `experiments/data/twitch_en_*.csv` on first run.
 
 ---
 

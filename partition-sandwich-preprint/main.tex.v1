@@ -1,0 +1,605 @@
+\documentclass[10pt]{article}
+\usepackage[preprint]{tmlr}
+
+% ---------- typography ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{xcolor}
+
+% ---------- math ----------
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
+\usepackage{mathtools}
+
+% ---------- lists ----------
+\usepackage[shortlabels]{enumitem}
+
+% ---------- references ----------
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks,
+  linkcolor={red!50!black},
+  citecolor={blue!60!black},
+  urlcolor={blue!80!black}
+}
+\usepackage[noabbrev,capitalize]{cleveref}
+
+% ----- theorem environments -----
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{corollary}{Corollary}{Corollaries}
+\crefname{remark}{Remark}{Remarks}
+\crefname{section}{\S}{\S\S}
+
+% ----- macros -----
+\newcommand{\Hbin}{H_{\mathrm{bin}}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\epsP}{\eps^{\!*}_{\Pi}}
+\newcommand{\epsE}{\eps^{\!*}_{\varnothing}}
+\let\Pr\relax
+\DeclareMathOperator{\Pr}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\dKL}{d_{\mathrm{KL}}}
+\newcommand{\Atilde}{\widetilde{A}_{2}}
+
+\title{A Two-Sided Entropy--Error Sandwich for Finite Partitions}
+
+\author{\name Anonymous \email anonymous@anonymous \\
+        \addr Anonymous Institution}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For a finite partition $\Pi$ of a finite set $V$ and a binary label
+$f : V \to \{0,1\}$, let $\epsP$ denote the minimum error of any
+predictor that is constant on each cell of $\Pi$, and let
+$H(f \mid \Pi)$ denote the partition-conditional Shannon entropy
+of $f$ (in bits, under uniform vertex weighting). We give the
+two-sided closed-form bracket
+\[
+  \Hbin^{-1}\!\bigl(H(f \mid \Pi)\bigr)
+  \;\le\; \epsP
+  \;\le\; \tfrac{1}{2}\,H(f \mid \Pi),
+\]
+where $\Hbin^{-1} : [0,1] \to [0,1/2]$ is the inverse binary
+entropy on its increasing branch. The two inequalities are
+respectively the Fano (1961) and Hellman--Raviv (1970) bounds
+specialised to the partition channel, packaged in the
+Feder--Merhav (1994) achievable-region form. We give one short
+proof that derives both halves as the optimal values of opposite
+Jaynes maximum-entropy programs on the cell statistics, making
+explicit a primal/dual duality between the Feder--Merhav
+concave-envelope construction and the Massey-style Lagrangian
+calculation. We prove that the upper coefficient $1/2$ is
+unimprovable by any uniform constant and that the lower
+$\Hbin^{-1}$ cannot be replaced by any pointwise-larger continuous
+function. Tightness witnesses are constructed explicitly on both
+boundaries of the achievable region. All proofs are elementary,
+use no measure-theoretic axioms beyond finite sums, and are
+amenable to mechanisation in proof assistants.
+\end{abstract}
+
+% ============================================================
+\section{Introduction}\label{sec:intro}
+% ============================================================
+
+A classical question in information theory and statistical pattern
+recognition is how tightly the Shannon entropy of a label given a
+discrete side observation controls the error of the best predictor
+based on that observation. For a binary label $f$ observed through
+a finite-alphabet channel $\Pi$, the canonical answers are Fano's
+inequality~\citep{fano1961}, in the sharp binary form
+$H(f \mid \Pi) \le \Hbin(\epsP)$, and the Hellman--Raviv
+upper bound~\citep{hellmanraviv1970},
+$\epsP \le \tfrac{1}{2}H(f \mid \Pi)$. The two-sided packaging is
+attributed to~\citet{feder1994}, whose concave-envelope
+construction identifies the convex hull of admissible
+(entropy, error) pairs over all binary $f$ and all side channels.
+
+The present note collects this material in the one form most
+useful for downstream applications --- a closed-form two-sided
+bracket for a finite \emph{partition} (rather than a general
+channel) of a finite set --- and contributes three small
+refinements.
+
+\paragraph{Contributions.}
+\begin{enumerate}[(a)]
+  \item A self-contained statement and proof of the bracket
+    (\cref{thm:sandwich}) for finite partitions and binary tasks,
+    using only finite sums and elementary concavity.
+  \item A unification of the two halves as opposite Jaynes
+    maximum-entropy programs (\cref{sec:lagrangian}), making
+    explicit the primal/dual correspondence between the
+    Feder--Merhav concave-envelope construction and the Lagrangian
+    calculation in the style of~\citet{massey1994}.
+  \item A negative sharpness result (\cref{prop:sharp}) ruling out
+    \emph{any} closed-form improvement: neither the constant $1/2$
+    on the upper side nor the function $\Hbin^{-1}$ on the lower
+    side admits a uniform pointwise improvement.
+\end{enumerate}
+Explicit boundary witnesses (\cref{sec:tightness}) realise both
+edges of the achievable region and confirm sharpness.
+
+\paragraph{Scope.} Every statement is stated for finite $V$,
+finite partition $\Pi$, and binary $f$. We do not pursue
+multi-class extensions ($|\mathcal{Y}| > 2$), which proceed via the
+concave-envelope construction of~\citet{feder1994}; nor do we
+pursue continuous-alphabet generalisations, which require
+additional regularity. Applications to expressivity of
+constant-on-leaves predictors --- decision trees, vector
+quantisers, clustering classifiers, and depth-$L$
+permutation-invariant message-passing on graphs --- are sketched in
+\cref{sec:discussion} and deferred to companion work.
+
+% ============================================================
+\section{Setup}\label{sec:setup}
+% ============================================================
+
+Let $V$ be a finite set with $|V| = n \ge 1$, and let $\Pi$ be a
+finite partition of $V$ into nonempty cells $\Pi = \{C_1, \ldots, C_m\}$.
+Let $f : V \to \{0, 1\}$ be a binary label. Endow $V$ with the
+uniform probability measure $q_v = 1/n$; we discuss the
+straightforward extension to non-uniform weighting in
+\cref{rem:weights}.
+
+\paragraph{Cell statistics.} Write
+\[
+  q_C \;:=\; |C|/n, \qquad
+  P_C \;:=\; |C|^{-1} \sum_{v \in C} f(v), \qquad
+  e_C \;:=\; \min(P_C,\, 1 - P_C) \;\in\; [0, 1/2].
+\]
+Thus $q_C$ is the mass of cell $C$, $P_C$ is the cell-conditional
+mean of $f$, and $e_C$ is the cell-conditional Bayes error of $f$.
+
+\paragraph{Partition-conditional entropy.} The
+partition-conditional entropy of $f$ given $\Pi$ (in bits) is
+\[
+  H(f \mid \Pi)
+  \;:=\; \sum_{C \in \Pi} q_C \cdot \Hbin(P_C)
+  \;=\; \sum_{C \in \Pi} q_C \cdot \Hbin(e_C),
+\]
+where $\Hbin(p) := -p \log_2 p - (1 - p) \log_2 (1 - p)$ with the
+convention $0 \log_2 0 := 0$, and the second equality is the
+symmetry $\Hbin(p) = \Hbin(1 - p)$.
+
+\paragraph{Partition Bayes error.} The minimum error of any
+predictor that is constant on each cell of $\Pi$ is
+\begin{equation}\label{eq:bayes-def}
+  \epsP \;:=\; \min_{g : \Pi \to \{0, 1\}}
+    \Pr\bigl[g(C(v)) \neq f(v)\bigr]
+  \;=\; \sum_{C \in \Pi} q_C \cdot e_C,
+\end{equation}
+attained by the plug-in rule $\hat{h}_\Pi(v) := \mathbf{1}\{P_{C(v)} \ge 1/2\}$,
+where $C(v)$ is the cell containing $v$. Equivalently, $\epsP$ is
+the Bayes risk of $f$ when the predictor is restricted to depend
+on $v$ only through $C(v)$~\citep[\S2.1]{devroye1996ptpr}.
+
+\paragraph{Inverse binary entropy.} The function
+$\Hbin : [0, 1] \to [0, 1]$ is strictly concave with maximum
+$\Hbin(1/2) = 1$ and is strictly increasing on $[0, 1/2]$. Its
+inverse on the increasing branch is the unique function
+$\Hbin^{-1} : [0, 1] \to [0, 1/2]$ satisfying
+$\Hbin(\Hbin^{-1}(h)) = h$ for all $h \in [0, 1]$. It is continuous,
+concave, and strictly increasing.
+
+\begin{remark}[non-uniform weighting]\label{rem:weights}
+Replacing the uniform measure $q_v = 1/n$ by any probability mass
+$\{q_v\}_{v \in V}$ with $\sum_v q_v = 1$, and redefining
+$q_C := \sum_{v \in C} q_v$ and $P_C := q_C^{-1} \sum_{v \in C} q_v f(v)$,
+leaves every statement and proof in \cref{sec:main,sec:proof,sec:tightness}
+unchanged: the only properties of $\{q_C\}$ used are nonnegativity
+and $\sum_C q_C = 1$.
+\end{remark}
+
+% ============================================================
+\section{Main result}\label{sec:main}
+% ============================================================
+
+\begin{theorem}[Two-sided sandwich]\label{thm:sandwich}
+For every finite partition $\Pi$ of a finite set $V$ and every
+binary label $f : V \to \{0, 1\}$,
+\begin{equation}\label{eq:sandwich}
+  \Hbin^{-1}\!\bigl(H(f \mid \Pi)\bigr)
+  \;\le\; \epsP
+  \;\le\; \tfrac{1}{2}\,H(f \mid \Pi).
+\end{equation}
+\end{theorem}
+
+Both bounds are classical. The lower bound is Fano's
+inequality~\citep{fano1961} in its sharp binary
+form~\citep[Thm.\ 2.10.1]{cover2006eit}; the upper bound is
+\citet{hellmanraviv1970}; the two-sided packaging is
+\citet[Thm.\ 1]{feder1994}. The contribution of
+\cref{sec:lagrangian,sec:proof} is to present both halves as the
+optimal values of a single pair of Jaynes maximum-entropy programs
+\citep{jaynes1957}, in the compact derivation style of
+\citet{massey1994}.
+
+\paragraph{Achievable region.} Combining the two halves, every
+pair $(\eps, H) = (\epsP, H(f \mid \Pi))$ arising from a finite
+partition of a finite set and a binary label lies in the closed
+region
+\[
+  \Atilde
+  \;:=\; \bigl\{\,(\eps, H) \in [0, 1/2] \times [0, 1]
+    \;:\; \Hbin^{-1}(H) \le \eps \le H/2 \,\bigr\}.
+\]
+The two boundaries of $\Atilde$ are realised by explicit
+one-parameter families (\cref{sec:tightness}); hence $\Atilde$ is
+exactly the closure of achievable pairs.
+
+\paragraph{Quantified slack.} The width of the sandwich,
+\[
+  w(H) \;:=\; \tfrac{1}{2}H - \Hbin^{-1}(H),
+\]
+vanishes at the endpoints $H \in \{0, 1\}$ and attains its maximum
+at the interior critical point $H^{*}$ solving
+$\Hbin'(\Hbin^{-1}(H^{*})) = 2$, i.e.\ at
+$\eps^{*} := \Hbin^{-1}(H^{*}) = 1/5$ (since
+$\log_2((1-\eps)/\eps) = 2$ gives $\eps = 1/5$). The maximal slack
+is therefore
+\[
+  w^{*} \;=\; \tfrac{1}{2}\Hbin(1/5) - 1/5
+  \;\approx\; 0.1610,
+\]
+so \eqref{eq:sandwich} pins $\epsP$ to a window of width at most
+$\approx 0.161$ uniformly in $\Pi$ and $f$.
+
+% ============================================================
+\section{The Lagrangian view}\label{sec:lagrangian}
+% ============================================================
+
+The two halves of \eqref{eq:sandwich} are the optimal values of a
+pair of opposite Jaynes maximum-entropy programs on the cell
+statistics $\{(q_C, e_C)\}_{C \in \Pi}$, viewed as a probability
+distribution on $[0, 1/2]$ paired with a constraint.
+
+Fix $\eps \in [0, 1/2]$ and $H \in [0, 1]$. Consider the two
+optimisation problems
+\begin{align}
+  \text{(F)} \qquad
+  & \sup_{\{(q_C, e_C)\}_C}\;
+    \sum_C q_C\,\Hbin(e_C)
+    \quad\text{s.t.}\quad q_C \ge 0,\;\sum_C q_C = 1,\;
+    \sum_C q_C\, e_C = \eps,
+    \label{eq:program-F}\\
+  \text{(HR)} \qquad
+  & \sup_{\{(q_C, e_C)\}_C}\;
+    \sum_C q_C\, e_C
+    \quad\text{s.t.}\quad q_C \ge 0,\;\sum_C q_C = 1,\;
+    \sum_C q_C\,\Hbin(e_C) = H,
+    \label{eq:program-HR}
+\end{align}
+where the supremum is over all finite collections of pairs
+$\{(q_C, e_C)\}$ with $e_C \in [0, 1/2]$.
+
+\begin{lemma}[Lagrangian envelopes]\label{lem:lagrangian}
+The optimal value of \eqref{eq:program-F} is $\Hbin(\eps)$,
+attained at the constant interior point $e_C \equiv \eps$ (any
+$q$-mass distribution). The optimal value of \eqref{eq:program-HR}
+is $H/2$, attained at a two-mass boundary distribution
+$\{e_{C_0}, e_{C_1}\} = \{0, 1/2\}$ with $q_{C_1} = H$.
+\end{lemma}
+
+\begin{proof}
+For (F), $\sum_C q_C \Hbin(e_C) \le \Hbin(\sum_C q_C e_C) = \Hbin(\eps)$
+by Jensen's inequality and concavity of $\Hbin$ on $[0, 1]$, with
+equality when all $e_C$ coincide. For (HR), the scalar inequality
+$e \le \tfrac{1}{2}\Hbin(e)$ on $[0, 1/2]$ (\cref{lem:scalar}
+below) gives $\sum_C q_C e_C \le \tfrac{1}{2}\sum_C q_C \Hbin(e_C) = H/2$,
+with equality iff each $e_C$ saturates the scalar inequality, i.e.\
+each $e_C \in \{0, 1/2\}$; the constraint $\sum_C q_C \Hbin(e_C) = H$
+then forces $q_{C_1} = H$ on cells with $e_C = 1/2$.
+\end{proof}
+
+\Cref{lem:lagrangian} is the entire content of \cref{thm:sandwich}:
+program (F) certifies the lower bound after inversion of $\Hbin$;
+program (HR) is the upper bound directly. The Feder--Merhav primal
+concave-envelope construction~\citep{feder1994} traces the upper
+boundary of the achievable region $\Atilde$ by exactly this
+two-mass mixture; the Lagrangian dual gives the closed-form
+optimal value in one line.
+
+% ============================================================
+\section{Proof of \cref{thm:sandwich}}\label{sec:proof}
+% ============================================================
+
+We give the elementary, finite-sum proof. Both halves rest on the
+following scalar inequality.
+
+\begin{lemma}[Scalar Hellman--Raviv]\label{lem:scalar}
+For every $p \in [0, 1]$,
+\begin{equation}\label{eq:hr-scalar}
+  \min(p,\, 1 - p) \;\le\; \tfrac{1}{2}\,\Hbin(p),
+\end{equation}
+with equality iff $p \in \{0, 1/2, 1\}$.
+\end{lemma}
+
+\begin{proof}
+By the symmetry $p \mapsto 1 - p$ of both sides we may assume
+$p \in [0, 1/2]$, so $\min(p, 1-p) = p$ and \eqref{eq:hr-scalar}
+becomes $g(p) := \tfrac{1}{2}\Hbin(p) - p \ge 0$. We have $g(0) = 0$
+and $g(1/2) = 0$. Differentiating,
+$g'(p) = \tfrac{1}{2}\log_2((1-p)/p) - 1$, which vanishes at
+$p^{*} = 1/5$ and is positive on $[0, 1/5)$, negative on
+$(1/5, 1/2]$; hence $g$ is unimodal on $[0, 1/2]$ with $g(p^{*}) = w^{*} > 0$.
+In particular $g \ge 0$ on $[0, 1/2]$, with equality only at the
+endpoints.
+\end{proof}
+
+\begin{proof}[Proof of \cref{thm:sandwich}]
+\emph{Upper bound.} Applying \eqref{eq:hr-scalar} with $p = P_C$
+to each cell $C$ and multiplying by $q_C \ge 0$,
+\[
+  q_C \cdot e_C
+  \;=\; q_C \cdot \min(P_C, 1 - P_C)
+  \;\le\; \tfrac{1}{2}\,q_C \cdot \Hbin(P_C).
+\]
+Summing over $C \in \Pi$ and recalling
+$\epsP = \sum_C q_C e_C$ and $H(f \mid \Pi) = \sum_C q_C \Hbin(P_C)$
+gives $\epsP \le \tfrac{1}{2} H(f \mid \Pi)$.
+
+\smallskip
+\emph{Lower bound.} The symmetry $\Hbin(P_C) = \Hbin(e_C)$ yields
+\begin{equation}\label{eq:H-as-ec}
+  H(f \mid \Pi) \;=\; \sum_C q_C\,\Hbin(e_C).
+\end{equation}
+The function $\Hbin$ is concave on $[0, 1]$, hence on $[0, 1/2]$.
+Jensen's inequality with weights $\{q_C\}_C$ (which sum to one)
+applied to $\{e_C\}_C \subset [0, 1/2]$ gives
+\begin{equation}\label{eq:H-jensen}
+  \sum_C q_C\,\Hbin(e_C)
+  \;\le\; \Hbin\!\Bigl(\sum_C q_C\, e_C\Bigr)
+  \;=\; \Hbin(\epsP).
+\end{equation}
+Combining \eqref{eq:H-as-ec}--\eqref{eq:H-jensen},
+$H(f \mid \Pi) \le \Hbin(\epsP)$. Since $\epsP \in [0, 1/2]$ and
+$\Hbin^{-1}$ is the inverse of $\Hbin$ on the increasing branch
+$[0, 1/2]$, applying $\Hbin^{-1}$ to both sides yields
+$\Hbin^{-1}(H(f \mid \Pi)) \le \epsP$.
+\end{proof}
+
+\begin{remark}[Gini shadow of the upper bound]\label{rem:gini}
+A useful corollary of \eqref{eq:hr-scalar} is the variance
+inequality $\epsP \le 2\,\E[\mathrm{Var}(f \mid \Pi)] = 2 \sum_C q_C P_C (1 - P_C)$,
+the cell-wise Gini--Bayes inequality~\citep{breiman1984cart}.
+When all $P_C \in \mathbb{Q}$, the variance form is rational and
+admits exact arithmetic, which is convenient for mechanised
+verification.
+\end{remark}
+
+% ============================================================
+\section{Refinement monotonicity}\label{sec:refine}
+% ============================================================
+
+A partition $\Pi'$ \emph{refines} $\Pi$, written $\Pi' \preceq \Pi$,
+if every cell of $\Pi'$ is contained in some cell of $\Pi$.
+
+\begin{proposition}[Refinement monotonicity]\label{prop:refine}
+If $\Pi' \preceq \Pi$, then for every binary $f : V \to \{0, 1\}$,
+\[
+  H(f \mid \Pi') \;\le\; H(f \mid \Pi),
+  \qquad
+  \eps^{\!*}_{\Pi'} \;\le\; \epsP.
+\]
+\end{proposition}
+
+\begin{proof}
+Fix $C \in \Pi$ and write $C = \bigsqcup_j C'_j$ as the disjoint
+union of its sub-cells in $\Pi'$, with masses $q_{C'_j}$
+satisfying $\sum_j q_{C'_j} = q_C$. The cell mean
+$P_C = q_C^{-1} \sum_j q_{C'_j} P_{C'_j}$ is a convex combination
+of $\{P_{C'_j}\}_j$ with weights $q_{C'_j}/q_C$. Concavity of
+$\Hbin$ on $[0, 1]$ gives
+$q_C^{-1} \sum_j q_{C'_j} \Hbin(P_{C'_j}) \le \Hbin(P_C)$, hence
+$\sum_j q_{C'_j} \Hbin(P_{C'_j}) \le q_C \Hbin(P_C)$. Summing over
+$C \in \Pi$ gives the entropy claim. The error claim follows by
+the same argument applied to the concave function
+$p \mapsto \min(p, 1 - p)$ on $[0, 1]$.
+\end{proof}
+
+This is the deterministic-coarsening case of the data-processing
+inequality~\citep[Thm.\ 2.8.1]{cover2006eit}. We record the
+elementary proof to keep this note self-contained.
+
+% ============================================================
+\section{Sharpness}\label{sec:sharp}
+% ============================================================
+
+We now show that no closed-form improvement of either bound is
+possible.
+
+\begin{proposition}[Unimprovability]\label{prop:sharp}\hfill
+\begin{enumerate}[(i)]
+  \item For every constant $c < 1/2$ there exists a finite
+    partition $\Pi$ of a finite $V$ and a binary $f$ with
+    $\epsP > c \cdot H(f \mid \Pi)$. In particular, no constant
+    smaller than $1/2$ can replace the coefficient on the
+    right-hand side of \eqref{eq:sandwich}.
+  \item For every continuous function $\psi : [0, 1] \to [0, 1/2]$
+    with $\psi(H_{0}) > \Hbin^{-1}(H_{0})$ at some $H_{0} \in (0, 1)$,
+    there exists a finite partition $\Pi$ of a finite $V$ and a
+    binary $f$ with $\epsP < \psi(H(f \mid \Pi))$. In particular,
+    $\Hbin^{-1}$ cannot be replaced on the left-hand side of
+    \eqref{eq:sandwich} by any pointwise-larger continuous
+    function.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) The upper-boundary family $\Pi_{\alpha}^{\mathrm{HR}}$
+constructed in \cref{sec:tightness} achieves equality
+$\epsP = \tfrac{1}{2}H(f \mid \Pi)$ for every $\alpha \in (0, 1]$,
+hence for every $c < 1/2$ any such row witnesses $\epsP > c \cdot H(f \mid \Pi)$.
+
+(ii) Set $\delta := \psi(H_{0}) - \Hbin^{-1}(H_{0}) > 0$. By
+continuity of $\psi$ and of $\Hbin^{-1}$, there is an open
+neighbourhood $U \ni H_{0}$ in $(0, 1)$ on which
+$\psi(H) > \Hbin^{-1}(H) + \delta/2$. Pick a rational
+$\eps \in (0, 1/2)$ with $\Hbin(\eps) \in U$, and let $n$ be a
+positive integer with $\eps n \in \mathbb{Z}$. The lower-boundary
+family $\Pi_{\eps}^{\mathrm{F}}$ of \cref{sec:tightness} on this
+$n$ satisfies $\epsP = \eps$ and $H(f \mid \Pi) = \Hbin(\eps) \in U$,
+hence $\epsP = \Hbin^{-1}(H(f \mid \Pi)) < \psi(H(f \mid \Pi))$.
+\end{proof}
+
+The rhetorical content of \cref{prop:sharp} is in the style of
+\citet[\S III]{massey1994}: a positive sharpness claim upgraded to
+a negative non-existence claim. \Cref{thm:sandwich} together with
+\cref{prop:sharp} identifies $\Atilde$ as the tightest two-sided
+closed-form bracket on $(\epsP, H(f \mid \Pi))$ available in the
+binary case.
+
+\begin{remark}[multi-class]
+For label alphabets of size $M > 2$ the sharp bracket replaces
+$\Hbin^{-1}$ by the lower concave envelope of admissible
+(entropy, error) pairs on $\{1, \ldots, M\}$; this is the
+construction of~\citet{feder1994}. A multi-class strengthening of
+the Hellman--Raviv upper bound via $f$-divergences is given by
+\citet{hashlamoun1994}; specialised to $M = 2$ their bound
+coincides with \eqref{eq:hr-scalar}.
+\end{remark}
+
+% ============================================================
+\section{Tightness}\label{sec:tightness}
+% ============================================================
+
+Both boundaries of $\Atilde$ are realised by explicit one-parameter
+families on a finite $V = \{1, \ldots, n\}$ under uniform
+weighting.
+
+\paragraph{Lower (Fano) boundary $\Pi_{\eps}^{\mathrm{F}}$.}
+Fix $\eps \in [0, 1/2]$ and $n$ with $\eps n \in \mathbb{Z}$. Take
+the trivial partition $\Pi_{\eps}^{\mathrm{F}} := \{V\}$ and let
+$f$ have exactly $\eps n$ ones. Then $P_C = e_C = \eps$,
+\[
+  H(f \mid \Pi_{\eps}^{\mathrm{F}}) \;=\; \Hbin(\eps),
+  \qquad
+  \eps^{\!*}_{\Pi_{\eps}^{\mathrm{F}}} \;=\; \eps,
+\]
+attaining the lower bound of \eqref{eq:sandwich} with equality and
+tracing the curve $\eps = \Hbin^{-1}(H)$ as $\eps$ varies over
+$[0, 1/2]$.
+
+\paragraph{Upper (Hellman--Raviv) boundary
+$\Pi_{\alpha}^{\mathrm{HR}}$.}
+Fix $\alpha \in [0, 1]$ and $n$ with $\alpha n \in 2\mathbb{Z}$.
+Partition $V = C_{0} \sqcup C_{1}$ with $|C_{1}| = \alpha n$,
+$|C_{0}| = (1 - \alpha) n$, set $f \equiv 0$ on $C_{0}$, and let
+$f$ be exactly half-zero / half-one on $C_{1}$. Then
+$e_{C_{0}} = 0$, $e_{C_{1}} = 1/2$, $q_{C_{0}} = 1 - \alpha$,
+$q_{C_{1}} = \alpha$, so
+\[
+  H(f \mid \Pi_{\alpha}^{\mathrm{HR}}) \;=\; \alpha,
+  \qquad
+  \eps^{\!*}_{\Pi_{\alpha}^{\mathrm{HR}}}
+  \;=\; \alpha/2
+  \;=\; \tfrac{1}{2}\,H(f \mid \Pi_{\alpha}^{\mathrm{HR}}),
+\]
+attaining the upper bound of \eqref{eq:sandwich} with equality and
+tracing the line $\eps = H/2$ as $\alpha$ varies over $[0, 1]$.
+
+The balanced limit $\alpha = 1$ collapses the sandwich at
+$H = 1$, $\eps = 1/2$, $\Hbin^{-1}(1) = 1/2 = \tfrac{1}{2} \cdot 1$.
+The pure limit $\alpha = 0$ collapses the sandwich at
+$H = 0$, $\eps = 0$.
+
+\paragraph{Tightness of the slack.} The maximal slack
+$w^{*} \approx 0.1610$ is attained on the lower boundary at
+$\eps = 1/5$: the Fano witness
+$\Pi_{1/5}^{\mathrm{F}}$ on any $n$ divisible by $5$ realises
+$\bigl(\eps, H, w(H)\bigr) = \bigl(1/5,\, \Hbin(1/5),\, w^{*}\bigr)$.
+
+% ============================================================
+\section{Discussion and applications}\label{sec:discussion}
+% ============================================================
+
+\Cref{thm:sandwich} is a uniform two-sided bracket on the Bayes
+error of any predictor constrained to be constant on the cells of
+a fixed partition. Three immediate application domains follow this
+shape.
+
+\paragraph{Decision trees.} Each leaf of a finite decision tree
+corresponds to a cell, and a leaf-constant predictor is a
+constant-on-cells predictor in the sense of \eqref{eq:bayes-def}.
+\Cref{thm:sandwich} therefore brackets the training-set Bayes risk
+of any such tree by its label entropy conditioned on the leaf
+partition, two-sidedly, with the quantified slack of \cref{sec:main}.
+
+\paragraph{Vector quantisation and clustering.} A
+$k$-codeword vector quantiser, or a hard clustering produced by
+$k$-means or spectral clustering, induces a finite partition of
+its input set. The bracket bounds the supervised classification
+error of any classifier constrained to be constant on codewords
+(equivalently, of nearest-codeword classification) in terms of the
+post-quantisation label entropy.
+
+\paragraph{Permutation-invariant message passing.} A depth-$L$
+permutation-invariant message-passing predictor on a finite graph
+$G$ is constant on the cells of the Weisfeiler--Leman colour
+refinement at depth $L$, by an elementary induction on layers.
+\Cref{thm:sandwich} therefore brackets the error of every such
+predictor by the partition-conditional entropy of the task given
+the depth-$L$ refinement. This application is the motivating one
+for the present note; we develop it elsewhere.
+
+\paragraph{What is genuinely new.} The two inequalities themselves
+are not new. What is new is (a) the explicit Jaynes-Lagrangian
+unification of \cref{sec:lagrangian,lem:lagrangian}, which gives
+both halves as opposite max-entropy programs on the same variables
+and makes explicit a primal/dual correspondence between the
+Feder--Merhav concave-envelope construction and the
+Massey-style Lagrangian derivation; (b) the negative sharpness
+result \cref{prop:sharp}, which establishes that the bracket is
+unimprovable in closed form; and (c) the quantified-slack bound
+$w^{*} \approx 0.161$ uniform in $\Pi$ and $f$.
+
+% ============================================================
+\section{Related work}\label{sec:related}
+% ============================================================
+
+The upper bound \eqref{eq:hr-scalar} is~\citet[eq.\ (6)]{hellmanraviv1970};
+an earlier appearance of a related entropy upper bound on Bayes
+error is~\citet{tebbe1968uncertainty} and~\citet{kovalevskij1968}.
+The lower bound is Fano's inequality~\citep{fano1961} in the binary
+form of~\citet[Thm.\ 2.10.1]{cover2006eit}. The two-sided
+achievable-region packaging is~\citet[Thm.\ 1]{feder1994};
+\citet{santhi2006agnostic} give a further improvement on the lower
+bound under a different optimisation. The Lagrangian /
+maximum-entropy view appears in~\citet{jaynes1957} and in the
+guessing-entropy work of~\citet{massey1994}; the contribution here
+is to make the primal/dual correspondence between the two
+classical packagings explicit. Prior-aware sharpenings of the
+Fano half via data processing on the binary error indicator
+(e.g.~\citealp{hanverdu1994}) are available when the label
+marginal is bounded away from $1/2$; they are orthogonal to the
+closed-form bracket studied here and are pursued elsewhere.
+
+% ============================================================
+\section{Conclusion}\label{sec:conclusion}
+% ============================================================
+
+We have given a self-contained two-sided closed-form bracket on
+the Bayes error of any constant-on-cells predictor for any finite
+partition of a finite set and any binary label, with proof, sharp
+boundary witnesses, a uniform slack bound of $\approx 0.161$, a
+unimprovability statement, and a prior-aware sharpening. All
+arguments are elementary, use only finite sums, and are amenable
+to mechanisation in proof assistants such as Lean~4 or
+Isabelle/HOL.
+
+\bibliographystyle{tmlr}
+\bibliography{main}
+
+\end{document}

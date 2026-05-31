@@ -5,8 +5,8 @@ Search space: MLP architectures
     hidden_layer_sizes ∈ {(16,), (32,), (64,), (128,),
                           (16,16), (32,32), (64,64), (128,128),
                           (32,32,32), (64,64,64)}
-    seeds ∈ {0, 1, 2}
-= 30 candidate architectures.
+    seeds ∈ {0, 1, 2, 3, 4}
+= 50 candidate (arch, seed) pairs.
 
 For each candidate (X, y) on UCI Adult (80/20 split, fixed):
 
@@ -59,7 +59,7 @@ ARCHS = [
     (16, 16), (32, 32), (64, 64), (128, 128),
     (32, 32, 32), (64, 64, 64),
 ]
-SEEDS = [0]
+SEEDS = [0, 1, 2, 3, 4]
 HASH_BITS = 12           # max cells = 2**12 = 4096
 TEST_SIZE = 0.20
 SPLIT_SEED = 0

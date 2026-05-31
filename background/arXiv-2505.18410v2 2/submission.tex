@@ -1,0 +1,1903 @@
+\documentclass[10pt]{article} %
+\usepackage[preprint]{tmlr}
+%
+%
+%
+%
+
+%
+%
+
+\usepackage{hyperref}
+\usepackage{url}
+
+
+\title{On Theoretical Identifiability of Discrete Latent Causal Graphical Models}
+
+%
+%
+%
+
+\author{\name Seunghyun Lee \email sl4963@columbia.edu \\
+      \addr Department of Statistics \\
+      Columbia University
+      \AND
+      \name Yuqi Gu \email yuqi.gu@columbia.edu \\
+       \addr Department of Statistics \\
+      Columbia University}
+
+%
+%
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\def\month{01}  %
+\def\year{2026} %
+\def\openreview{\url{https://openreview.net/forum?id=XXXX}} %
+
+
+
+
+%
+%
+%
+%
+
+%
+%
+
+
+\usepackage[utf8]{inputenc} %
+\usepackage[T1]{fontenc}    %
+\usepackage{hyperref}       %
+\hypersetup{
+  colorlinks,
+  linkcolor={red!50!black},
+  citecolor={blue},
+  urlcolor={blue!80!black}
+}
+\usepackage{url}            %
+\usepackage{booktabs}       %
+\usepackage{amsfonts}       %
+\usepackage{nicefrac}       %
+\usepackage{microtype}      %
+\usepackage{xcolor}         %
+
+
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{float}
+\usepackage{verbatim}
+\usepackage{subcaption}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage[nodisplayskipstretch]{setspace}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[noabbrev,capitalize]{cleveref}
+\usepackage[shortlabels]{enumitem}
+\setlist[enumerate]{topsep=0pt, partopsep=0pt, itemsep=2.5pt, parsep=0pt}
+\usepackage{stmaryrd}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{assumption}{Assumption}
+\newtheorem{lemma}{Lemma}
+\newtheorem{state}{exploratoryStatement}
+\newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{claim}{Claim}
+\newtheorem*{theorem*}{Theorem}
+
+\newcommand{\aaa}{\boldsymbol{\alpha}}
+\newcommand{\ma}{\mathbf A}
+\newcommand{\mck}{\mathcal K}
+\newcommand{\Y}{\mathbf Y}
+\newcommand{\ZZ}{\mathbf Z}
+\newcommand{\M}{\mathbf M}
+\newcommand{\NN}{\mathbf N}
+\newcommand{\R}{\mathbf R}
+\newcommand{\GG}{\mathbf G}
+\newcommand{\I}{\mathbf I}
+\newcommand{\QQ}{\mathbf Q}
+\newcommand{\CC}{\mathbf C}
+\newcommand{\DD}{\mathbf D}
+\newcommand{\PP}{\mathbb P}
+\newcommand{\Pp}{\mathbf P}
+\newcommand{\Z}{\mathbf Z}
+\newcommand{\z}{\mathbf z}
+\newcommand{\UU}{\mathbf U}
+\newcommand{\VV}{\mathbf V}
+\newcommand{\II}{\tilde{\mathcal I}}
+
+\newcommand{\bd}{ldsymbol\Delta}
+\newcommand{\TT}{ldsymbol \Theta}
+
+\newcommand{\mca}{\mathcal A}
+\newcommand{\mce}{\mathcal E}
+\newcommand{\mcm}{\mathcal M}
+\newcommand{\mct}{\mathcal T}
+\newcommand{\mcx}{\mathcal X}
+\newcommand{\mcy}{\mathcal Y}
+\newcommand{\gt}{\tilde{g}}
+
+\newcommand{\pa}{\textsf{\upshape pa}}
+\newcommand{\rk}{\textsf{\upshape rk}}
+\newcommand{\ch}{\textsf{\upshape ch}}
+\newcommand{\supp}{\textsf{\upshape supp}}
+\newcommand{\PC}{\textsf{\upshape PC}}
+\newcommand{\diag}{\textsf{\upshape diag}}
+
+\def\hat{\widehat}
+\def\tilde{\widetilde}
+
+\newcommand{\bcolon}{ldsymbol{:}}
+\newcommand{\SL}[1]{\textcolor{blue!70!black}{[SL: #1]}}
+\newcommand{\yg}[1]{\textcolor{red!70!black}{[YG: #1]}}
+
+\allowdisplaybreaks
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{black}{#1}}
+%
+
+%
+\usepackage{tikz}
+\usetikzlibrary{shapes, calc, shapes, arrows, positioning}
+\tikzstyle{qedge}=[->,thick,black]
+\tikzstyle{pre}=[->,thick,dotted]
+
+\definecolor{myblue}{rgb}{0.0265,    0.6137,    0.8135}
+\definecolor{myyellow}{rgb}{0.9290,    0.6940,    0.1250}
+%
+\tikzstyle{neuron}=[draw,circle,minimum size=26pt,inner sep=0pt, fill=black!10]
+\tikzstyle{hidden}=[draw,circle,minimum size=26pt,inner sep=0pt, fill=white]
+\usetikzlibrary{arrows.meta}
+\tikzset{>={Latex[width=3mm,length=2mm]}}
+\tikzstyle{arr}=[->, thick, black]
+\usetikzlibrary{decorations.text}
+%
+\usetikzlibrary{shadings,shapes.symbols}
+\tikzset{
+    double color fill/.code 2 args={
+        \pgfdeclareverticalshading[%
+            tikz@axis@top,tikz@axis@middle,tikz@axis@bottom%
+        ]{diagonalfill}{100bp}{%
+            color(0bp)=(tikz@axis@bottom);
+            color(50bp)=(tikz@axis@bottom);
+            color(50bp)=(tikz@axis@middle);
+            color(50bp)=(tikz@axis@top);
+            color(100bp)=(tikz@axis@top)
+        }
+        \tikzset{shade, left color=#1, right color=#2, shading=diagonalfill}
+    }
+}
+%
+
+\usepackage{forest}
+
+
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+  This paper considers a challenging problem of identifying a causal graphical model under the presence of latent variables. While various identifiability conditions have been proposed in the literature, they often require multiple pure children per latent variable or restrictions on the latent causal graph. Furthermore, it is common for all observed variables to exhibit the same modality. %
+    Consequently, the existing identifiability conditions are often too stringent for complex real-world data. We consider a general nonparametric measurement model with arbitrary observed variable types and binary latent variables, and propose a \emph{double triangular} graphical condition that guarantees identifiability of the entire causal graphical model. The proposed condition significantly relaxes the popular pure children condition. 
+    %
+    We also establish necessary conditions for identifiability and provide valuable insights into fundamental limits of identifiability. Simulation studies verify that latent structures satisfying our conditions can be accurately estimated from data. {We also illustrate the practicality of our conditions with a real data example.}
+\end{abstract}
+
+
+\section{Introduction}
+%
+
+Discovering causal relationships under the presence of latent variables is a fundamental challenge in observational studies such as psychology and education, as well as modern machine learning and generative modeling \citep{bollen2002latent,pearl2014probabilistic}. Latent variables are especially valuable in these domains as they offer a low-dimensional, interpretable representation that captures substantively meaningful concepts and  effectively summarizes high-dimensional data.
+%
+For instance, in educational assessments designed to evaluate students' understanding of key concepts, only their responses are observable, whereas the underlying conceptual knowledge is latent. Often, these latent variables have interpretable causal relationships among themselves. Consequently, an important problem is to identify this latent graph structure using only the noisy, observed measurements.
+
+
+
+%
+
+
+%
+
+This problem -- also commonly known as \emph{identifiability of latent causal structures} -- has been studied from numerous perspectives. Traditional studies have largely focused on models with continuous variables with linear or additive structural equations \citep{silva2006learning,anandkumar2013learning,huang2022latent,xie2022identification,xie2024generalized,montagna2023causal,montagna2025demystifying,moran2025towards}, and established various conditions that guarantee model identifiability. 
+%
+Despite the attractive parsimony, this modeling assumption can be unrealistic in practice, as the latent concepts can be discrete and the relationship between the latent and the observed may be non-additive. For example, in educational assessments, it is common to consider binary latent variables to model cognitive abilities, whose values correspond to mastery or deficiency of a certain skill, say addition or multiplication \citep{junker2001dina, von2008general}. These models are often highly non-linear, motivated by the fact that solving a question correctly requires the interaction of multiple latent skills.
+
+Consequently, causal discovery with \emph{discrete} latent variables has received growing attention in recent years. As causal graphical models with latent variables are non-identifiable without further assumptions \citep{spirtes2001causation}, existing works have focused on proposing sufficient conditions for identifiability. In particular, {common identifiability conditions for discrete latent variable models} include (a) structural constraints on the latent graph, such as trees \citep{pearl1986structuring, song2014nonparametric,wang2017spectral} or graphs with no triangles alongside atomic cover assumptions \citep{kong2024learning},
+(b) requiring two or three pure children (observed variables with exactly one latent parent) per latent variable \citep{gu2023bayesian,chen2024learning,chen2025identification,lee2025deep},
+or (c) assuming a mixture oracle that recovers the order of all marginal modes \citep{kivva2021learning}\footnote{{While there exist identifiability results for \textit{linear} models with \textit{continuous} latents that do not fall into the three categories (a)--(c) (e.g. see \cite{anandkumar2013learning,adams2021identification,li2025recovery}), they do not extend to \textit{nonlinear} models with \textit{discrete} latents}.}. However, these existing results do not guarantee identifiability for complex causal structures where both the latent graph and the latent-to-observed graph are allowed to have many edges. For instance, only \cite{kivva2021learning} can identify the graphical structure in \cref{fig:intro}, by relying on the strong assumption of a mixture oracle.
+
+\begin{figure}[h!]
+\centering
+\resizebox{0.49\textwidth}{!}{
+  \begin{tikzpicture}[node distance={15mm},
+                      empty/.style = {}
+                     ] 
+  
+    
+  \node[neuron] (X1) {$X_1$}; 
+  \node[neuron] (X2) [right of=X1]  {$X_2$}; 
+  \node[neuron] (X3) [right of=X2]  {$X_3$}; 
+  \node[neuron] (X4) [right of=X3]  {$X_4$}; 
+  \node[neuron] (X5) [right of=X4]  {$X_5$}; 
+  \node[neuron] (X6) [right of=X5]  {$X_6$};
+  \node[neuron] (X7) [right of=X6]  {$X_7$};
+  \node[neuron] (X8) [right of=X7]  {$X_8$};
+  %
+  %
+  %
+ 
+  \node[hidden] (H1) [above=1.5cm of X3] {$H_1$};    
+  \node[hidden] (H2) [above = 2.5cm of $(X4)!0.5!(X5)$] {$H_2$};    
+  \node[hidden] (H3) [above=1.5cm of X6] {$H_3$};
+  %
+
+
+  \node[empty] (Gam) at (-0.9,0.3) {$\Gamma$}; 
+  \node[empty,red] (Lamb) at (2.1,2.5) {$\Lambda$};
+
+  \node[empty] (inv) at (2,1.5) {};
+
+  \node [draw=black,dashed,fit=(X1)(X8)(inv), inner sep=0.1cm, rounded corners] (GBbox) {};
+  \node [draw=red,dashed,fit=(H1)(H2)(H3), inner sep=0.1cm] (GHbox) {};
+
+  \draw[->, red, pre] (H1) -- (H2);
+  \draw[->, red, pre] (H2) -- (H3);
+  \draw[->, red, pre] (H1) -- (H3);
+  %
+  
+  \draw[->] (H1) -- (X1);
+  \draw[->] (H1) -- (X2);
+  \draw[->] (H1) -- (X3);
+  \draw[->] (H1) -- (X4);
+  \draw[->] (H1) -- (X5);
+
+  \draw[->] (H2) -- (X2);
+  %
+  \draw[->] (H2) -- (X4);
+  \draw[->] (H2) -- (X7);
+  \draw[->] (H2) -- (X6);
+  
+  \draw[->] (H3) -- (X3);
+  \draw[->] (H3) -- (X4);
+  \draw[->] (H3) -- (X5);
+  \draw[->] (H3) -- (X7);
+  
+  %
+  %
+
+  \end{tikzpicture}
+}
+  \caption{Example of an identifiable causal graphical structure. Here, $H = \{H_1, H_2, H_3\}$ denotes the unobserved hidden/latent variables, and $X = \{X_1, \ldots, X_{8}\}$ denotes the observed responses. The edges of the DAG are partitioned into the latent graph $\Lambda$ (indicated by the dotted red arrows) and the latent-to-observed bipartite graph $\Gamma$ (indicated by the solid black arrows).} %
+  
+  %
+  \label{fig:intro}
+  \end{figure}
+
+
+This work proposes a new and significantly weaker set of conditions under which all components of the causal graphical model (both the graphs and conditional probabilities) are identifiable. We work under a setting where the latent variables are binary but the observed responses can be arbitrary and have flexible non-linear distributions. Binary latent variables are common in many applications, and can model a students' mastery/non-mastery of a skill or a patients' presence/absence of a disease. In particular, our proposed identifiability result shows that complex causal structures such as that in \cref{fig:intro} can be identified.
+%
+
+%
+%
+%
+
+\paragraph{Organization and main contributions}
+This paper is organized as follows. \cref{sec:setup} formalizes the model setup and assumptions. \cref{sec:main result} provides our main theoretical contributions regarding identifiability, which we further elaborate below.
+\begin{enumerate}[(a)]
+    \item We propose \emph{sufficient conditions for identifiability} without any parametric or latent structural requirements. Our main condition is the \emph{double-triangular} graphical condition, which requires two distinct triangular structures in the latent-to-observed graph $\Gamma$ (see Theorems \ref{thm:identify K} and \ref{thm:identifiability}). These conditions are easily checkable and significantly weaker than those in the existing literature. In particular, we make no assumptions on the latent causal structure, do not require pure children or parametric forms, and allow arbitrary response types for the observed variables. Thus, our framework is broadly applicable to a wide range of real-world problems.
+%
+    %
+    
+    \item We also propose \emph{necessary conditions for identifiability}. In Theorems \ref{thm:necessary} and \ref{thm:subset necessary}, we show that each latent variable must have at least three observed children, and the latent-to-observed graph must have non-nested columns (the so-called subset condition, see \cref{def:subset condition}). While these necessary conditions do not exactly match our sufficient conditions, they help depict the fundamental limits of identifying causal models with binary latent variables.
+\end{enumerate}
+
+{In \cref{sec:sim}, we conduct experiments on both simulated and real data to demonstrate the implications and practical usefulness of our identifiability theory. Finally, \cref{sec:discussion} discusses directions for future work.}
+
+%
+
+
+\subsection{Other related works}\label{sec:related works}
+\paragraph{Structure learning with latent variables}
+Learning graphical structures in the presence of latent variables has been widely studied, and there exist many works that learn (a) the latent structure up to a certain class of ambiguities (e.g. ancestral graphs in \cite{richardson2002ancestral} and \cite{ali2009ancestral} or atomic covers in \cite{xie2022identification}) 
+or (b) the graphical structure among observed variables \citep{evans2018margins,frot2019robust,gordon2023causal}. In particular, \cite{evans2018margins} considered a flipped setting (compared to ours) with discrete observations and arbitrary latent variables. %
+However, our problem of identifying the causal structure \emph{over all variables}, including those related to latent variables, is distinct from these line of works. {Mainly, we work under the so-called ``measurement model'' (see \cref{assmp:measurement model}) to resolve such ambiguities and identify the complex causal relations among the latent variables.}
+%
+
+\paragraph{Identifiability of hierarchical latent structures}
+%
+%
+%
+Recently, identifiability issues have been explored for hierarchical latent structure models that allow latent variables without any observed children %
+\citep{anandkumar2013learning, xie2022identification, kong2024learning, xie2024generalized, lee2025deep, dong2023versatile}. Under our general setup without any structural/parametric assumptions, it is impossible to recover hierarchical structures since such latent variables not directly measured by observed variables can be marginalized out without changing the likelihood, and we do not consider this direction.
+
+%
+
+%
+Directly related works that consider discrete latent variables \citep{kivva2021learning, chen2024learning,chen2025identification, lee2025deep} are discussed in detail in \cref{sec:literature review}.
+
+
+%
+
+
+\section{Background}\label{sec:setup}
+\subsection{Model setup and assumptions}
+We start by defining notations for the considered causal graphical models.
+Let $G = (V, E)$ be a directed acyclic graph (DAG), where the vertex set is partitioned as $V = (X, H)$, with observed variables $X = (X_1, \ldots, X_J) \in \prod_{j=1}^J \mathcal{X}_j$ and binary hidden/latent variables $H = (H_1, \ldots, H_K) \in \{0,1\}^K$. {The binary latent variable assumption turns out to be crucial for our technical arguments as well as for allowing minimal restrictions on observed sample space $\mathcal{X}_j$s, as further elaborated in \cref{sec:binary}.}
+%
+%
+The observed variables are not necessarily discrete, and can be \emph{arbitrary} types of responses, as long as each sample space $\mathcal{X}_j$ is a nondegenerate separable metric space. Throughout the paper, we will work under this setting, which can allow flexible modeling of multi-modal data that includes both discrete and continuous responses. %
+
+We separate our global model assumptions into those on the graph structure $G$ and that on the probability distribution on the vertices $V$. First, regarding the graph $G$, we work under the following \emph{measurement model assumption \citep{silva2004generalized, silva2006learning, kivva2021learning}.}
+%
+\begin{assumption}[Measurement model]\label{assmp:measurement model}
+    Assume that there are no edges (a) between the observed variables $X$ and (b) from observed to hidden variables.
+\end{assumption}
+\cref{assmp:measurement model} states that the observations are noisy measurements of the latent. Then, we decompose the edge set as $E = \Lambda \cup \Gamma$, where $\Lambda$ collects the edges among the hidden variables $H$ (i.e. the latent causal graph), and $\Gamma$ collects the edges from one hidden variable to one observed variable (i.e. the latent-to-observed bipartite graph). With a slight abuse of notation, also let $\Gamma$ denote the $J \times K$ bipartite graph adjacency matrix where the $(j,k)$-th entry $\gamma_{j,k}$ is an indicator of whether there is an edge from $H_k$ to $X_j$.
+See Figure \ref{fig:intro} for a visualization. Note that an observed variable can have \emph{all} latent variables as parents ($X_4$) or \emph{no} parent ($X_{8}$).
+%
+%
+%
+%
+
+Next, we discuss assumptions on the probability distribution $\PP(V) = \PP(X,H)$. We assume that $\PP(V)$ follows the causal Markov property under $G$ and is faithful, which are fundamental assumptions for learning graphical models \citep{spirtes2001causation}. 
+\begin{assumption}[Basic graphical model assumptions]\label{assmp:causal markov}
+    Assume the causal Markov property 
+    \begin{align*}
+        \PP(V) &= \prod_{V_i \in V}\PP(V_i \mid \pa(V_i)) \\
+        &= \prod_{k=1}^K \PP(H_k \mid \pa(H_k)) \prod_{j=1}^J \PP(X_j \mid \pa(X_j)).
+    \end{align*}
+    Also, assume that $\PP(V)$ is faithful to $G$ in the sense that the conditional independence relationships embedded in the DAG $G$ is equal to that in $\PP(V)$.
+\end{assumption}
+
+We additionally impose the following nondegeneracy assumption.
+
+\begin{assumption}[Nondegeneracy]\label{assmp:nondegenerate}
+The probability distribution of $V=(X,H)$ satisfies:
+\begin{enumerate}[(a)]
+    \item All latent configurations are allowed, that is $\PP(H = h) > 0$ for all $h \in \{0,1\}^K$.
+    \item For each $j$, the conditional distributions of $X_j$ are distinct for each latent configuration: $\PP(X_j \mid \pa(X_j) = h) \neq \PP(X_j \mid \pa(X_j) = h')$ for all $h \neq h' \in \{0,1\}^{|\pa(X_j)|}.$
+    \item Each latent variable $H_k$ has at least one observed child. In other words, $\Gamma$ has no all-zero columns.
+\end{enumerate}
+\end{assumption}
+
+We elaborate more on each condition. Here, Assumption \ref{assmp:nondegenerate}(a) ensures full support over all latent configurations. Assumption \ref{assmp:nondegenerate}(b) ensure nondegeneracy of all conditional distributions that correspond to each edge in the latent-to-observed graph $\Gamma$. Note that we only require the conditional distributions of $X_j$ to be distinct for each configuration of the latent parents, and do not assume full rankness of the matrix $\PP(X_j \mid \pa(X_j))$. %
+These two conditions are standard for identifying discrete latent causal models (e.g. see Assumption 2.4 in \cite{kivva2021learning} or Condition 4.1 (i) in \cite{chen2024learning}). We refer the interested reader to Appendix A in \cite{kivva2021learning} for examples arguing the necessity of these conditions. In particular, in Appendix \ref{sec:counterex} of this paper, we provide an alternative example with binary responses that highlights the need for the second condition.
+%
+Assumption \ref{assmp:nondegenerate}(c) rules out unmeasured latent variables without any observed child. While this is often considered as part of the measurement model setting, we spell this out to clarify that no hierarchical (or multi-layer) latent structures are considered, as discussed in \cref{sec:related works}. 
+
+
+Based on \cref{assmp:nondegenerate}, we formalize the class of models that we will consider as \emph{binary latent causal models}.
+\begin{definition}[BLCM]\label{def:blcm}
+    A Binary Latent Causal Model (BLCM) on the graph $G = (V, E)$ is a probability distribution $\PP(V)$ that satisfies Assumptions \ref{assmp:measurement model}--\ref{assmp:nondegenerate}. %
+\end{definition}
+
+\begin{remark}[Comparison with assumptions in the literature]
+    One distinction of this paper compared to other discrete latent causal models \citep{kivva2021learning, chen2024learning, kong2024learning} is that we assume a priori that all latent variables are \emph{binary}. While this is a stronger assumption, it is highly interpretable and also grants additional flexibility. To elaborate, the cited papers require additional conditions on top of \cref{assmp:nondegenerate}, such as no twins and maximality, to deal with the merging and splitting of latent variables. We do not require such assumptions. 
+    %
+
+    Also, note that we do not impose any structural assumptions on the latent graph $\Lambda$; it can be an arbitrary graph that ranges from a tree to a complete graph, and can even allow isolated latent variables (without any latent neighbor). This stands in contrast to many previous approaches that restrict the latent graph to be a tree \citep{pearl1986structuring, choi2011learning} or forbids triangles \citep{kong2024learning}.
+\end{remark}
+
+
+
+\subsection{Objective: Identifiability}\label{sec:objective} 
+Under the above modeling assumptions, our goal is to identify all model components of the BLCM from the observed distribution $\PP(X)$:
+\begin{enumerate}[1.]
+    \item The number of latent variables $K$,
+    \item The latent DAG $\Lambda$ and the latent-to-observed bipartite graph $\Gamma$,
+    \item The distribution of the latent variables $\PP(H)$ and the conditional observed distributions $\PP(X_j \mid H)$.
+    %
+\end{enumerate}
+Here, it is important to clearly define the notion of ``identifiability'', as the exact definition varies by different models and papers. We wish to adopt the most stringent, statistical notion of parameter identifiability. In other words, by viewing the above model components as a parameter vector $\theta$, we say that an identical observed distribution $\PP(X; \theta) = \PP(X; \theta')$ implies identical parameters $\theta = \theta'$.
+
+%
+Unfortunately, identifiability in latent variable models is subject to various fundamental ambiguities, and the above definition does not directly apply.
+%
+First, we consider identifiability up to latent variable \emph{label permutation} (e.g., $H_1$ and $H_2$ can be re-labeled in \cref{fig:intro}) and \emph{sign-flipping} (e.g., the meaning of $H_1 = 0$ and $H_1 = 1$ can be permuted). These two ambiguities are fundamental under the presence of categorical latent variables \citep{lee2025deep}. 
+%
+%
+Additionally, in terms of identifying the graphical structure, we identify the latent graph $\Lambda$ up to its \emph{Markov equivalence} class. It is well known that the edges $E = (\Lambda, \Gamma)$ are identifiable only up to Markov equivalence, even when the entire distribution $\PP(X, H)$ is known \citep{pearl2014probabilistic, spirtes2001causation}. Under the measurement model assumption described earlier (\cref{assmp:measurement model}), the bipartite graph $\Gamma$ does not suffer from this problem and can be fully identified. {A rigorous definition of these trivial ambiguities are provided in \cref{sec:ambiguities}.}
+%
+%
+%
+%
+%
+
+Based on the above considerations, we formally define the notion of identifiability that will be used in the remainder of the paper.
+\begin{definition}[Identifiability]\label{def:identifiability}
+    Consider a BLCM with distribution $\PP(V)$ on $G = (V, E)$, with variables $V = (X, H)$ and edges $E = \Lambda \cup \Gamma$. 
+    We say that the \emph{latent dimension} $K$ is identifiable if there is no alternate BLCM with distribution $\tilde{\PP}(\tilde{V})$ on $\tilde{G} = (\tilde{V}, \tilde{E})$ that satisfies the following:
+    \begin{enumerate}[(a)]
+        \item $\tilde{V} = (X, \tilde{H})$ for latent variables $\tilde{H} \in \{0,1\}^{\tilde{K}}$ such that $\tilde{K} < K$.
+        \item $\PP(X) = \tilde{\PP}(X)$, that is, $\PP$ and $\tilde{\PP}$ define identical marginal distributions.
+        %
+    \end{enumerate}
+    Next, given the latent dimension $K$, we say that the remaining \emph{model components} $(E, \PP)$ are identifiable when there is no alternate BLCM with distribution $\tilde{\PP}(\tilde{V})$ that satisfies the above condition (b) and the following conditions (a'), (c):
+    \begin{enumerate}
+        \item[(a')] $\tilde{V} = (X, \tilde{H})$ for latent variables $\tilde{H} \in \{0,1\}^{K}$.
+        \item[(c)] $(E, \PP)$ is distinct from $(\tilde{E}, \tilde{\PP})$ up to label permutation, sign-flipping, and Markov equivalence (see \cref{def:ambiguities} for details).
+    \end{enumerate}
+\end{definition}
+
+%
+%
+%
+%
+%
+%
+%
+       
+%
+
+%
+    
+%
+    
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+       
+%
+%
+
+%
+
+%
+    
+%
+
+%
+    
+%
+%
+%
+%
+%
+%
+%
+
+%
+%
+%
+
+
+%
+%
+\cref{def:identifiability} ensures that no alternate, nontrivial BLCM with $\tilde{K} \le K$ latent variables defines the same observed distribution $\PP(X)$. 
+The alternate latent dimension $\tilde{K}$ is restricted to address a final source of trivial non-identifiability that arises from the existence of redundant latent variables (e.g. see Lemma 1 in \cite{evans2016graphs}, or the notion of minimality in \cite{markham2020measurement}). This restriction can be avoided at the cost of imposing additional constraints on alternate BLCMs (see \cref{rmk:alternative K} and \cref{prop:identifiability of K}). %
+
+%
+
+
+%
+
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+
+
+
+\subsection{Notations}\label{sec:notation}
+For an integer $K$, write $[K] := \{1, \ldots, K\}$.
+Recall that $V = (X, H)$ collects all observed and hidden variables. For any variable $v \in V$, we use standard graphical model notations and let $\pa(v), \ch_X(v)$ denote the parent variables and observed children (in $X$) of $v$, respectively. For example, in the setting of \cref{fig:intro}, we have $\pa(X_2) = \{H_1,H_2\}$ and $\ch_X(H_2) = \{X_2, X_4, X_6, X_{7}\}.$
+Let $H_{(-k)} := H \setminus \{H_k\}$ denote the set of all hidden variables except for $H_k$. 
+Write $\PP_{j, h} := \PP(X_j \mid H = h)$ as the conditional probability for the observation $X_j$, and let $\pi_h := \PP(H = h)$ be the probability of the latent configuration $h$. {Under categorical observations with $|\mathcal{X}_j|<\infty$, for any $S \subseteq [J]$, let $\PP(X_S \mid H)$ denote the conditional probability table whose rows and columns are indexed by $\prod_{j \in S} \mathcal{X}_j$ and $\{0,1\}^k$, respectively.}
+Let $\pi = (\pi_h)_{h \in \{0,1\}^K}$ collect all mixture proportions, and let $\diag(\pi)$ be the $2^K \times 2^K$ diagonal matrix with entries of $\pi$ on the diagonal. %
+For two binary vectors $h, h'$ of the same length, write $h \succeq h'$ when $h_k \ge h_k'$ for all $k$. 
+
+%
+
+
+
+
+
+\section{Main Identifiability Results}\label{sec:main result}
+\subsection{Sufficient Condition}
+We present our main result on sufficient conditions that guarantee that the entire BLCM is identifiable. Interestingly, all our conditions are neatly stated in terms of the bipartite graph $\Gamma$. The key concept is the following ``double triangular'' structure in $\Gamma$.
+
+\begin{definition}[Triangular $\Gamma$-matrix]\label{def:triangular}
+    A $K \times K$ matrix $\Gamma_1$ with binary entries is ``triangular'' when it can be written as the following form \emph{after arbitrary row and column permutations}:
+    \begin{equation}\label{eq:triangular gamma}
+        \Gamma_1 = \begin{pmatrix}
+        1 & 0 & 0 & \ldots & 0 \\
+        * & 1 & 0 & \ldots & 0 \\
+        * & * & 1 & \ldots & 0 \\
+        \vdots & \vdots & \vdots & \ddots & \vdots \\
+        * & * & * & \ldots & 1
+    \end{pmatrix}.
+    \end{equation}
+    Here, each $* \in \{0,1\}$ denotes an arbitrary value.
+
+    Additionally, we say that the $J \times K$ bipartite adjacency matrix $\Gamma$ is ``double triangular'' when it can be written (after possibly permuting the rows) as:
+    \begin{align}\label{eq:double triangular}
+        \Gamma = \begin{pmatrix}
+        \Gamma_1 \\ \Gamma_2 \\ \Gamma_3
+    \end{pmatrix},
+    \end{align}
+    where the $K \times K$ matrices $\Gamma_1, \Gamma_2$ are triangular (with potentially \emph{different column permutations}). %
+    %
+     The remaining $(J - 2K) \times K$ matrix $\Gamma_3$ can be an arbitrary matrix, and may have zero rows.
+\end{definition}
+
+\begin{example}\label{ex:double triangular checking}
+    Still consider the graphical structure with $K = 3$ latent variables and $J = 8$ observed variables from \cref{fig:intro}. Here, we verify that this structure is double triangular by explicitly defining the row permutation that gives \eqref{eq:double triangular}. For example, if we define $\Gamma_1, \Gamma_2, \Gamma_3$ to correspond to the observed variables $(X_1, X_2, X_3), (X_6, X_7, X_5), (X_4, X_8)$, we get:
+    \begin{align*}
+        \Gamma_1 &= \begin{pmatrix}
+        1 & 0 & 0 \\
+        1 & 1 & 0 \\
+        1 & 0 & 1 \\
+    \end{pmatrix}, \quad \Gamma_2 = \begin{pmatrix}
+        0 & 1 & 0 \\
+        0 & 1 & 1 \\
+        1 & 0 & 1 \\
+    \end{pmatrix} \stackrel{\text{permute columns}}{\sim} \begin{pmatrix}
+        1 & 0 & 0 \\
+        1 & 1 & 0 \\
+        0 & 1 & 1 \end{pmatrix}, \quad \Gamma_3 = \begin{pmatrix}
+        1 & 1 & 1 \\
+        0 & 0 & 0 \\
+    \end{pmatrix}.    
+    \end{align*}
+    It is immediate that $\Gamma_1$ is a $K \times K$ triangular matrix, and $\Gamma_2$ can also be written as a triangular matrix after permuting the columns.
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+\end{example}
+
+\begin{remark}[Comparison with the pure children condition]
+    The double triangular condition \eqref{eq:double triangular} generalizes the popular ``two pure children per latent'' condition that guarantees identifiability of various latent variable models \citep{xie2022identification,chen2022identification,lee2025deep}. Note that an observed variable $X_j$ is called a \emph{pure child} when it has exactly one latent parent $H_k$, or equivalently, the corresponding ($j$th) row in $\Gamma$ is a standard basis vector $e_k$. By setting all the arbitrary values indexed by $*$ in \eqref{eq:triangular gamma} equal to zero, we get $\Gamma_1 = \Gamma_2 = I_K$. This is equivalent to assuming two pure children per latent variable. Thus, the double triangular condition relaxes the two pure children condition by allowing a significantly denser bipartite graph $\Gamma$.
+
+    %
+
+%
+%
+%
+%
+%
+%
+%
+ 
+%
+%
+%
+%
+%
+%
+{To illustrate this we consider applications in educational testing, where there are often complex skills that are measured alongside another skill, as opposed to having observed pure children. Various real-world test designs and estimated graphical structures satisfy the double-triangular condition, but violates the usual two pure children condition. For example, the test design for TOEFL reading (see Table A2 in \cite{von2008general}) does not contain any pure children for the complex skill “Synthesize and organize”, but this design still satisfies our double triangular condition. The same phenomenon can be observed for the estimated bipartite graph $\hat{\Gamma}$ of a benchmark educational dataset as well (see \cref{tab:fraction} in Appendix \ref{sec:real data details}).}
+\end{remark}
+
+\begin{remark}[{Verifying the double triangular condition}]
+    To verify the double triangular condition, one can take a greedy approach to sequentially search triangular sub-matrices. To elaborate, first find a standard basis row-vector $e_k$. For example, this is the bold row in the left term in the below equation. This becomes the first row in the triangular structure in \eqref{eq:triangular gamma} after row/column permutations. Let $\Gamma^{(1)}$ be the $(J-1) \times (K-1)$ matrix obtained from $\Gamma$ by removing the corresponding row and $k$th column (marked blue below).
+
+    Next, we search for a standard basis row-vector in $\Gamma^{(1)}$, which is computationally as easy as the step above. For example, this is the bold row in the right term of the below equation. This procedure searches the second row in \eqref{eq:triangular gamma}. This is because after removing the first column in \eqref{eq:triangular gamma}, the second row in \eqref{eq:triangular gamma} (of length $K-1$) must also be a standard basis vector. By continuing this procedure inductively, we can identify a triangular structure. We can repeat the same procedure for the remaining rows to search for the second triangular structure. 
+    $$\Gamma = \begin{pmatrix} 1 & {\color{blue} 0} & 1 \\ \textbf{\color{blue} 0} & \textbf{\color{blue} 1} & \textbf{\color{blue} 0} \\ 0 & {\color{blue} 1} & 1 \end{pmatrix} \xrightarrow{\text{remove 2nd row / col}} \Gamma^{(1)} = \begin{pmatrix} {1} & 1 \\ \textbf{0} & \textbf{1} \end{pmatrix}.$$
+
+In practice, the double-triangular condition can be verified in multiple ways. For example in Figure \ref{fig:intro}, the row-indices for the triangular matrices $\Gamma_1,\Gamma_2$ can be chosen as (a) $\{1,2,3\}$, $\{5,6,7\}$, (b) $\{1,3,7\}$, $\{2,5,6\}$, or (c) $\{1,5,7\}$, $\{2,3,6\}$. Thus, while the success of the above procedure may require multiple restarts in worst-case settings, it can practically verify the double-triangular condition. %
+\end{remark}
+
+%
+
+Now, we present our main identifiability results. We start with identifying the latent dimension $K$.
+\begin{theorem}[Identifying $K$]\label{thm:identify K}
+    For each $j$, let $\mathcal{X}_j$ be a nondegenerate separable metric space. Suppose that the true $\Gamma$-matrix is double triangular. Then, the number of latent variables $K$ is identifiable.
+    %
+    %
+    %
+    %
+\end{theorem}
+
+The proof argument is based on the following key property, which shows that a triangular matrix $\Gamma_1$ forces the corresponding conditional probability table to have full rank.
+%
+We prove \cref{lem:full rank} in Appendix \ref{sec:pf of lemmas}, and \cref{thm:identify K} in \cref{sec:proof}.
+\begin{lemma}\label{lem:full rank}
+    Consider a BLCM with binary responses, that is $\mcx_j = \{0,1\}$ for all $j$. %
+    Suppose that the $\Gamma$-matrix corresponding to $X_1, \ldots, X_K$ is lower-triangular and can be written as in \eqref{eq:triangular gamma}. 
+    Then, the $2^K \times 2^K$ conditional probability table $\PP(X_{1:K} \mid H)$ %
+    has full column-rank.
+    %
+\end{lemma}
+
+Here, for simplicity, we prove \cref{thm:identify K} assuming binary responses. The full proof under general responses builds upon discretizing the sample space $\mathcal{X}_j$, and is postponed to \cref{sec:proof}.
+
+\begin{proof}[Simplified proof of \cref{thm:identify K}]
+As the true model is double triangular, let $S_1$ and $S_2$ denote two disjoint subsets of $[J]$ that index the rows of $\Gamma_1$ and $\Gamma_2$, respectively. %
+    Under the modeling assumptions and recalling that $\pi := (\pi_h)_{h \in \{0,1\}^K}$ for $\pi_h = \PP(H=h)$, we can write
+    \begin{align}\label{eq:pmf matrix decomposition}
+        \PP(X_{S_1} , X_{S_2}) & = \underbrace{{\PP}(X_{S_1} \mid {H})}_{2^{|S_1| \times 2^{K}}} \times \underbrace{\diag(\pi)}_{2^K \times 2^K} \times \underbrace{{\PP}(X_{S_2} \mid {H})^\top}_{2^{K} \times 2^{|S_2|}} \\
+        &= \sum_{h \in \{0,1\}^K} \pi_h \PP(X_{S_1} \mid H=h) \circ \PP(X_{S_2} \mid H=h). \notag
+    \end{align}
+    Here, $\circ$ denotes the outer product of vectors.
+    Now, \cref{lem:full rank} implies that ${\PP}(X_{S_1} \mid {H}), {\PP}(X_{S_2} \mid {H})$ have full column rank of $2^K$. Additionally, under part (a) of the nondegeneracy \cref{assmp:nondegenerate}, the diagonal matrix $\diag(\pi)$ also has full rank $2^K$. Thus, $\PP(X_{S_1}, X_{S_2})$ has rank $2^K$.
+
+    Now, consider an alternative model with $L < K$ latent variables (indexed by $\tilde{G}, \tilde{\PP}$) that defines an identical marginal distribution for the observed variables $\tilde{\PP}(X) = \PP(X)$. Then, writing $\tilde{\pi}_h := \tilde{\PP}(\tilde{H}=h)$, we must have 
+    \begin{align*}
+        \PP(&X_{S_1} , X_{S_2}) = \tilde{\PP}(X_{S_1}, X_{S_2}) = \underbrace{\tilde{\PP}(X_{S_1} \mid \tilde{H})}_{2^{|S_1| \times 2^{L}}} \times \underbrace{\diag(\tilde{\pi})}_{2^L \times 2^L} \times \underbrace{\tilde{\PP}(X_{S_2} \mid \tilde{H})^\top}_{2^{L} \times 2^{|S_2|}},
+    \end{align*}
+    which gives $\rk(\PP(X_{S_1}, X_{S_2})) \le 2^L < 2^K$. Thus, we have a contradiction, and such an alternative model does not exist. 
+\end{proof}
+
+
+
+\begin{remark}[Allowing alternative models with more latent variables]\label{rmk:alternative K}
+    The restriction on the number of latent variables ``$\tilde{K} < K$'' in property (a) of \cref{def:identifiability} can be relaxed, at the cost of considering alternative BLCMs that are double triangular. The proof argument is similar to \cref{thm:identify K}, see Proposition \ref{prop:identifiability of K} in Appendix \ref{sec:proof} for a formal statement.
+\end{remark}
+
+
+
+Now, we move on to identifying the remaining model components. We show that the bipartite graph $\Gamma$ of a BLCM with given $K$ is identifiable when $\Gamma$ is double triangular. To identify the latent DAG $\Lambda$ as well as all conditional distributions $\PP_{j,h}$ and latent proportions $\pi$, we additionally require the following subset condition. This condition was first proposed in \cite{pearl1992statistical} for latent causal graphical models, and was also assumed in several recent works as well \citep{evans2016graphs, kivva2021learning}.
+%
+
+\begin{definition}[Subset condition]\label{def:subset condition}
+    %
+    We say that the $J \times K$ matrix $\Gamma$ satisfies the subset condition if for different latent variables $H_k \neq H_l$, $\ch_X(H_k)$ is not a subset of $\ch_X(H_l)$ and vice versa; or equivalently, there exists no partial order between any two columns of $\Gamma$ indexed by $k \neq l$.
+\end{definition}
+The subset condition is not directly implied by the double triangular assumption, as the columns of $\Gamma$ may exhibit a partial order when all * values in \eqref{eq:triangular gamma} are set to 1, and both $\Gamma_1, \Gamma_2$ in \eqref{eq:double triangular} exhibit an identical triangular structure. However, the subset condition is satisfied when there exist a pure child for each latent variable, so this condition is weaker than assuming pure children.
+%
+
+\begin{theorem}[Identifiability of model components]\label{thm:identifiability}
+    Consider a BLCM with a known latent dimension $K$.
+    Assuming that (i) the true $\Gamma$-matrix is double triangular, and that (ii) all columns in $\Gamma_3$ of \cref{def:triangular} are not empty, $\Gamma$ is identifiable. Additionally, when the true $\Gamma$-matrix satisfies the subset condition (in addition to (i) and (ii)), the latent graph $\Lambda$ and probability distribution $\PP$ are identifiable.
+\end{theorem}
+%
+%
+\begin{proof}[Proof sketch of \cref{thm:identifiability}]
+For simplicity, suppose all sample spaces $\mathcal{X}_j$ are binary. Similar to earlier, let $S_1, S_2, S_3$ be the partition of $[J]$ such that each $S_a$ index the rows of $\Gamma_a$.
+Our key idea is to show that the following tensor CP decomposition (a three-way generalization of the matrix decomposition \eqref{eq:pmf matrix decomposition}) of the full marginal distribution $\PP(X)$ is unique:
+\begin{align}\label{eq:tensor decomposition}
+    \PP(X_{S_1}, X_{S_2}, X_{S_3}) &= \Big\llbracket \underbrace{\PP(X_{S_1} \mid H)}_{2^{|S_1|} \times 2^K} \times \underbrace{\diag(\pi)}_{2^K \times 2^K},~ \underbrace{\PP(X_{S_2} \mid H)}_{2^{|S_2|} \times 2^K}, ~\underbrace{\PP(X_{S_3} \mid H)}_{2^{|S_3|} \times 2^K}\Big\rrbracket  \\
+    =&\sum_{h \in \{0,1\}^K} \pi_h \PP(X_{S_1} \mid H=h) \circ \PP(X_{S_2} \mid H=h \circ \PP(X_{S_3} \mid H=h). \notag
+\end{align}
+%
+%
+See \cref{lem:kruskal} for additional details and notations for tensor decompositions.
+%
+
+We separate the proof into three steps as follows.
+
+\textit{Step 1: Apply Kruskal's theorem to identify the components in \eqref{eq:tensor decomposition}.}
+By \cref{lem:full rank}, the first two components of \eqref{eq:tensor decomposition} have full column rank. Also, 
+\cref{assmp:nondegenerate} implies that all columns of the third component are distinct. This allows us to apply Kruskal's theorem for the uniqueness of tensor decompositions \citep[][also see \cref{lem:kruskal}]{kruskal1977three}. Hence, we can identify the three components of \eqref{eq:tensor decomposition} up to a permutation of $2^K$ components.
+
+
+\textit{Step 2: Identify the bipartite graph $\Gamma$.}
+We identify the bipartite graph $\Gamma$ up to a permutation of its $K$ columns. The main idea is to partition the $2^K$ tensor component indices based on the corresponding columns of $\PP(X_{S_2} \mid H)$ in \eqref{eq:tensor decomposition}, and resolve the label permutation based on the triangular structure of $\Gamma_2$. Then, we identify each row of $\Gamma$ via an induction on $k=1,\ldots,K$.
+%
+
+
+\textit{Step 3: Identify $\pi, \PP_{j,h},$ and the latent DAG $\Lambda$.}
+Using the assumption that $\Gamma$ satisfies the subset condition, we map each tensor component in \eqref{eq:tensor decomposition} to a binary vector representation, up to label permutation and sign flipping. Given this, $\pi$ and $\PP_{j,h}$ are identified by marginalizing out each component of \eqref{eq:tensor decomposition}. Finally, using faithfulness (\cref{assmp:causal markov}), the DAG $\Lambda$ can be identified up to its Markov equivalence class from $\pi$.
+\end{proof}
+
+
+\begin{remark}[Extension to general responses]
+    {The above proof argument generalizes to arbitrary observed variables that take values in any nondegenerate metric spaces (as stated at the beginning of \cref{sec:setup}) by discretizing the sample space. By choosing a wise discretization, the discretized observations still satisfy Assumption \ref{assmp:nondegenerate}(b), and a similar argument using Kruskal's theorem can be applied to identify the DAGs and the latent proportion vector $\pi$. Identifying the conditional distribution itself is trickier, for which we use ideas from measure theory (separating classes) to identify the full conditional distributions (e.g., continuous densities) from the discretized p.m.f.}
+\end{remark}
+%
+%
+%
+
+Next, we revisit our running example in \cref{fig:intro} and illustrate that the conditions in \cref{thm:identifiability} are easy to check.
+\begin{example}
+    Recall our running example from \cref{fig:intro} and \cref{ex:double triangular checking}. We have already verified that $\Gamma$ is double triangular, and the remaining matrix $\Gamma_3 = \begin{pmatrix}
+        1 & 1 & 1 \\ 0 & 0 & 0
+    \end{pmatrix}$ has no empty columns. Also, $\Gamma$ satisfies the subset condition since there is no partial order between any two columns. 
+    %
+    Thus, the BLCM parameters with a graphical structure as in \cref{fig:intro} is identifiable by \cref{thm:identifiability}.
+\end{example}
+
+\begin{remark}[Discussion on the identifiability notion]\label{rmk:identifiability}
+    While \cref{thm:identifiability} imposes assumptions on the true model components, it establishes identifiability against \emph{arbitrary alternative models} $(\tilde{G}, \tilde{\PP})$ that only satisfy the minimal BLCM requirements in \cref{def:blcm}. In other words, we do not establish identifiability by assuming that the alternative model also satisfies the double triangular condition. 
+    {Note that this is more general than the notion of \emph{recoverability} often used in causal discovery.}
+    %
+    %
+\end{remark}
+
+\begin{remark}[Relaxing the subset condition]
+    One may assume alternative conditions on behalf of the subset condition in \cref{thm:identifiability}. One possibility is to assume \emph{monotonicity} of the latent variable $H$, by supposing 
+    \begin{align}\label{eq:monotonocity}
+        \PP_{j,h}(C_j) > \PP_{j,h'}(C_j), ~~ \forall h \neq h' ~~ \text{s.t} ~~ h_{\pa(X_j)} \succ h'_{\pa(X_j)},
+    \end{align} for some fixed baseline set $C_j \subsetneq \mathcal{X}_j$. For example, one may take $C_j = \{1\}$ for binary responses, and $C_j = (0, \infty)$ for continuous responses. See the following proposition for a formal statement. While assuming monotonicity does restrict the parameter space, it additionally resolves the sign-flipping ambiguity as well as enhancing interpretability.
+\end{remark}
+
+\begin{proposition}[Modification of \cref{thm:identifiability} under monotonicity]\label{prop:identifiability monotone}
+    Consider a BLCM with a known latent dimension $K$ that satisfies the above monotonicity condition \eqref{eq:monotonocity}.
+    %
+    Then, the BLCM is identifiable under conditions (i), (ii) in \cref{thm:identifiability}.
+\end{proposition}
+%
+
+\subsection{Necessary Condition}
+Next, we establish necessary conditions for identifiability. To summarize, we show that each column of $\Gamma$ must not be too sparse (\cref{thm:necessary}) as well as not too dense (\cref{thm:subset necessary}).
+
+When all responses are categorical, trivial requirements for identifiability follow from comparing the number of equations and parameters. 
+%
+The following theorem strengthens this by showing that each latent variable must be measured by at least three observed variables. This is a fundamental requirement for categorical observed and latent variables, and in fact we prove \cref{thm:necessary} under the general assumption of categorical latent variables $H$ (with known cardinality). 
+This strengthens the usual requirement for two measurements per latent \citep[e.g. see Lemma 3 in][]{evans2016graphs}. 
+%
+%
+
+\begin{theorem}[Three measurements per latent]\label{thm:necessary}
+    For a BLCM with known $K$ and categorical observed variables (that is, $|\mathcal{X}_j| < \infty$ for all $j$) to be identifiable, it is necessary for each latent variable $H_k$ to have at least \emph{three} observed children. 
+    %
+\end{theorem}
+
+
+\cref{thm:necessary} justifies the decomposition of $\Gamma$ into three components as in \eqref{eq:double triangular}. The sufficient condition in \cref{thm:identifiability} requires all columns of $\Gamma_a$ to be non-empty, so each $\Gamma_a$ measures each latent variable $H_k$ at least once.
+%
+%
+%
+%
+
+Our next necessity result proves the necessity of the subset condition (see \cref{def:subset condition}). This condition is closely related to the sign-flipping of $H_k = 0/ 1$ for each latent variable, and the following result shows its necessity even under a known graphical structure $\Gamma$. 
+%
+
+\begin{theorem}[Subset condition]\label{thm:subset necessary}
+    For a BLCM with known $K \ge 2$ and known $\Gamma$ to be identifiable, the $\Gamma$-matrix must satisfy the subset condition.
+\end{theorem}
+
+In the following two examples, we motivate each necessary condition in Theorems \ref{thm:necessary} and \ref{thm:subset necessary}.
+\begin{figure}[h!]
+\centering
+\begin{minipage}[c]{0.53\linewidth}
+\centering
+\begin{subfigure}[c]{0.46\textwidth}
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[scale=1.8]
+    \node (v1)[neuron] at (0, 0) {$X_{1}$};
+    \node (v2)[neuron] at (0.8, 0) {$X_{2}$};
+    \node (v3)[neuron] at (1.6, 0) {$X_{3}$};
+    \node (v4)[neuron] at (2.4, 0) {$X_{4}$};
+    \node (v5)[neuron] at (3.2, 0) {$X_{5}$};
+       
+    \node (h1)[hidden] at (0.8, 1.2) {$H_{1}$};
+    \node (h2)[hidden] at (2.4, 1.2) {$H_{2}$};
+
+    %
+
+    \draw[qedge] (h1) -- (v1) node [midway,above=-0.12cm,sloped] {}; 
+    
+    \draw[qedge] (h1) -- (v2) node [midway,above=-0.12cm,sloped] {};  
+    
+    \draw[qedge] (h1) -- (v3) node [midway,above=-0.12cm,sloped] {}; 
+    
+    %
+    
+    \draw[qedge] (h2) -- (v4) node [midway,above=-0.12cm,sloped] {};
+    \draw[qedge] (h2) -- (v5) node [midway,above=-0.12cm,sloped] {};
+\end{tikzpicture}
+}
+\end{subfigure}
+~~
+\begin{subfigure}[c]{0.46\textwidth}
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[scale=1.8]
+    \node (v1)[neuron] at (0, 0) {$X_{1}$};
+    \node (v2)[neuron] at (0.8, 0) {$X_{2}$};
+    \node (v3)[neuron] at (1.6, 0) {$X_{3}$};
+    \node (v4)[neuron] at (2.4, 0) {$X_{4}$};
+    \node (v5)[neuron] at (3.2, 0) {$X_{5}$};
+       
+    \node (h1)[hidden] at (0.8, 1.2) {$H_{1}$};
+    \node (h2)[hidden] at (2.4, 1.2) {$H_{2}$};
+
+    \draw[red, pre] (h2) -- (h1) node [midway,above=-0.12cm,sloped] {}; 
+
+    \draw[qedge] (h1) -- (v1) node [midway,above=-0.12cm,sloped] {}; 
+    
+    \draw[qedge] (h1) -- (v2) node [midway,above=-0.12cm,sloped] {};  
+    
+    \draw[qedge] (h1) -- (v3) node [midway,above=-0.12cm,sloped] {}; 
+    
+    \draw[qedge] (h1) -- (v4) node [midway,above=-0.12cm,sloped] {}; 
+    
+    \draw[qedge] (h2) -- (v4) node [midway,above=-0.12cm,sloped] {};
+    \draw[qedge] (h2) -- (v5) node [midway,above=-0.12cm,sloped] {};
+\end{tikzpicture}
+}
+\end{subfigure}
+\caption{Counterexamples of three measurements per latent.}
+\label{fig:counterex pure child}
+\end{minipage}
+\quad
+%
+\begin{minipage}[c]{0.42\linewidth}
+        \centering
+        \resizebox{0.98\textwidth}{!}{
+        \begin{tabular}{ccccc}
+            \toprule
+            $h = (h_1, h_2)$ & $(0, 0)$ & $(0, 1)$ & $(1, 0)$ & $(1, 1)$  \\
+            \midrule
+            $\pi_h$ & 0.36 & 0.24 & 0.24 & 0.16 \\
+            $\tilde{\pi}_h$ & 0.36 & 0.24 & 0.16 & 0.24 \\
+            \bottomrule
+        \end{tabular}
+        }
+        \captionof{table}{Counterexample of the subset condition. The first/second row denotes true/alternative proportion parameters $\pi$/$\tilde{\pi}$.}
+        \label{tab:counterexample}
+\end{minipage}
+%
+\end{figure}
+
+
+\begin{example}[Violation of three measurements per latent variable]
+    Suppose that the true model follows the DAG in the left panel of \cref{fig:counterex pure child}, where the latent variable $H_2$ is measured only twice. For simplicity, suppose that the graphical structures $(\Gamma, \Lambda)$ are known and that all observed variables are binary. As $H_1$ and $H_2$ are independent, $(X_1,X_2,X_3) \perp H_2$. Thus, one has to identify the conditional distributions associated with $H_2$ only based on $\PP(X_4, X_5)$. Simply comparing the number of effective parameters for this structure ($1+2\times2 = 5$) versus the number of equations provided by the marginal distribution of $(X_4, X_5)$ ($2^2-1 = 3$) demonstrates non-identifiability. On the contrary, the latent variable $H_1$ does not suffer from this issue, as it has three measurements as opposed to two. In fact, the conditional distributions $\PP(X_j \mid H_1)$ for $j=1,2,3$ are still identifiable.
+    
+    \cref{thm:necessary} extends this non-identifiability argument to \emph{arbitrary} latent structures such as that on the right panel of \cref{fig:counterex pure child}, where dependent latent variables $H_1, H_2$ as well as additional latent parents of $X_4$ are allowed.
+    %
+    %
+    %
+\end{example}
+
+\begin{example}[Violation of the subset condition]
+    Consider a BLCM with $K=2$ latent variables that are independent: $H_1 \perp H_2$ (i.e. $\Lambda = \phi$) and $\PP(H_1 = 1) = \PP(H_2 = 1) = 0.4$. Suppose that we can write $\Gamma$ as in \eqref{eq:double triangular}, where $\Gamma_1 = \Gamma_2 = \Gamma_3 = \begin{pmatrix}
+        1 & 0 \\
+        1 & 1 \\
+    \end{pmatrix}$. This $\Gamma$ satisfies all conditions in \cref{thm:identifiability} except for the subset condition.
+    %
+    Then, even though $\Gamma$ is identifiable by \cref{thm:identifiability}, the latent causal graph $\Lambda$ is non-identifiable. %
+    {For this goal, the proof of \cref{thm:subset necessary} constructs an alternative distribution $\tilde{\PP}$ with $\tilde{\pi}_h = \tilde{\PP}(H=h)$ as in the second row of \cref{tab:counterexample}, and similarly define conditional probabilities $\tilde{\PP}_{j,h}$.} Under $\tilde{\PP}$, $H_1$ and $H_2$ are dependent, 
+    %
+    so the latent DAG $\Lambda$ is non-identifiable.
+    %
+\end{example}
+
+In Appendix \ref{sec:counterex}, we illustrate that the necessary conditions in Theorems \ref{thm:necessary} and \ref{thm:subset necessary} themselves do not guarantee identifiability, which justifies the gap between our necessary and sufficient conditions. {Closing this gap is certainly important, but also known to be notoriously challenging. One exception is the finite mixture model with $L$ mixture components and $J$ binary observations, where $J \ge 2L-1$ was recently shown to be the tight identifiability requirement \citep{tahmasebi2018identifiability,pmlr-v291-lyu25a}. However, under a weaker notion of ``generic identifiability'' that allows a measure-zero non-identifiable parameter space, \cite{allman2009} showed a much weaker sufficient condition of $J\ge 2\log_2 L+1$ (whose tightness is unknown).
+
+Interestingly, viewing our causal model as a finite mixture with $L = 2^K$ components, the double-triangular condition (more generally, \cref{thm:identifiability}) requires $J\ge 2K+1 = 2\log_2 L +1$ observed variables. It is quite surprising that our non-generic result matches the generic result in \cite{allman2009}, and significantly relaxes the requirement $J\ge 2^{K+1}-1$. Additionally, our lower bound on $J$ also relaxes that in other discrete causal discovery works, such as $J\ge 3K$ in \cite{chen2024learning}.}
+
+
+
+%
+%
+%
+%
+%
+%
+%
+%
+
+    %
+
+    %
+
+    %
+
+
+
+
+\section{Experiments}\label{sec:sim}
+We conduct experiments to empirically validate our identifiability results under finite samples. Building upon the identifiability guarantees of the entire model, we implement a score-based estimator by discretizing the continuous responses and maximizing the regularized log-likelihood. {Our method first utilizes a penalized EM algorithm \citep{ma2023learning} to learn the bipartite graph $\Gamma$ alongside the latent proportion vector $\pi$. Then, we use the estimated latent proportions $\hat{\pi}$ to recover the latent graph $\Lambda$.} The implementation details are provided in Appendix \ref{subsec:algo}.
+%
+%
+
+\paragraph{Experiments under varying latent structures}
+Following \cref{fig:intro}, assume a true BLCM with $K = 3$ latent variables and $J = 8$ observed variables, where $X_1, X_2, X_3, X_4$ are binary and $X_5, X_6, X_7, X_8$ are continuous. We assume that $X_5, X_6$ are generated from a Normal and that $X_7, X_8$ are generated from a Cauchy distribution. Note that the distributional assumptions are not used for estimation. In terms of the graphical structures, $\Gamma$ is defined as in \cref{fig:intro}, and we consider three settings for $\Lambda$: (a) chain ($H_1 \to H_2 \to H_3$), (b) collider ($H_1 \to H_2 \leftarrow H_3$), (c) all dependent (as in \cref{fig:intro}). We consider varying sample sizes of $N = 1000, 5000, 10000$, and conduct 300 independent simulation trials for each setting.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{ccccccc}
+    \toprule
+        \multirow{2}{*}{$\Lambda \setminus N$} &
+      \multicolumn{3}{c}{SHD$(\hat{\Gamma},\Gamma)$} & \multicolumn{3}{c}{SHD$(\hat{\Lambda},\Lambda)$} \\
+      \cmidrule{2-7}
+      & 1k & 5k & 10k & 1k & 5k & 10k \\
+    \midrule
+    Chain & 1.90 & 1.64 & 1.48 & 0.57 & 0.46 & 0.38 \\
+    Collider & 2.51 & 2.24 & 2.05 & 0.36 & 0.27 & 0.24 \\
+    Dependent & 1.83 & 1.56 & 1.35 & 0.45 & 0.41 & 0.35 \\
+        %
+        %
+        %
+    \bottomrule
+    \end{tabular}
+    \vspace{0.2cm}
+    \caption{SHD for estimating $\Gamma$ and $\Lambda$, \textbf{smaller is better}. Maximum error for $\Gamma$, $\Lambda$ is $24, 3$, respectively.}
+    \label{tab:shd}
+\end{table}
+
+In \cref{tab:shd}, we report the average structured Hamming distance (SHD) between the estimated and true DAG, separately for $\Gamma$ and $\Lambda$. The SHD computes the number of incorrectly estimated edges. %
+The results in \cref{tab:shd} illustrate that both $\Gamma$ and $\Lambda$ can be effectively estimated regardless of the true latent structure $\Lambda$, and that the accuracy increases as the sample size $N$ increases. This clearly validates that latent structures can be accurately recovered under our weak identifiability conditions. See \cref{fig:boxplot} in Appendix \ref{sec:simulation details} for boxplots corresponding to \cref{tab:shd}. {In Appendix \ref{subsec:comparison}, we also compare the  performance of our approach against the mixture oracle baseline \citep{kivva2021learning} under a slightly modified setting with continuous responses.}
+
+\paragraph{Ablation studies} We conduct ablation studies by assessing robustness when the conditions in \cref{thm:identifiability} does not hold. Here, $\Gamma^{\text{DT}}$ is the `double-triangular' bipartite graphical structure in \cref{fig:intro}. $\Gamma^{\text{dense}}, \Gamma^{\text{sparse}}$ denote alternative bipartite graphs that do not satisfy our identifiability conditions, as their third column is either too dense or sparse (see \eqref{eq:gamma formula} in Appendix \ref{subsec:true param} for the explicit forms).
+
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{ccccccc}
+    \toprule
+        \multirow{2}{*}{$\Gamma \setminus N$} &
+      \multicolumn{3}{c}{SHD$(\hat{\Gamma},\Gamma)$} & \multicolumn{3}{c}{SHD$(\hat{\Lambda},\Lambda)$} \\
+      \cmidrule{2-7}
+      & 1k & 5k & 10k & 1k & 5k & 10k \\
+    \midrule
+    $\Gamma^{\text{DT}}$ & 1.90 & 1.64 & 1.48 & 0.57 & 0.46 & 0.38 \\
+    $\Gamma^{\text{dense}}$	& 4.62 & 3.58 & 3.01 & 1.46 & 1.59 & 1.66 \\
+    $\Gamma^{\text{sparse}}$ & 3.95 & 4.04 & 4.00 & 0.81 & 0.76 & 0.77 \\
+    \bottomrule
+%
+    \end{tabular}
+    %
+    \caption{SHD under varying $\Gamma$ and $N$, where $\Lambda$ is fixed as the chain graph. Only $\Gamma^{\text{DT}}$ satisfy the proposed identifiability conditions.}
+    \label{tab:robust}
+\end{table}
+The results in \cref{tab:robust} reveal performance degradation when the proposed conditions in Theorem \ref{thm:identifiability} are violated. More importantly, the error in these non-double-triangular cases does not decrease as the sample size $N$ increases. This suggests the fundamental failure of identifiability even at the population level, and empirically verifies our necessary conditions. 
+
+In \cref{tab:gamma-accuracy-entry} in Appendix \ref{subsec:true param}, we additionally report entry-wise estimation errors corresponding to the third column of \cref{tab:robust}, which illustrates an accuracy drop for edges associated with the theoretically non-identifiable latent variables.
+
+\paragraph{Real data analysis}
+Finally, we analyze a benchmark educational testing dataset on fraction subtraction \citep{tatsuoka2002data}, which consists of binary responses that record students' correct/incorrect answers. Estimating the causal graph $\Gamma$ between the observed and latent variables has been an important problem in educational measurement, and this dataset has been extremely popular due to the explicit nature of the questions (e.g. $\frac{3}{4} - \frac{3}{8}$ or $3 \frac{1}{2} - 2 \frac{3}{2}$).
+
+By fitting the model with $K=2,3,4$ latent variables, we chose $K=3$ latent variables based on BIC. The estimated bipartite graph $\hat{\Gamma}$ (see Table \ref{tab:fraction} in the appendix) closely resembles that learned from the earlier analysis in \cite{chen2015statistical}, and the three latent skills can be interpreted similarly: computing common denominator, writing integer as fraction, and subtracting integers. Notably, the estimated $\hat{\Gamma}$ does not have two pure children per latent, but satisfies the double triangular condition in \cref{thm:identifiability}. This illustrates the practical usefulness of our proposed conditions. Additionally, the estimated latent graph $\hat{\Lambda}$ is fully dependent, which illustrates that all skills are closely correlated.
+
+
+\section{Discussion}\label{sec:discussion}
+%
+This work opens up many directions for future work. 
+First, it would be interesting to consider more complex graphical structures that go beyond measurement models under additional (but still weak) assumptions. For example, one may allow direct causal relationships between the observed variables or allow hierarchical latent variables, under additional structural constraints. 
+%
+%
+Second, it would be important to generalize our identifiability conditions for causal models with general types of latent variables. This includes considering categorical latents (that may not be binary), as well as potentially allowing both categorical and continuous latents. In particular, for the case of categorical latents, {we conjecture that our sufficient identifiability conditions may be extended at the cost of modifying \cref{assmp:nondegenerate}(b) to a stronger ``full-rank'' requirement for the conditional probabilities $\PP(X_j \mid \pa(X_j))$. Note that extending  the score-based estimator in \cref{sec:sim} to categorical latents is not a bottleneck, since extending the penalized likelihood estimation strategy is immediate.}
+Finally, it would be important to develop a nonparametric method that can fully leverage continuous responses to estimate individual conditional distributions, for example using kernel methods.
+%
+
+
+
+%
+%
+
+
+%
+\bibliography{ref}
+\bibliographystyle{tmlr}
+
+%
+
+
+\clearpage
+\appendix
+%
+%
+\section*{Appendix} This Appendix is organized as follows. Section \ref{sec:literature review} discusses three closely related works in-depth. Section \ref{sec:counterex} provides additional examples. Section \ref{sec:proof} proves all main theorems, and Section \ref{sec:pf of lemmas} proves all technical lemmas. Section \ref{sec:simulation details} provides all implementation details for our simulations alongside comparison studies. Section \ref{sec:real data details} provides details for real data analysis, and Section \ref{sec:binary} provides detiled theoretical and practical justifications regarding our setup with binary latent variables.
+
+\section{Detailed literature review}\label{sec:literature review}
+\paragraph{Comparison to \cite{kivva2021learning}}
+Both our work and \cite{kivva2021learning} consider discrete latent variables without any assumptions on the true latent structure.
+%
+While we require binary latent variables, \cite{kivva2021learning} allow arbitrary categorical latent variables with unknown number of categories. However, their arguments rely on the existence of a mixture oracle, which gives the number of mixture components of each marginal distribution $\PP(X_S)$ for $S \subset [J]$. This does not hold under our minimal model definition. For example, for binary responses with $\mathcal{X}_1=\{0,1\}$, the one-dimensional marginal $\PP(X_1 = 1)$ does not contain enough information and its mixture components are fundamentally non-identifiable. The same argument holds for continuous responses as well, unless we impose parametric assumptions or separation between the conditional distributions $\PP_{1,h}$. %
+
+One may point out that to identify the bipartite graph $\Gamma$, \cite{kivva2021learning} only utilizes the mixture oracle to obtain the number of mixture components for three observed variables, say $X_S = (X_1, X_2, X_3)$. Without further assumptions, the mixture oracle does not exist for this goal as well. To see this, consider a simple setting with $K=2$ and $J=3$, where $H_1 \to \{H_2, X_1, X_2\}, H_2 \to X_3$. Then, the minimal number of mixture components in $(X_1, X_2, X_3)$ is $2$ because $X_1, X_2, X_3$ are conditionally independent given $H_1$. Hence, under our setup, it is impossible to conclude that there must be $2\times 2=4$ mixture components, which corresponds to all configurations of $(H_1, H_2)$.
+
+Another point of comparison is regarding the use of tensor decompositions. \cite{kivva2021learning} also utilizes tensor decompositions to identify the bipartite graph $\Gamma$, but looks at the three-way tensor whose $(j_1, j_2, j_3)$-th element corresponds to the (log) \emph{number of mixture components} of the distribution $(X_{j_1}, X_{j_2}, X_{j_3})$. Computing the value of this tensor requires a mixture oracle. %
+On the other hand, our three-way tensor arises from re-shaping the marginal probability mass function (pmf) $\PP(X_1, \ldots, X_J) = \PP\Big((X_1,\ldots, X_K), (X_{K+1}, \ldots, X_{2K}), (X_{2K+1}, \ldots, X_J) \Big)$ based on the double triangular structure. Hence, our tensor does not require any additional information beyond that in the observed data $X$.
+
+A final point of comparison is about learning $\Lambda$. %
+While the proof strategy (especially reducing the ambiguity of latent variable value up to sign flip) shares the similar spirit, the key distinction arises again from the mixture oracle. \cite{kivva2021learning} utilizes the number of mixture components to construct a projection mapping between the mixture components of $X_S$ and the mixture components of each mode $X_j$. 
+%
+As this information is not available in our work, we take a detour and utilize the sparsity patterns in the conditional distributions $\PP_{j,h}$ instead.
+
+\paragraph{Comparison to \cite{chen2024learning,chen2025identification}} Both our work and \cite{chen2024learning,chen2025identification} establish identifiability by utilizing tensor decompositions of the observed variables. {In particular, \cite{chen2025identification} allows both discrete and continuous responses by using the key idea of discretizing the continuous responses, similar to our paper.} While both works can allow general categorical latent variables, they require stronger identifiability conditions compared to this paper.
+
+First, both works require three pure children per latent variable, as opposed to our double triangular condition. Second, they require the cardinality of the observed variables $|\mathcal{X}_j|$ to be \emph{strictly} greater than the cardinality of any latent variable. This does not allow binary responses as opposed to our result. Third, they operate under a stronger nondegeneracy assumption that requires full-rankness of the conditional probability table $\PP(X_{j} \mid \pa(X_j))$. In contrast, we do not require any full rank assumptions and assume a minimal nondegeneracy condition (see \cref{assmp:nondegenerate}).
+
+We also mention that one of their main contribution is on algorithmic recoverability based on a novel tensor rank criteria, and they do not establish identifiability by considering alternative models that do not contain pure children (in the sense of \cref{rmk:identifiability}).
+
+
+\paragraph{Comparison to \cite{lee2025deep}} The works \cite{lee2024new, lee2025deep} also establishes identifiability of binary latent variable models for arbitrary responses. As our proof argument for establishing nonparametric identifiability is motivated by this line of work, it is important to clarify the differences. Since \cite{lee2025deep} extends the conclusion of \cite{lee2024new}, which requires the bipartite graph $\Gamma$ to be known, we mainly focus on comparing our work with \cite{lee2025deep}.
+
+First, the strict identifiability result in \cite{lee2025deep} require two pure children per latent variable, and mainly assumes the conditional distributions $\PP_{j,h}$ to be a parametric generalized linear model:
+$$\PP_{j,h} \stackrel{d}{\equiv} \textsf{ParFam}(\beta_{j,0} + \sum_{k=1}^K \beta_{j,k} h_k, \gamma_j), \quad \forall j, h.$$
+Under the weaker notion of ``generic'' identifiability \blue{that allows a measure-zero subset of the true parameter space to be non-identifiable}, they establish weaker identifiability conditions that do not require any pure children. We note that this condition is even weaker than our double triangular criteria, as they do not require any triangular structure. By assuming a multi-layer architecture, they additionally establish identifiability of hierarchical latent structures.
+
+In comparison to the strict identifiability result in \cite{lee2025deep}, we do not require any pure children nor any parametric structure. The generic identifiability result there also requires the generalized linear model parametric form, \blue{and is not able to pinpoint the non-identifiable true parameter values.
+%
+In contrast, our results do not allow any sort of non-identifiability.}
+%
+Additionally, the theoretical results in \cite{lee2025deep} treats the latent dimension $K$ as known, whereas we establish its identifiability. Finally, we consider different latent architectures, as \cite{lee2025deep} considers a multi-layer latent structure without any between layer edges, but we consider a one-layer latent structure with arbitrary dependencies between the latent variables.
+
+%
+
+
+
+\section{Examples}\label{sec:counterex}
+Our first example illustrates the necessity of condition (b) in \cref{assmp:nondegenerate}.
+\begin{example}[Degenerate conditional distributions]\label{ex:degenerate}
+    For simplicity, suppose that the responses are binary. We construct an example with degenerate conditional distributions that lead to a non-identifiable $\Gamma$ matrix.
+    For each $k \in [K]$, assume that the corresponding $\Gamma$ is lower triangular with all ones:
+    $$\Gamma = \begin{pmatrix}
+        1 & 0 & 0 & \ldots & 0 \\
+        1 & 1 & 0 & \ldots & 0 \\
+        1 & 1 & 1 & \ldots & 0 \\
+        \vdots & \vdots & \vdots & \ddots & \vdots \\
+        1 & 1 & 1 & \ldots & 1
+    \end{pmatrix}.$$
+    For constants $a \neq b \in [0,1]$, suppose that the conditional distributions $\PP_{k,h} := \text{Ber}(\theta_{k,h})$ are defined as:
+    $$\theta_{k,h} = \begin{cases}
+        a & \text{if } d_H(h, 0) \text{ is } even, \\
+        b & \text{if } d_H(h, 0) \text{ is } odd. \\
+    \end{cases}$$
+    Here, $d_H$ denotes the Hamming distance between two binary vectors. The conditional distributions are clearly degenerate, as $\theta_{k,h}$ can take only two possible values regardless of the configuration $h$, for all $k$. 
+
+    Then, we can construct an alternative labeling $\tilde{H}$ that corresponds to $\tilde{\Gamma} = I_K$. See the following table for an illustration with $K=3$. This illustrates the fundamental ambiguity resulting from nondegeneracy. 
+    
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{ccccccccc}
+        \toprule
+        $j \setminus h$ & (0,0,0) & (1,0,0) & (0,1,0) & (1,1,0) & (0,0,1) & (1,0,1) & (0,1,1) & (1,1,1) \\
+        \midrule
+        1 & a & b & a & b & a & b & a & b \\
+        2 & a & b & b & a & a & b & b & a \\
+        3 & a & b & b & a & b & a & a & b \\
+        \midrule
+        $\tilde{h}$ & (0,0,0) & (1,1,1) & (0,1,1) & (1,0,0) & (0,0,1) & (1,1,0) & (0,1,0) & (1,1,1) \\
+        \bottomrule
+    \end{tabular}
+    \vspace{2mm}
+    \caption{A degenerate pmf table of $\theta_{j,h} = \PP(X_j = 1 \mid H = h)$, which can define multiple graphical structures: $\Gamma = \begin{pmatrix}
+        1 & 0 & 0 \\
+        1 & 1 & 0 \\
+        1 & 1 & 1
+    \end{pmatrix}$ and $ \begin{pmatrix}
+        1 & 0 & 0 \\
+        0 & 1 & 0 \\
+        0 & 0 & 1
+    \end{pmatrix}$.}
+    \label{tab:degenerate}
+\end{table}
+\end{example}
+
+Note that under further degeneracy specifications such as the conjunctive assumption in \cite{lee2024latent}, it is possible to identify degenerate causal graphical models.
+
+
+
+
+Our final example illustrates the gap between the necessary and sufficient conditions.
+\begin{example}[Gap between necessary and sufficient conditions]\label{ex:condition gap}
+    Consider a toy model with $K = 3$ latent variables and $J = 4$ binary observed variables, where the true bipartite graph is
+    $$\Gamma = \begin{pmatrix}
+        1 & 1 & 0 \\ 1 & 0 & 1 \\ 0 & 1 & 1 \\ 1 & 1 & 1
+    \end{pmatrix}.$$ 
+    This $\Gamma$ satisfies both the three measurement per latent condition (see \cref{thm:necessary}) and the subset condition (see \cref{thm:subset necessary}). However, simply observing that this model has 39 parameters (7 parameter for $\pi$ and 32 for the conditional distributions $\PP_{j,h}$) but only 15 equations are given by the marginal distribution $\PP(X)$, we can deduce that the model is non-identifiable. This illustrates that, without the double triangular condition to guarantee a sufficient number of observed variables, the model may be non-identifiable.
+\end{example}
+
+\begin{remark}[The necessary conditions can be weakened under additional assumptions]
+    Our necessary conditions are stated under our minimal, nonparametric modeling framework. Under additional assumptions such as linearity and pure-children structures, the model can still be identifiable when there are two measurements per latent variable \citep{xie2020generalized, gu2025blessing}. Also, the subset condition is not required under (generalized) linear parametrizations \citep[Theorem 2,][]{lee2025deep}.
+\end{remark}
+
+
+\section{Proof of main results}\label{sec:proof}
+%
+%
+%
+%
+
+\subsection{Rigorous definition of trivial ambiguities}\label{sec:ambiguities}
+
+Before proving individual results, we formalize the three notions of ambiguities from \cref{sec:objective}. Recall from \cref{sec:notation} that $\pi_h = \PP(H =h)$ and $\PP_{j,h}$ denotes the conditional distribution of $X_j$ given $H=h$.
+\begin{definition}\label{def:ambiguities}
+    Consider two BLCMs with a known $K$ and model components $\big(\Lambda, \Gamma, \pi, \{\PP_{j,h}\}\big)$ and $\big(\tilde{\Lambda}, \tilde{\Gamma}, \tilde{\pi}, \{\tilde{\PP}_{j,h}\} \big)$, respectively. We formally say that these two models are equivalent up to \emph{label permutation} when there exists a permutation $\sigma:[K] \to [K]$ such that for $\tilde{h}_{h,\sigma} := (h_{\sigma_{(1)}}, \ldots, {h_{\sigma(K)}})$, we have
+    \begin{align*}
+        \pi_h  = \tilde{\pi}_{\tilde{h}_{h,\sigma}}, \quad \gamma_{j,k} &= \tilde{\gamma}_{j,\sigma(k)}, \quad \PP_{j,h} = \tilde{\PP}_{j,\tilde{h}_{h,\sigma}}, \quad \forall h \in \{0,1\}^K, ~ j \in [J], ~ k \in [K], \\
+        \quad 
+        \{k \to \ell\} \in \Gamma &\iff \{\sigma(k) \to \sigma(\ell)\} \in \tilde{\Gamma}, \quad \forall k \neq \ell \in [K].
+    \end{align*}
+    Next, we say that the two models are equivalent up to \emph{sign-flip} when $\Lambda = \tilde{\Lambda}, \Gamma = \tilde{\Gamma}$ and there exists permutations $\tau_k:\{0,1\} \to \{0,1\}$ for each $k \in [K]$ that satisfy
+    \begin{align*}
+        \pi_h = \tilde{\pi}_{(\tau_1(h_1), \ldots, \tau_K(h_K))}, \quad \PP_{j,h} = \tilde{\PP}_{j,(\tau_1(h_1), \ldots, \tau_K(h_K))}, \quad \forall h \in \{0,1\}^K, j \in [J].
+    \end{align*}
+    Finally, we say that the two models are equivalent up to \emph{Markov equivalence} when $\pi = \tilde{\pi}, \Gamma = \tilde{\Gamma}, \PP =\tilde{\PP},$ and the latent graphs $\Lambda$ and $\tilde{\Lambda}$ induce the same conditional independence relations \citep{pearl2014probabilistic}. Note that the bipartite graph $\Gamma$ does not suffer from Markov equivalence due to \cref{assmp:measurement model}, which restricts the direction of the edges in $\Gamma$.
+\end{definition}
+
+
+%
+%
+%
+%
+
+\subsection{Proof of \cref{thm:identify K} and \cref{prop:identifiability of K}}
+\begin{proof}[Proof of \cref{thm:identify K} for general responses]
+    We proceed in a similar spirit as in the sketch in the main text, where technical challenges arise from the arbitrary response types. Here, we reduce the responses to binary responses noting that the rank information is still preserved. 
+    For each $j$, let $C_{j} \subsetneq \mathcal{X}_j$ be a non-empty subset of the sample space. Let $Y_j$ be a binary random variable defined by setting 
+    \begin{align}\label{eq:discretized y_j}
+        Y_j := I(X_j \in C_j).
+    \end{align}
+    Note that this implies $$\PP(Y_j = 1 \mid H = h) = \PP(X_j \in C_j \mid H = h).$$
+    Then, by assumption \cref{assmp:nondegenerate}, we have $\PP(Y_j = 1 \mid H = h) \neq \PP(Y_j = 1 \mid H = h')$ for any $h \neq h'$ such that $h_{\pa(X_j)} \neq h_{\pa(X_j)}'$. Hence, the second part of \cref{assmp:nondegenerate} holds for the discretized random variable $Y_j$. 
+
+    Now, the argument in the main text can be applied by changing the notation $X$ to $Y$, and the proof is complete.
+\end{proof}
+
+Next, we present the delegated statement (from \cref{rmk:alternative K}) for identifying $K$ under the class of BLCMs, where alternate models with more than $K$ latent variables are allowed.
+\begin{proposition}\label{prop:identifiability of K}
+    Among the class of double triangular BLCMs, $K$ is identifiable in the weaker sense that the lower-dimensional restriction ``$\tilde{K} < K$'' in condition (a) of \cref{def:identifiability} can be relaxed to ``$\tilde{K} \neq K$''. 
+    %
+    %
+\end{proposition}
+\begin{proof}[Proof of \cref{prop:identifiability of K}]
+    Consider an alternative model with $L > K$ latent variables, that is double triangular and defines an identical marginal distribution $\tilde{\PP}(X) = \PP(X)$. For each $j$, define the discretized random variable $Y_j$ as in \eqref{eq:discretized y_j}.
+    By the double triangular condition and \eqref{eq:pmf matrix decomposition}, there exists some disjoint set of observed variables $X_{S_1}, X_{S_2} \subset (X_1, \ldots, X_J)$ such that the discretized pmf $\tilde{\PP}(Y_{S_1}, Y_{S_2})$ has full rank of $2^L > 2^K$. However, since the true model has $K$ latent variables, we can write
+    $$\PP(Y_{S_1}, Y_{S_2}) = \PP(Y_{S_1} \mid H) \diag(\pi) \PP(Y_{S_2} \mid H)^\top,$$
+    which gives $\rk(\PP(Y_{S_1}, Y_{S_2})) \le 2^K$. Thus, we have a contradiction.
+
+    Now, the proof is complete, since \cref{thm:identify K} has already established that there exists no alternative model with $L < K$ latent variables.
+\end{proof}
+
+\subsection{Proof of \cref{thm:identifiability} and \cref{prop:identifiability monotone}}
+Next, we show \cref{thm:identifiability} and \cref{prop:identifiability monotone}. 
+Our first tool is the following technical lemma, which allows us to boil down the identifiability of models with arbitrary types of random variables to that with categorical variables. 
+%
+We need to use the notion of separable metric spaces and separating classes from standard probability textbooks (e.g. Chapter 1 of \cite{billingsley2013convergence}).
+
+\begin{lemma}\label{lem:separating class}
+    For any separable metric space $\mathcal{X}_j$, there exists a countable separating class $\mathcal{C}_j$ whose values determine the probability measure on $\mathcal{X}_j$.
+\end{lemma}
+The existence of such a separating class $\mathcal{C}_j$ is a consequence of $\mathcal{X}_j$ being a separating metric space, which was assumed in the first paragraph of \cref{sec:setup}. For a proof, see Step 1 in the proof of Theorem 1 in \cite{lee2024new}. For example, for binary responses with $\mathcal{X}_j = \{0,1\}$, we can simply take $\mathcal{C}_j = \{\{0\}, \{0,1\}\}$. For continuous responses with $\mathcal{X}_j = \mathbb{R}$, we can take $\mathcal{C}_j = \{(-\infty, q): q \in \mathbb{Q}\} \cup (-\infty, \infty)$, where $\mathbb{Q}$ is the set of rational numbers.
+
+Having reduced the response types to categorical, our second tool is the celebrated Kruskal's theorem \citep{kruskal1977three, rhodes2010concise}, which guarantees the unique CP decomposition of a three-way tensor. Before presenting the result, define the Kruskal rank of a $n \times r$ matrix $T_1$ (denoted as $\rk_k(T_1)$) as the largest number $R \le r$ such that every distinct $R$ columns of $T_1$ are linearly independent. Also, for vectors $t_1, t_2, t_3$, denote their outer product as $t_1 \circ t_2 \circ t_3$.
+
+\begin{lemma}[Kruskal's Theorem]\label{lem:kruskal}
+    For $a = 1,2,3$, let $T_a$ be a $n_a \times r$ matrix, whose $\ell$th column is $t_{a,\ell}$. Let $\mathcal{T} := \llbracket T_1, T_2, T_3 \rrbracket = \sum_{l=1}^r t_{1,\ell} \circ t_{2,\ell} \circ t_{3,\ell}$ be a three-way tensor with dimension $n_1 \times n_2 \times n_3$. Then, when the following condition holds:
+    $$\rk_k(T_1) + \rk_k(T_2) + \rk_k(T_3) \ge 2r +2,$$
+    the rank $r$ decomposition of $\mathcal{T}$ is unique up to a common column permutation and rescaling of $T_a$s. In other words, if $\mathcal{T} := [\tilde{T}_1, \tilde{T}_2, \tilde{T}_3]$ for some $n_a \times r$ matrices $\tilde{T}_a$, there exists a permutation matrix $\Pi$ and invertible diagonal matrices $D_1, D_2, D_3$ with $D_1 D_2 D_3 = I_r$ such that $\tilde{T}_a = T_a D_a \Pi$.
+\end{lemma}
+
+
+
+\begin{proof}[Proof of \cref{thm:identifiability}]
+    Consider a BLCM with a known $K$ and model parameters $(\Gamma, \Lambda,\PP)$ where $\Gamma$ satisfy the conditions in the Theorem statement (double triangular, $\Gamma_3$ does not have empty columns, subset condition).
+    Suppose that there exists alternative model parameters $\tilde{\Gamma}, \tilde{\Lambda}, \tilde{\PP}$ that define the same marginal distribution $\PP(X) = \tilde{\PP}(X).$ We show that $(\tilde{\Gamma}, \tilde{\Lambda}, \tilde{\PP})$ must be equal to $(\Gamma, \Lambda,\PP)$ up to index/value permutation and Markov equivalence. 
+    We separate the proof into three parts, after introducing the necessary notations.
+
+
+
+    \emph{Step 0:} Additional notations regarding discretization.
+
+    We define the following notations under model parameters $(\Gamma, \Lambda,\PP)$. Assume analogous definitions under the alternative parameters $(\tilde{\Gamma}, \tilde{\Lambda}, \tilde{\PP})$.
+
+    
+    For each $j \in [J]$ and $h \in \{0,1\}^k$, let $\PP_{j,h}$ be the conditional distribution of $X_j \mid H = h$:
+    \begin{align}\label{eq:p_j,aaa def}
+        \PP_{j,h}(C) := \PP (X_j \in C \mid H = h), \quad \forall C \subseteq \mathcal{X}_j.
+    \end{align}
+    
+    
+    For each $j \in [J]$, fix an integer $\kappa_j \ge 2$, and consider distinct measurable subsets $C_{1,j}, \ldots, C_{\kappa_j, j} \in \mathcal{C}_j$ with $C_{\kappa_j,j} = \mcx_j$.
+    %
+    For each $j \in [J]$, define a $\kappa_j \times 2^K$ matrix $M_j$ by setting $$M_j(l_j, h) := \PP_{j,h}({C}_{l_j, j}) = \PP(X_j \in {C}_{l_j, j} \mid H = h).$$ 
+    Note that $C_{\kappa_j,j} = \mcx_j$ implies that $M_j(\kappa_j, h) = 1$ for all $h$, so the last row of $M_j$ is all-one.
+
+    Since the true model is double triangular, let $S_1$ and $S_2$ denote two disjoint subsets of $[J]$ that index the rows of $\Gamma_1$ and $\Gamma_2$. Also, let $S_3 := [J] \setminus (S_1 \cup S_2)$ denote the row indices of $\Gamma_3$.
+    For each $a=1,2,3$, set $\eta_a := \prod_{j \in S_a} \kappa_j$, and note that $\eta_1, \eta_2 \ge 2^K$. 
+    For each $a=1,2,3$, let $T_a$ be a $\eta_a \times 2^K$ matrix defined as
+    $$T_a\big((l_j: j \in S_a), h\big) := \PP(X_j \in C_{l_j, j}, ~ \forall j \in S_a \mid H = h) = \prod_{j \in S_a} M_j(l_j, h).$$
+    Here, each row of $T_a$ is indexed by a vector $(l_j: j \in S_a)$, where $l_j \in [\kappa_j]$ for all $j$. Also, note that $T_a\big((\kappa_j: j \in S_a), h\big) = 1$ for all $h$.
+    
+    Finally, define a $\eta_1 \times \eta_2 \times \eta_3$ tensor $\mathcal{T}$ by setting 
+    \begin{align*}
+        \mathcal{T}\Big((l_j: j \in S_1), (l_j: j \in S_2), (l_j: j \in S_3)\Big) &:= \PP(X_j \in C_{l_j, j}, ~ \forall j \in [J]) \\
+        &= \sum_{h} \pi_h \prod_{a=1}^3 T_a((l_j: j \in S_a), h).
+    \end{align*}
+    Note that $\mathcal{T}$ merely reshapes the discretization of the marginal distribution $\PP(X)$, and is identical under true and alternative model parameters.
+    
+    Using these notations, we can generalize \eqref{eq:tensor decomposition} in the main paper and write
+    \begin{align}\label{eq:tensor decomposition matrix}
+        \mathcal{T} = \Big\llbracket T_1 \diag(\pi), T_2, T_3 \Big\rrbracket = \Big\llbracket \tilde{T}_1 \diag(\tilde{\pi}), \tilde{T}_2, \tilde{T}_3 \Big\rrbracket .
+    \end{align}
+
+    \emph{Step 1:} Apply Kruskal's theorem to identify the components in \eqref{eq:tensor decomposition matrix}.
+
+    By \cref{lem:full rank}, we have $\rk(T_1), \rk(T_2) = 2^K$. Note that even though $T_1, T_2$ are allowed to have more than $2^K$ rows, they still have full column rank, and consequently full Kruskal rank:
+    $$\rk_k(T_1), \rk_k(T_2) = 2^K.$$
+    For any binary vectors $h \neq h'$, there exists some $k \le K$ such that $h_k \neq h_k'$. Recalling that $\Gamma_3$ has no empty columns, there exists some $j_k \in S_3$ such that $\gamma_{j_k, k} = 1$. In other words, $X_{j_k}$ measures $H_k$. Then, part (b) of \cref{assmp:nondegenerate} implies that $\PP_{j_k,h} \ne \PP_{j_k,h'}$, so the $h$-th and $h'$-th column of $T_3$ are distinct. Recalling that the last row of $T_3$ is $1$ in every column, every two columns in $T_3$ are linearly independent, and we have 
+    $$\rk_k(T_3) \ge 2.$$
+    Hence, the inequality in \cref{lem:kruskal} holds, and Kruskal's theorem can be applied. This implies that the tensor decomposition \eqref{eq:tensor decomposition matrix} is unique in the following sense: there exists some $2^K \times 2^K$ permutation matrix $\Pi$ such that 
+    \begin{align}\label{eq:kruskal consequence}
+        \diag(\tilde{\pi}) = \diag(\pi) \Pi, \quad \tilde{T}_1  = T_1 \Pi, \quad \tilde{T}_2= T_2 \Pi, \quad \tilde{T}_3 = T_3 \Pi.
+    \end{align}
+    Note that the diagonal matrices $D_a$ in \cref{lem:kruskal} can be omitted since the last rows of $T_a$ and $\tilde{T}_a$ are all-one. 
+
+    The conclusion \eqref{eq:kruskal consequence} implies
+    $$\tilde{M}_j = M_j \Pi, \quad \forall j \in [J],$$
+    where $\tilde{M}_j, M_j$ are $\kappa_j \times 2^K$ matrices that describe the conditional distribution $\PP_{j,h}$. For notational convenience, view the matrix $\Pi$ as a permutation mapping $\sigma_\Pi : \{0,1\}^K \to \{0,1\}^K$ that maps the column index $h$ to $\tilde{h} = \sigma_\Pi(h)$. As $\sigma_\Pi$ can be an arbitrary permutation, we still need to structure it so that $h$ and $\sigma_\Pi(h)$ are equivalent up to label permutation and sign-flipping.
+    
+
+    \emph{Step 2:} Identify the bipartite graph $\Gamma$.
+    
+    
+    
+    Using the triangular structure of the rows, we identify the $\tilde{\Gamma}$ matrix up to label permutation. Our main idea is to again utilize the triangular structure of $\Gamma_2$ to first determine the label permutation, and then identify each row of $\tilde{\Gamma}.$
+    %
+    %
+    Recall that $S_2$ denotes the row indices that correspond to $\Gamma_2$ (assumed to be ordered as in \eqref{eq:triangular gamma}). Write $S_2 = \{j_1, \ldots, j_K\}$ so that the $j_k$-th row of $\Gamma$ is $\gamma_{j_k} = (\underbrace{*, \ldots, *}_{k-1}, 1, 0, \ldots, 0)$.
+
+
+For each $1 \le k \le K$, we partition the set $\{0,1\}^K$ by clustering together indices $\tilde{h}$ that have identical columns in $\tilde{M}_{j_k}$. Denote this partition as $\mathcal{P}_k$. Also, define $\mathcal{Q}_k$ as the intersection of all partitions $\mathcal{P}_l$ for $l \le k$:
+$$\mathcal{Q}_k := \cap_{l \le k} \mathcal{P}_l = \{\cap_{l \le k} P_l: P_l \in \mathcal{P}_l, ~~ \forall l \le k \}.$$
+Our main ingredient is to show the following Lemma, which uniquely determines the label permutation $\tau:[K]\to[K]$ from the partition $\mathcal{Q}_k$. We postpone its proof to Appendix \ref{sec:pf of lemmas}.
+
+\begin{lemma}\label{lem:identify gamma}
+We claim the following: For any $k \le K$,
+\begin{align}\label{eq:Q_k}
+    \mathcal{Q}_k &= \{\{\sigma_\Pi(h_{1:k}, h'): h' \in \{0,1\}^{K-k}\}, ~~ \forall h_{1:k} \in \{0,1\}^k \} \\
+    &=\{\{\tilde{h}: \tilde{h}_{\tau(1)} = c_1, \ldots, \tilde{h}_{\tau(k)} = c_k\}, ~~ \forall (c_1,\ldots,c_k) \in \{0,1\}^k \}
+    \label{eq:Q_k alternative}
+\end{align}
+for some label permutation $\tau: [K] \to [K]$. Note that \eqref{eq:Q_k} implies $|\mathcal{Q}_k| = 2^k$, and $|P| = 2^{K-k}$ for any $P \in \mathcal{Q}_k$.
+\end{lemma}
+
+
+%
+%
+
+%
+%
+%
+%
+%
+%
+%
+%
+%
+
+Now, given the label permutation $\tau$, we identify each row of $\tilde{\Gamma}$.
+%
+Fix any $j \in [J]$.
+We use backwards induction on $k$ to show that $\tilde{\gamma}_{j,\tau(k)} = \gamma_{j,k}$ for all $k$. 
+\begin{itemize}
+\item We start with $k = K$. For any $P \in \mathcal{Q}_{K-1}$, \cref{lem:identify gamma} implies 
+$$P = \{\sigma_\Pi(h_{1:K-1},0), \sigma_\Pi(h_{1:K-1},1)\} =  \{\tilde{h}: \tilde{h}_{\tau(1)} = c_1, \ldots, \tilde{h}_{\tau(K-1)} = c_{K-1} \}$$ 
+for some $h_{1:K-1}, c_{1:K-1}.$
+Note that $\gamma_{j,k} = 1$ if and only if the columns of $M_j$ indexed by $\sigma_\Pi^{(-1)}(P) = \{(h_{1:K-1},0), (h_{1:K-1},1)\}$ are distinct. By the above characterization, this is equivalent to the columns of $M_j$ indexed by $P$ being distinct, which is equivalent to $\tilde{\gamma}_{j,\tau(K)} = 1$. Hence, $\gamma_{j,K} = \tilde{\gamma}_{j,\tau(K)}$.
+
+\item Now, for $k < K$, suppose that we know $\gamma_{j,l} = \tilde{\gamma}_{j,\tau(l)}$ for $l \ge k+1$. We determine $\tilde{\gamma}_{j,k}$ by focusing on any $P \in \mathcal{Q}_{k-1}$. 
+%
+Here, when $k = 1$, we write $\mathcal{Q}_{0} = \{[2^K]\}$ for notational convenience. Similar to the base case with $k = K$, the number of distinct columns indexed by $\sigma_\Pi^{(-1)}(P)$ in $M_j$ are equal to $2^{\sum_{l=k}^K {\gamma}_{j,l}}$. This value must be equal to the number of distinct columns indexed by $P$ in $\tilde{M}_j$. By the characterization of $P$ in \eqref{eq:Q_k alternative}, this value is equal to $2^{\sum_{l=k}^K \tilde{\gamma}_{j,\tau(l)}}$. Hence, 
+$$\sum_{l=k}^K {\gamma}_{j,l} = \sum_{l=k}^K \tilde{\gamma}_{j,\tau(l)},$$
+and we get $\gamma_{j,k} = \tilde{\gamma}_{j,\tau(k)}$ by the induction hypothesis.
+\end{itemize}
+Thus, we have shown the $k$-th column of $\Gamma$ is identical to the $\tau(k)$-th column of $\tilde{\Gamma}$.
+
+
+
+
+%
+
+%
+
+\emph{Step 3:} Identify $\PP(H), \PP_{j,h},$ and the latent DAG $\Lambda$.
+
+Now, we identify the remaining model components by additionally using the subset condition. Without the loss of generality, assume $\tau$ is the identity permutation on $[K]$, which gives $\Gamma = \tilde{\Gamma}.$ Consequently, we omit the $\tilde{\cdot}$ notation for $\Gamma$ and $H$.
+Our main idea is to use the subset condition on $\Gamma$ to %
+show that for each $k$, the set of columns indexed by $\tilde{h}_k = 0/1$ must match that with $h_k = 0/1$:
+\begin{align}\label{eq:column index suffices}
+    \big\{\{\tilde{h}: \tilde{h}_k = 0\}, \{\tilde{h}: \tilde{h}_k = 1\} \big\} = \big\{\{\sigma_\Pi (h): h_k=0\}, \{\sigma_\Pi (h): h_k=1\}\big\}.
+\end{align}
+
+Without loss of generality, let $k=1$. This is purely for notational convenience, and does not overlap with the indexing for the triangular $\Gamma$-matrix, which will be not used in this proof segment. 
+Let $\mathcal{J}_1 := \{j \in [J]: \gamma_{j,1} = 1\}$ denote the row indices for the children of $H_1$.
+For each $j \in \mathcal{J}_1$, we cluster $\{0,1\}^K$ based on identical columns $\tilde{M}_j$. Then, we merge the clusters by combining clusters that share common elements. By the subset condition on $\Gamma$, $(0, \tilde{h}_{(-1)})$ belongs in the same merged cluster for any $\tilde{h}_{(-1)} \in \{0,1\}^{K-1}$. To see this, observe that the subset condition implies that the column vector $\gamma_{\mathcal{J}_1, k}$ must include at least one zero, for all $k \neq 1$. Let $j_k'$ be a row index in $\mathcal{J}_1$ such that $\gamma_{j_k',k} = 0$. Then, $X_{j_k'}$ is not a child of $H_k$, and the all-zero vector $0_K$ and the basis vector $e_k = (0, \ldots, 1, \ldots, 0)$ (with 1 in the $k$th coordinate) must belong in the same cluster. By repeating this argument for each $k > 1$, we can conclude that $0_K$ and $(0, \tilde{h}_{(-1)})$ belong in the same cluster. Since for each $j \in \mathcal{J}_1$, $X_j$ measures the latent variable $H_1$, $0_K$ and $(1, \tilde{h}_{(-1)})$ can never be in the same cluster. 
+Thus, after merging, there are two final clusters: $\{\tilde{h} : \tilde{h}_1 = 0\}$ and $\{\tilde{h}: \tilde{h}_1 = 1\}$.
+
+This procedure inputs the matrices $\tilde{M}_j$ without any column indexing, and characterizes $\{\{\tilde{h} : \tilde{h}_k = 0\}, \{\tilde{h}: \tilde{h}_k = 1\}\}$ for all $k$. Recalling that $M_j = \tilde{M}_j \Pi^{-1} $ have an identical set of columns as $\tilde{M}_j$ and applying the same characterization to $M_j$, we get \eqref{eq:column index suffices}. Thus, the indexings $h$ and $\sigma_\Pi(h)$ are identical up to a potential swapping of the meaning of $H_k = 0/1$. Without loss of generality, ignore the sign-flipping and assume $\{\tilde{h}: \tilde{h}_k = 0\} = \{\sigma_\Pi({h}): {h}_k = 0\}$ and $\{\tilde{h}: \tilde{h}_k = 1\} = \{\sigma_\Pi({h}): {h}_k = 1\}$ for all $k$.
+%
+
+Now, given a matching column indexing, $\pi_h = \tilde{\pi}_h$ follows from eq. \eqref{eq:kruskal consequence}. Having identified the latent proportion $\PP(H)$, $\Lambda$ can also be identified up to Markov equivalence. This is the consequence of the faithfulness \cref{assmp:causal markov}, and is a well-known property alongside many existing algorithms \citep{pearl2014probabilistic, spirtes2001causation}. To this extent, it is possible to replace the faithfulness assumption to others that can recover the DAG $\Lambda$ from the pmf.
+
+Finally, it remains to identify the conditional distributions $\PP_{j,h}$ from the discretized values. As the above argument can be applied for any discretization $(C_{1,j}, \ldots, C_{\kappa_j,j})$, we have 
+$$\PP_{j,h}(C_j) = \tilde{\PP}_{j,h}(C_j), \quad \forall C_j \in \mathcal{C}_j.$$
+Note that all discretizations are subject to the same ambiguities (label permutation and sign flipping) since the alternative model $\tilde{\PP}$ does not depend on the specific discretization.
+This implies $\PP_{j,h} = \tilde{\PP}_{j,h}$, since \cref{lem:separating class} states that $\mathcal{C}_j$ is a separating class that uniquely defines a probability measure on $\mathcal{X}_j$. Hence, all model components can be identified.
+\end{proof}
+
+\begin{proof}[Proof of \cref{prop:identifiability monotone}]
+    Recall that $C_j$ denotes a baseline set such that $\PP_{j,h}(C_j) > \PP_{j,h'}(C_j)$ for any $h \succ h'$.
+    Without the loss of generality, assume that $C_j \in \mathcal{C}_j = \{C_{1,j}, \ldots, C_{\kappa_j,j})$, and index it as $C_j = C_{1,j}$.
+    Steps 1, 2 in the proof of \cref{thm:identifiability} still hold, and it suffices to modify step 3. We proceed via induction, and show that for each $k \in [K]$, the column indices corresponding to $\{h: {h}_k=0\}$ and $\{h: {h}_k=1\}$ can be recovered from the matrix ${M}_{j_k}$ (without using the column indexing of $M_{j_k}$). Recall from step 2 of the proof of \cref{thm:identifiability} that $\{j_1, \ldots, j_K\}$ denotes the row indices corresponding to the triangular structure $\Gamma_2$, and that $\mathcal{P}_k$ denotes the partition of the column indices $\{0,1\}^K$ based on identical columns of $M_{j_k}$.
+
+    First, for $k = 1$, the monotonicity conditions alongside $\gamma_{j_1} = (1, 0,\ldots, 0)$ imply 
+    $${M}_{j_1}\Big(1, (1,h_{(-1)})\Big) = \PP_{{j_1},(1,h_{(-1)})}(C_{j_1}) > \PP_{{j_1},(0,h_{(-1)})}(C_{j_1}) = {M}_{j_1}\Big(1, (0,h_{(-1)})\Big),$$
+    for any $h_{(-1)} \in \{0,1\}^{K-1}.$ Then, $\{h: {h}_1=0\}$ corresponds to the column indices of $M_{j_1}$ with a smaller value of $M_{j_1}(1, \cdot)$.
+    
+    Now, for any $2 \le k \le K-1$, assume that the claim holds for $l \le k$. We show that we can recover the set of indices $\{h: {h}_{k+1}=0\}$ and $\{h: {h}_{k+1}=1\}$ from $M_{j_{k+1}}$. By the induction hypothesis, we are able to map each partition $\mathcal{P}_k$ from step 2 of \cref{thm:identifiability} to each $h_{1:k} \in \{0,1\}^k$.
+    For any $h_{1:k} \in \{0,1\}^k$ and $s \in \{0,1\}^{K-k-1}$, the monotonicity assumption gives
+    $$M_{j_{k+1}}\Big(1, (h_{1:k}, 1, s)\Big) = \PP_{j_{k+1},(h_{1:k}, 1, s)}(C_{j_{k+1}}) > \PP_{j_{k+1},(h_{1:k}, 0, s)}(C_{j_{k+1}}) = M_{j_{k+1}}\Big(1, (h_{1:k}, 0, s)\Big).$$
+    Thus, for any $P \in \mathcal{Q}_k = \cap_{l \le k} \mathcal{P}_l$ (that corresponds to $h_{1:k}$ in the sense of \eqref{eq:Q_k}), we can further partition it into two sets based on the value of $M_{j_{k+1}}(1,h)$ for $h \in \mathcal{P}$. The set with the larger probability must correspond to $(h_{1:k}, 1)$, and we denote it as $Q_{(h_{1:k}, 1)}$.
+    Now, the set of column indices corresponding to $h_{k+1} = 1$ can be recovered as $\cup_{h_{1:k}} Q_{(h_{1:k}, 1)}$, and the induction is complete.
+    
+    Given the column indexing, we again have $\pi_h = \PP(H=h) = \tilde{\PP}(\tilde{H}=h) = \tilde{\pi}_h$ and the same argument in step 3 of \cref{thm:identifiability} completes the proof. Note that while \cref{thm:identifiability} has determined the column indexing up to sign-flipping, this proof does not suffer from sign-flipping.
+\end{proof}
+
+\subsection{Proof of Theorems \ref{thm:necessary} and \ref{thm:subset necessary}}
+%
+%
+%
+%
+
+%
+%
+%
+We prove \cref{thm:necessary} under a generalized BLCM, where $H = (H_1, \ldots, H_k)$ are \emph{categorical} latent variables (not necessarily binary). For each $k$, assume $H_k \in \Omega_k$, where $2 \le |\Omega_k| < \infty$. Our key observation is the following non-identifiability result for latent class models with two observed variables.
+
+\begin{lemma}[Non-identifiability of LCMs with $K=1, J=2$]\label{lem:product mixture nonidentifiable}
+    Consider a latent class model (LCM) with one latent categorical variable $H_1 \in \Omega_1$ and two observed categorical variables $X_1, X_2$ which are conditionally independent given $H_1$. Given the number of latent classes $|\Omega_1|$, the model parameters $\theta := \big(\PP(H_1), \PP(X_1 \mid H_1), \PP(X_2 \mid H_1)\big)$ are not even locally identifiable in the sense that for any $\epsilon > 0$ and true parameter $\theta_0$ that satisfy \cref{assmp:nondegenerate}, there exists an alternative parameter $\theta_1$ such that $\|\theta_0-\theta_1\| < \epsilon$.
+\end{lemma}
+
+While this result may appear familiar, we were unable to find a solid reference and we provide a proof in \cref{sec:pf of lemmas}. A related result dates back to the study of latent class models in 1950s where a set of \emph{sufficient} conditions for local identifiability were provided \citep{mchugh1956efficient, goodman1974exploratory}. More recently, sufficient conditions for generic identifiability were proposed \citep{allman2009}. However, these results do not imply the impossibility claim in \cref{lem:product mixture nonidentifiable}.
+
+
+\begin{proof}[Proof of \cref{thm:necessary}]
+We show that three observed children per  latent variable is necessary for identifiability.
+%
+%
+It suffices to consider the case when there exists some latent variable $H_1$ that has exactly two observed children $X_1, X_2$.
+%
+We prove non-identifiability by showing that there exists alternative model parameters that define the same pmf of $\PP(X)$.
+
+First, we claim that it suffices to construct alternative parameters that define the same $\PP(X_1, X_2 \mid H_{(-1)})$.
+To see this, write the marginal likelihood as
+\begin{align*}
+    \PP(X) &= \sum_{h =(h_1, h_{(-1)})} \PP(H = h) \PP(X_1, X_2 \mid H=h) \prod_{j \ge 3} \PP(X_j \mid H_{(-1)} = h_{(-1)}) \\
+    &=\sum_{h_{(-1)}} \Big[\sum_{h_1} \PP(X_1, X_2 \mid H = h) \PP(H_1 \mid H_{(-1)}) \Big]\PP(H_{(-1)} = h_{(-1)}) \prod_{j \ge 3} \PP(X_j \mid H_{(-1)} = h_{(-1)}) \\
+    &= \sum_{h_{(-1)}}  \PP(X_1, X_2 \mid H_{(-1)} = h_{(-1)}) \PP(H_{(-1)} = h_{(-1)}) \prod_{j \ge 3} \PP(X_j \mid H_{(-1)} = h_{(-1)}).
+\end{align*}
+The last equality follows by writing the summand inside the square bracket in the second row above as
+\begin{align*}
+    &\sum_{h_1 \in \Omega_1} \PP(X_1, X_2 \mid H = h) \PP(H_1 = h_1 \mid H_{(-1)} = h_{(-1)}) \\
+    =& \sum_{h_1 \in \Omega_1} \PP(X_1, X_2, H_1 = h_1 \mid H_{(-1)} = h_{(-1)}) \\
+    =&  \PP(X_1, X_2 \mid H_{(-1)} = h_{(-1)}).
+\end{align*}
+Thus, any alternative model with the same value of $\PP(X_1, X_2 \mid H_{(-1)})$, $\PP(H_{(-1)})$, and $\PP(X_j \mid H_{(-1)})$ for $j \ge 3$ defines the same marginal distribution of $X$.
+
+%
+%
+%
+For each configuration $h_{(-1)} \in \prod_{k=2}^K \Omega_k$, \cref{lem:product mixture nonidentifiable} shows that we can further specify a distinct set of parameters 
+$$\tilde{\PP}(H_1 \mid H_{(-1)} = h_{(-1)}), ~ \tilde{\PP}(X_1 \mid H_1, H_{(-1)} = h_{(-1)}), ~ \tilde{\PP}(X_2 \mid H_1, H_{(-1)} = h_{(-1)})$$ that define the same value of 
+$\PP(X_1, X_2 \mid H_{(-1)} = h_{(-1)}) = \tilde{\PP}(X_1, X_2 \mid H_{(-1)} = h_{(-1)})$. Hence, there exists an alternative set of parameters, and the model is non-identifiable. %
+
+Note that the above argument immediately implies non-identifiability of both the graph $E = (\Gamma, \Lambda)$ as well as the conditional distributions $\PP(X_1 \mid H), \PP(X_2 \mid H)$.
+%
+\end{proof}
+
+
+
+\begin{proof}[Proof of \cref{thm:subset necessary}]
+    Suppose there exists some $k \neq l \in [K]$ such that $\gamma_k \succeq \gamma_l$. Without loss of generality, let $k=1, l=2$.
+    Denoting the true latent pmf as $\pi$, one cannot distinguish the values $(\pi_{(0,0,h_{3:K})}, \pi_{(0,1,h_{3:K})})$ and $(\pi_{(1,0,h_{3:K})}, \pi_{(1,1,h_{3:K})})$ up to a common sign flip of $H_2$, for each realization $h_{3:K} \in \{0,1\}^{K-2}$. To see this, for any $h_{3:K}$, define alternative proportion parameters
+    \begin{align*}
+        &\tilde{\pi}_{(0,0,h_{3:K})} := \pi_{(0,0,h_{3:K})}, \quad \tilde{\pi}_{(0,1,h_{3:K})} := \pi_{(0,1,h_{3:K})}, \\
+        &\tilde{\pi}_{(1,0,h_{3:K})} := \pi_{(1,1,h_{3:K})}, \quad \tilde{\pi}_{(1,1,h_{3:K})} := \pi_{(1,0,h_{3:K})},
+    \end{align*}
+    and alternative conditional distributions with
+    \begin{align*}
+        &\tilde{\PP}_{j,(0,0,h_{3:K})} = \PP_{j,(0,0,h_{3:K})}, \quad \tilde{\PP}_{j,(0,1,h_{3:K})} = \PP_{j,(0,1,h_{3:K})}, \\
+        &\tilde{\PP}_{j,(1,0,h_{3:K})} = \PP_{j,(1,1,h_{3:K})}, \quad \tilde{\PP}_{j,(1,1,h_{3:K})} = \PP_{j,(1,0,h_{3:K})}, \quad \forall j \in [J].
+    \end{align*}
+    The observed distribution under the alternative parameters is identical since
+    \begin{align*}
+        \PP(X) = \sum_{h} \pi_h \prod_{j=1}^J \PP_{j,h} (X_j) = \sum_{h} \tilde{\pi}_h \prod_{j=1}^J \tilde{\PP}_{j,h} (X_j) = \tilde{\PP}(X).
+    \end{align*}
+    Now, it suffices to check that the alternative conditional distributions $\tilde{\PP}_{j,\cdot}$ are faithful to the graphical structure in $\Gamma$. To see this, first consider any row-vector $\gamma_j$ with $\gamma_{j,2} = 0$. Then, $H_2$ is not measured and the conditional distributions under $\tilde{\PP}$ are identical to that under $\PP$:
+     \begin{align*}
+        \tilde{\PP}_{j,(0,0,h_{3:K})} = \tilde{\PP}_{j,(0,1,h_{3:K})} = \PP_{j,(0,\cdot,h_{3:K})}, \\
+        \tilde{\PP}_{j,(1,0,h_{3:K})} = \tilde{\PP}_{j,(1,1,h_{3:K})} = \PP_{j,(1,\cdot,h_{3:K})}.
+    \end{align*}
+    Next, suppose that $\gamma_{j,2} = 1$. Then, by the assumption $\gamma_1 \succeq \gamma_2$, we also have $\gamma_{j,1} = 1$. Since the nondegeneracy \cref{assmp:nondegenerate} implies that the four conditional distributions in the above display are all distinct, the distribution $\tilde{\PP}_{j,\cdot}$ is faithful to the row-vector $\gamma_j$.
+
+    We note that the above construction generalizes the counterexample in Appendix C.3 of \cite{kivva2021learning}, which focuses on the specific instance of $K=2, J=2$.
+\end{proof}
+
+
+
+
+\section{Proof of lemmas}\label{sec:pf of lemmas}
+
+\begin{proof}[Proof of \cref{lem:full rank}]
+    Recall the lower-triangular assumption on the first $K$ rows of $\Gamma$.
+    Parametrize each conditional distribution by setting 
+    $$\theta_{k, (h_1, \ldots, h_k)} := \PP(X_k = 1 \mid H_{1:k} = (h_1, \ldots, h_k)) \in [0,1].$$
+    
+    We proceed via an induction on the latent dimension $K$. The claim is trivial for $K=1$. For any $K \ge 2$, suppose that the claim holds when there are $K-1$ latent variables. Define a $2^K \times 2^K$ matrix $T$ as:
+    $$T(x, h) = \PP(X \succeq x \mid H = h), \quad \forall x, h\in \{0,1\}^K.$$
+    Without the loss of generality, suppose that the row/columns of $T$ are indexed based on the increasing order of $\sum_{k=1}^K x_k 2^{k-1}$ / $\sum_{k=1}^K h_k 2^{k-1}$ (from top to bottom/left to right).
+    %
+    %
+    For example, when $K=3$, the row/columns are indexed as follows:
+    $$(0,0,0) < (1,0,0) < (0,1,0) < (1,1,0) < (0,0,1) < (1,0,1) < (0,1,1) < (1,1,1).$$
+    Additionally, write
+    $$T = \begin{pmatrix}
+        T_{00} & T_{01} \\
+        T_{10} & T_{11}
+    \end{pmatrix},$$
+    where each $T_{ab}$ are $2^{K-1} \times 2^{K-1}$ matrices.
+    See the below table for an example expression of $T$ when $K=3$ (where each block corresponds to $T_{00}, T_{10}, T_{01}, T_{11}$):
+
+\begin{table}[h!]
+    \centering
+    %
+    \begin{tabular}{cc|cccc}
+    %
+    & $x \setminus h$ & (0,0,0) & (1,0,0) & (0,1,0) & (1,1,0) \\
+    \cmidrule{2-6}
+    \multirow{4}{*}{$T_{00} =$} & $(0,0,0)$ & 1 & 1 & 1 & 1 \\
+    & $(1,0,0)$ & $\theta_{1,0}$ & $\theta_{1,1}$ & $\theta_{1,0}$ & $\theta_{1,1}$ \\ 
+    & $(0, 1, 0)$ & $\theta_{2,00}$ & $\theta_{2,10}$ & $\theta_{2,01}$ & $\theta_{2,11}$ \\ 
+    & $(1,1,0)$ & $\theta_{1,0}\theta_{2,00}$ & $\theta_{1,1} \theta_{2,10}$ & $\theta_{1,0} \theta_{2,01}$ & $\theta_{1,1} \theta_{2,11}$ \\
+    \cmidrule{2-6}
+    \multirow{4}{*}{$T_{10} =$} & $(0, 0, 1)$ & $\theta_{3,000}$ & $\theta_{3,100}$ & $\theta_{3,010}$ & $\theta_{3,110}$ \\
+    & $(1, 0, 1)$ & $\theta_{1,0} \theta_{3,000}$ & $\theta_{1,1} \theta_{3,100}$ & $\theta_{1,0} \theta_{3,010}$ & $\theta_{1,1} \theta_{3,110}$ \\
+    & $(0, 1, 1)$ & $\theta_{2,00} \theta_{3,000}$ & $\theta_{2,10} \theta_{3,100}$ & $\theta_{2,01} \theta_{3,010}$ & $\theta_{2,11} \theta_{3,110}$ \\
+    & $(1, 1, 1)$ & $\theta_{1,0} \theta_{2,00} \theta_{3,000}$ & $\theta_{1,1} \theta_{2,10} \theta_{3,100}$ & $\theta_{1,0} \theta_{2,01} \theta_{3,010}$ & $\theta_{1,1} \theta_{2,11} \theta_{3,110}$ \\
+    \cmidrule{2-6}
+    %
+    \addlinespace
+    & $x \setminus h$ & (0,0,1) & (1,0,1) & (0,1,1) & (1,1,1) \\ %
+    \cmidrule{2-6}
+    \multirow{4}{*}{$T_{01} =$} & $(0,0,0)$ & 1 & 1 & 1 & 1 \\
+    & $(1,0,0)$ & $\theta_{1,0}$ & $\theta_{1,1}$ & $\theta_{1,0}$ & $\theta_{1,1}$ \\ 
+    & $(0, 1, 0)$ & $\theta_{2,00}$ & $\theta_{2,10}$ & $\theta_{2,01}$ & $\theta_{2,11}$ \\ 
+    & $(1,1,0)$ & $\theta_{1,0}\theta_{2,00}$ & $\theta_{1,1} \theta_{2,10}$ & $\theta_{1,0} \theta_{2,01}$ & $\theta_{1,1} \theta_{2,11}$ \\
+    \cmidrule{2-6}
+    \multirow{4}{*}{$T_{11} =$} & $(0, 0, 1)$  & $\theta_{3,001}$ & $\theta_{3,101}$ & $\theta_{3,011}$ & $\theta_{3,111}$ \\
+    & $(1, 0, 1)$ & $\theta_{1,0} \theta_{3,001}$ & $\theta_{1,1} \theta_{3,101}$ & $\theta_{1,0} \theta_{3,011}$ & $\theta_{1,1} \theta_{3,111}$ \\
+    & $(0, 1, 1)$ & $\theta_{2,00} \theta_{3,001}$ & $\theta_{2,10} \theta_{3,101}$ & $\theta_{2,01} \theta_{3,011}$ & $\theta_{2,11} \theta_{3,111}$ \\
+    & $(1, 1, 1)$ & $\theta_{1,0} \theta_{2,00} \theta_{3,001}$ & $\theta_{1,1} \theta_{2,10} \theta_{3,101}$ & $\theta_{1,0} \theta_{2,01} \theta_{3,011}$ & $\theta_{1,1} \theta_{2,11} \theta_{3,111}$ \\
+    \cmidrule{2-6}
+    \end{tabular}
+    %
+\end{table}
+    
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    
+    \noindent For any $x_{1:K-1}$ and $h_{1:K-1}$, the lower-triangular structure implies
+    \begin{align*}
+        T_{00}\big(x_{1:K-1}, h_{1:K-1} \big) &= \PP \big(X_1 \succeq x_1, \ldots, X_{K-1} \succeq x_{K-1} \mid H_{1:K-1} = h_{1:K-1}, H_K = 0 \big) \\
+        &= \PP \big(X_1 \succeq x_1, \ldots, X_{K-1} \succeq x_{K-1} \mid H_{1:K-1} = h_{1:K-1}\big) \\
+        &= \PP \big(X_1 \succeq x_1, \ldots, X_{K-1} \succeq x_{K-1} \mid H_{1:K-1} = h_{1:K-1}, H_K = 1 \big) \\
+        &= T_{01}\big(x_{1:K-1}, h_{1:K-1} \big),
+    \end{align*}
+    and we have $T_{00} = T_{01}$. 
+    
+    Now, note that $T$ can be obtained from the conditional probability matrix $\PP(X_{1:K} \mid H)$ via elementary row operations. Also, by elementary column operations, $T$ can be reduced to
+    $$\bar{T} := \begin{pmatrix}
+        T_{00} & 0 \\
+        T_{10} & T_{11}-T_{10}.
+    \end{pmatrix}.$$
+    Hence, we have
+    $$\rk(\PP(X_{1:K} \mid H)) = \rk(T) = \rk(\bar{T}),$$
+    and by the property of determinant for block matrices, it suffices to show that $$\det(\bar{T}) = \det(T_{00}) \det(T_{11}-T_{10}) \neq 0.$$
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    
+    
+    For notational simplicity, for each $h_{(-1)} = h_{1:K-1} \in \{0,1\}^{K-1}$, define $$\eta_{h_{(-1)}} := \theta_{K,(h_{(-1)},1)} - \theta_{K,(h_{(-1)},0)}\neq 0.$$
+    The last inequality is a consequence of \cref{assmp:nondegenerate}. 
+    Noting that
+    \begin{align*}
+        T_{11}\big(x_{1:K-1}, h_{(-1)} \big) &= \PP \big(X_1 \succeq x_1, \ldots, X_{K-1} \succeq x_{K-1}, X_{K} = 1 \mid h_{(-1)} = h_{(-1)}, H_K = 1 \big) \\
+        &= T_{00}\big(x_{1:K-1}, h_{(-1)} \big) \theta_{K,(h_{(-1)},1)}, \\
+        T_{10}\big(x_{1:K-1}, h_{(-1)} \big) &= \PP \big(X_1 \succeq x_1, \ldots, X_{K-1} \succeq x_{K-1}, X_{K} = 1 \mid h_{(-1)} = h_{(-1)}, H_K = 0 \big) \\
+        &= T_{00}\big(x_{1:K-1}, h_{(-1)} \big) \theta_{K,(h_{(-1)},0)},
+    \end{align*}
+    we have 
+    $$(T_{11}-T_{10})\big(x_{1:K-1}, h_{(-1)} \big) = T_{00}\big(x_{1:K-1}, h_{(-1)} \big) \eta_{(h_{(-1)})}.$$
+    In other words, each column of $T_{11}-T_{10}$ is equal to the corresponding column of $T_{00}$ times $\eta_{h_{(-1)}}$. For example, in our running example with $K = 3$, $T_{11}-T_{10}$ can be written as:
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{cc|cccc}
+            & $x \setminus h$ & (0,0,1) & (1,0,1) & (0,1,1) & (1,1,1) \\ %
+            \cmidrule{2-6}
+            \multirow{4}{*}{$T_{11}-T_{10} =$} & $(0,0,1)$ & $\eta_{00}$ & $\eta_{10}$ & $\eta_{01}$ & $\eta_{11}$ \\
+            & $(1, 0, 1)$ & $\theta_{1,0} \eta_{00}$ & $\theta_{1,1} \eta_{10}$ & $\theta_{1,0} \eta_{01}$ & $\theta_{1,1} \eta_{11}$ \\
+            & $(0, 1, 1)$ & $\theta_{2,00} \eta_{00}$ & $\theta_{2,10} \eta_{10}$ & $\theta_{2,01} \eta_{01}$ & $\theta_{2,11} \eta_{11}$ \\
+            & $(1, 1, 1)$ & $\theta_{1,0} \theta_{2,00} \eta_{00}$ & $\theta_{1,1} \theta_{2,10} \eta_{10}$ & $\theta_{1,0} \theta_{2,01} \eta_{01}$ & $\theta_{1,1} \theta_{2,11} \eta_{11}$ \\
+            \cmidrule{2-6}
+        \end{tabular}
+    \end{table}
+    
+    Thus, $$\det(T_{11}-T_{10}) = \det(T_{00}) \prod_{h_{(-1)} \in \{0,1\}^{K-1}} \eta_{h_{(-1)}},$$
+    and, we have 
+    $$\det(\bar{T}) = \det(T_{00}) \det(T_{11}-T_{10}) = \det(T_{00})^2 \prod_{h_{(-1)} \in \{0,1\}^{K-1}} \eta_{h_{(-1)}} \neq 0.$$
+    Here, the inequality follows from the induction hypothesis and the observation that $\eta_{h_{(-1)}} \neq 0$.
+\end{proof}
+
+\begin{proof}[Proof of \cref{lem:identify gamma}]
+We separately show \eqref{eq:Q_k} and \eqref{eq:Q_k alternative}. First, to show \eqref{eq:Q_k}, note that the $h$-th column of $M_j$ (denoted as $M_j(:, h)$) is identical to the $\sigma_\Pi(h)$-th column of $\tilde{M}_j$. Thus, each $P \in \mathcal{Q}_k$ can be represented as $P = \{\sigma_\Pi(h): M_{j_k}(:, h) = M_{j_k}(:, h_0) \}$ for some $h_0$. Now, the simplification in \eqref{eq:Q_k} follows from recalling the form of $\gamma_{j,k}$ alongside part (b) of \cref{assmp:nondegenerate}.
+
+The second equality in \eqref{eq:Q_k alternative} follows by induction on $k$. We inductively show that for each $k \le K$, \eqref{eq:Q_k alternative} holds. %
+
+
+\begin{itemize}
+    \item Suppose $k=1$. As the corresponding row of $\Gamma_2$ is $\gamma_{j_1} = (1, 0, \ldots, 0)$, we have $|\mathcal{Q}_1| = |\mathcal{P}_1| =2$. Then, the nondegeneracy \cref{assmp:nondegenerate} gives $\sum_{l=1}^K \tilde{\gamma}_{j_1,l} = 1.$ In other words, $\tilde{\gamma}_{j_1}$ is a standard basis vector $e_l$. Let $\tau(1)$ be this $l$. Then, \eqref{eq:Q_k alternative} holds by the definition of $\mathcal{P}_1$.
+    
+    \item Now, for each $1 \le k < K$, suppose that \eqref{eq:Q_k alternative} holds. By the expression in \eqref{eq:Q_k}, $\mathcal{Q}_{k+1} \not\subseteq \mathcal{Q}_{k}$. So, $\mathcal{P}_{k+1} \not\subseteq \mathcal{Q}_k$, and there must be some $l \neq \tau(1), \ldots, \tau(k)$ such that $\tilde{\gamma}_{j_{k+1}, l} \neq 0$. Suppose that there exist $l_1, l_2 \neq \tau(1), \ldots, \tau(k)$ with $\tilde{\gamma}_{j_{k+1}, l_1} = \tilde{\gamma}_{j_{k+1}, l_2} = 1$. This implies that each element in $\mathcal{P}_{k+1}$ must have identical values of $\tilde{h}_{l_1}, \tilde{h}_{l_2}$. But, recalling the induction hypothesis that any $P \in \mathcal{Q}_k$ must be written as $P = \{\tilde{h}: \tilde{h}_{\tau(1)}=c_1, \ldots, \tilde{h}_{\tau(k)}=c_k\}$ for some $c_{1:k}$, we have $$2^{k+1} = |\mathcal{Q}_{k+1}| = |\mathcal{Q}_k \cap \mathcal{P}_{k+1}| \ge 2^{k} \times 2^2,$$
+    and hence contradiction. Thus, we must have exactly one $l \neq \tau(1), \ldots, \tau(k)$ with $\tilde{\gamma}_{j_{k+1}, l} =1$. Define $\tau(k+1)$ to be this $l$. Then, \eqref{eq:Q_k alternative} follows since $\mathcal{Q}_{k+1} = \mathcal{Q}_k \cap \mathcal{P}_{k+1}$.
+ 
+    %
+\end{itemize}
+\end{proof}
+
+\begin{proof}[Proof of \cref{lem:product mixture nonidentifiable}]
+    For notational convenience, let $L := |\Omega|$ be the number of latent classes and write $\Omega = [L], \mcx_1 = [M], \mcx_2 = [N]$. 
+    For each $l \in \Omega, m \in \mcx_1, n \in \mcx_2$, define 
+    $$p_l := \PP(H_1 = l), ~q_{m,l} := \PP(X_1 = m \mid H_1 = l), ~ r_{n,l} := \PP(X_2 = n \mid H_1 = l).$$
+    Then, we can write the model parameter as $$\theta = ((p_l : l \le L-1), (q_{m,l}: m \le M-1, l \le L), (r_{n,l}: n \le N-1, l \le L)) \in (0,1)^{(M+N-1)L-1},$$ where we ignore redundant parameters $p_L, (q_{M,l}: l \in [L]), (r_{N,l}: l \in [L])$ that arise from probability constraints (such as $\sum_{l \in [L]} p_l = 1)$.
+    Define the log-likelihood $\ell(\theta)$ as
+    $$\ell(\theta \mid X) := \log \mathcal{L}(\theta \mid X) = \log \Big[\sum_{l \in [L]} p_l \prod_{m=1}^M q_{m,l}^{I(X_1 = m)} \prod_{n=1}^N r_{n,l}^{I(X_2 = n)}\Big].$$
+    It is well known that latent class models are not locally identifiable if and only if the Jacobian matrix $$J(X, \theta) := \frac{\partial \ell(\theta \mid X)}{\partial \theta} = \frac{1}{\mathcal{L}(\theta \mid X)} \frac{\partial \mathcal{L}(\theta \mid X)}{\partial \theta}$$ does not have full column rank (see \cite{goodman1974exploratory} or Theorem 1 in \cite{ouyang2022identifiability}). We claim that for all $\theta$ that satisfy \cref{assmp:nondegenerate}, $J(\theta)$ does not have full-column rank.
+
+    Instead of working directly with $Y(X, \theta) := \frac{\partial \mathcal{L}(\theta \mid X)}{\partial \theta}$, we define a transformed $MN \times |\theta|$ matrix $Z$ that has the same column rank. 
+    Recalling that $X = (X_1, X_2) \in [M]\times [N]$, each row in $J(X, \theta)$ can be indexed by the integer pair $(m, n)$ where $m \le M, n \le N$. As we ignore the redundant conditional probability parameters $q_{M,l}, r_{N,l}$, we define each row of $Z$ as follows:
+    \begin{itemize}
+        \item $Z((M,N), \theta) = 0,$
+        \item define the row corresponding to $(X_1,X_2) =(M,n)$ (for $n <N$) as 
+        $$Z((M,n), \theta) := \frac{\partial}{\partial \theta} \PP(X_1 \in [M], X_2 = n) = \frac{\partial}{\partial \theta} \PP(X_2 = n),$$
+        \item define the row corresponding to $(X_1,X_2) =(m,N)$ (for $m<M$) as 
+        $$Z((m,N), \theta) := \frac{\partial}{\partial \theta} \PP(X_1 =m, X_2 \in[N]) = \frac{\partial}{\partial \theta} \PP(X_2 = n),$$
+        \item define the row corresponding to $(X_1,X_2) =(M,n)$ (for $m<M, n <N$) as
+        $$Z((m,n), \theta) := Y((m,n), \theta) = \frac{\partial}{\partial \theta} \PP(X_1 =m, X_2 = n).$$
+    \end{itemize}
+    Note that $Z$ can be obtained from $Y$ by elementary row-operations, so the matrix rank is preserved. 
+
+    Write the column vectors of $Z$ as $Z = ((\vec{z}_{p_l}: l \le L-1), (\vec{z}_{q_{m,l}}: m \le M-1, l \le L), (\vec{z}_{r_{n,l}}: n \le N-1, l \le L))$, where the indexing corresponds to each partial derivative. For any $l\in[L-1]$, we show that 
+    \begin{align}\label{eq:lcm}
+        \vec{z}_{p_l} = \sum_{m=1}^{M-1} \frac{q_{m,l}-q_{m,L}}{p_l} \vec{z}_{q_{m,l}} + \sum_{n=1}^{N-1} \frac{r_{n,l}-r_{n,L}}{p_L} \vec{z}_{r_{n,L}},
+    \end{align}
+    which immediately implies linear dependence of the columns. To see this, first note that direct computations give
+    \begin{align*}
+        z_{(m', n'), p_{l}} &= \begin{cases}
+                0 & \text{if} \quad m' = M, n' = N, \\
+                r_{n', l}-r_{n',L} & \text{if} \quad m' = M, n' < N, \\
+                q_{m', l}-q_{m',L} & \text{if} \quad m' < M, n'= N, \\
+                q_{m', l} r_{n', l}-q_{m',L}r_{n',L} & \text{otherwise},
+            \end{cases} \\
+        z_{(m', n'), q_{m,l}} &= \begin{cases}
+           p_l r_{n', l} I(m = m') & \text{if} \quad n' < N, \\
+           p_l I(m = m') & \text{if} \quad n' = N,
+        \end{cases} \\
+        z_{(m', n'), r_{n,l}} &= \begin{cases}
+           p_l q_{m', l} I(n = n') & \text{if} \quad m' <M, \\
+           p_l I(n = n') & \text{if} \quad m' = M,
+        \end{cases}
+    \end{align*}
+    for all $l \in L$, where each row of $Z$ is indexed by $(m', n')$. We use this expression to check that each $(m',n')$-th element in the LHS/RHS of the vector equation \eqref{eq:lcm} are equal.
+    \begin{itemize}
+        \item When $m' = M, n' = N$, both sides of \eqref{eq:lcm} are 0.
+        \item When $m' = M, n' < N$, the only nonzero summand in the RHS is when $n = n'$. Thus, the RHS simplifies to $r_{n',l} - r_{n',L}$, which is equal to the LHS.
+        \item When $m' < M, n' = N$, the only nonzero summand in the RHS is when $m = m'$. Thus, the RHS simplifies to $q_{m',l} - q_{m',L}$, which is equal to the LHS.
+        \item When $m'< M, n'< N$, the only nonzero summand in the RHS is when $m = m'$ or $n = n'$. Then, the RHS simplifies to
+        $$(q_{m',l} - q_{m',L}) r_{n',l} + (r_{n',l} - r_{n',L}) q_{m',L} = q_{m',l} r_{n',l} - q_{m',L}r_{n',L},$$
+        which is the LHS.
+    \end{itemize}
+    This completes the proof.    
+\end{proof}
+
+\section{Simulation details}\label{sec:simulation details}
+\subsection{True parameters}\label{subsec:true param} The structural parameters are set as in the main text and here we describe the true distributional assumptions. The latent proportions $\pi$ under each latent DAG $\Lambda$ are set as follows: 
+\begin{enumerate}[(a)]
+    \item Chain: $\PP(H_1 = 1) = 2/3$, $\PP(H_2 = H_1 \mid H_1) = 2/3$ for both $H_1 = 0, 1$, $\PP(H_3 = H_2 \mid H_2) = 2/3$ for both $H_2 = 0, 1$.
+    \item Collider: $\PP(H_1 = 1) = \PP(H_3 = 1) = 2/3$, $$\PP(H_2 = 1 \mid H_1, H_3) = \begin{cases}
+        0.2 & \text{if} \quad (H_1,H_3) = (1,1), \\
+        0.4 & \text{if} \quad (H_1,H_3) = (1,0), \\
+        0.6 & \text{if} \quad (H_1,H_3) = (0,1), \\
+        0.8 & \text{if} \quad (H_1,H_3) = (0,0).
+    \end{cases}$$
+    \item Dependent: consider an hierarchical binary latent variable $H_0$ such that $\PP(H_0=1)=2/3$, and define $\PP(H_a = H_0 \mid H_0) = 2/3$ for all $a=1,2,3$. Define $\pi = \PP(H_1, H_2, H_3)$ by marginalizing out $H_0$.
+\end{enumerate}
+
+The true conditional probabilities $\PP_{j,h}$ are set as follows: $X_j \mid (H=h) \sim \text{Ber}(\mu_{j,h})$ for $j = 1,2,3,4$, $X_j \mid (H=h) \sim \text{N}(\mu_{j,h}, 1)$ for $j = 5,6$, $X_j \mid (H=h) \sim \text{Cauchy}(\mu_{j,h}, 1)$ for $j = 7,8$, where $\mu_{j,h}$ is given in \cref{tab:pmf simulation}.
+\begin{table}[h!]
+\centering
+\begin{tabular}{ccccccccc}
+\toprule
+$j \setminus h$ & (0,0,0) & (0,0,1) & (0,1,0) & (0,1,1) & (1,0,0) & (1,0,1) & (1,1,0) & (1,1,1) \\
+\midrule
+1 & 0.1     & 0.1     & 0.1     & 0.1     & 0.9     & 0.9     & 0.9     & 0.9     \\
+2 & 0.05    & 0.05    & 0.4     & 0.4     & 0.7     & 0.7     & 0.95    & 0.95    \\
+3 & 0.05    & 0.7     & 0.05    & 0.7     & 0.4     & 0.95    & 0.4     & 0.95    \\
+4 & 0.985   & 0.857   & 0.714   & 0.571   & 0.429   & 0.285   & 0.143   & 0.014  \\
+5 & -2 & -0.5 & -2 & -0.5 & 2 & 0.5 & 2 & 0.5 \\
+6 & -1.5 & -1.5 & 1.5 & 1.5 & -1.5 & -1.5 & 1.5 & 1.5 \\
+7 & 0.5 & -0.5 & 2 & -2 & 0.5 & -0.5 & 2 & -2 \\
+8 & 0.5 & 0.5 & 0.5 & 0.5 & 0.5 & 0.5 & 0.5 & 0.5 \\
+\bottomrule
+\end{tabular}
+\vspace{2mm}
+\caption{True parameter values of $\mu_{j,h}$ for each $j,h$.
+}
+\label{tab:pmf simulation}
+\end{table}
+Note that we use the same conditional probabilities $\PP_{j,h}$ for all $\Lambda$. 
+
+For the ablation studies, we consider the following three possible structures for $\Gamma$ while fixing the latent DAG $\Lambda$ to be chain ($H_1 \to H_2 \to H_3$). Here, $\Gamma^{\text{DT}}$ is the bipartite graph in \cref{fig:intro} and satisfies the condition in \cref{thm:identifiability}. The bold entries in $\Gamma^{\text{dense}}, \Gamma^{\text{sparse}}$ indicate the changes made from $\Gamma^{\text{DT}}$. Note that $\Gamma^{\text{dense}}$ and $\Gamma^{\text{sparse}}$ does not satisfy the necessary condition in Theorems \ref{thm:subset necessary}, \ref{thm:necessary}, respectively. 
+\begin{align}\label{eq:gamma formula}
+    \Gamma^{\text{DT}}= \begin{pmatrix} 1 & 0 & 0 \\ 1 & 1 & 0 \\ 1 & 0 & 1 \\ 1 & 1 & 1 \\ 1 & 0 & 1 \\ 0 & 1 & 0 \\ 0 & 1 & 1 \\ 0 & 0 & 0 \\ \end{pmatrix}, \quad \Gamma^{\text{dense}}= \begin{pmatrix} 1 & 0 & 0 \\ 1 & 1 & \textbf{1} \\ 1 & 0 & 1 \\ 1 & 1 & 1 \\ 1 & 0 & 1 \\ 0 & 1 & \textbf{1} \\ 0 & 1 & 1 \\ 0 & 0 & 0 \\ \end{pmatrix}, \quad \Gamma^{\text{sparse}}= \begin{pmatrix} 1 & 0 & 0 \\ 1 & 1 & 0 \\ 1 & 0 & \textbf{0} \\ 1 & 1 & 1 \\ 1 & 0 & \textbf{0} \\ 0 & 1 & 0 \\ 0 & 1 & 1 \\ 0 & 0 & 0 \\ \end{pmatrix}.
+\end{align}
+We also modified the parameter values accordingly from that in \cref{tab:pmf simulation} for $\Gamma = \Gamma^{\text{dense}}, \Gamma^{\text{sparse}}$.
+
+\subsection{Algorithm details}\label{subsec:algo}
+While our identifiability results (\cref{thm:identify K} and \cref{thm:identifiability}) naturally lead to an algorithm, its practical implementation is challenging. The main point of concern is computing the rank $2^K$ tensor CP decomposition in \eqref{eq:tensor decomposition}. In general, computing tensor decompositions are challenging nonconvex optimization problems. While there exists methods such as alternating least squares or Jennrich's algorithm \citep{kolda2009tensor, harshman1970foundations}, its finite sample accuracy was not satisfactory for our purpose. Moreover, the computational complexity suffers from potentially large values of the latent and observed dimensions $K, J$. Based on these concerns, we instead implement a simple score-based estimation procedure. {Our algorithm is a two-step procedure, where we first maximize the penalized likelihood to estimate the bipartite graph $\Gamma$ and the latent proportion vector $\pi$. Then, we recover the latent causal graph $\Lambda$ from the estimated latent proportions $\hat{\pi}$. 
+Here, the first step utilizes \cite{ma2023learning}, and the second step is motivated by a similar procedure in \cite{zhang2025causalrep}.
+} See \cref{algo:pem} for the general pipeline.
+%
+
+\begin{algorithm}
+\caption{Full algorithm to learn the model components.}
+\label{algo:pem}
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+
+\KwData{Observed data $X^{(1)}, \ldots, X^{(N)}$
+}
+Set the truncation parameter $\epsilon = 0.125$ and the number of pseudo-samples $N_{\text{sample}} = 2000$
+\begin{enumerate}
+    \item Define the discretized data $Y^{(1)},\ldots,Y^{(N)}$ by thresholding  at $0$.
+    \item Apply the penalized EM algorithm (Algorithm 1 in \cite{ma2023learning}) to estimate ${\pi}$ and ${\Theta}$.
+    \item For each $j \in [J], k \in [K]$, estimate $\gamma_{j,k}$ by \eqref{eq:estimate gamma}
+    \item Given $\hat{\pi}$, we generate $N_{\text{sample}}$ pseudo-samples of $H$ and estimate $\Lambda$ by the GES algorithm.
+\end{enumerate}
+\Output{Estimated DAG $(\Gamma,\Lambda)$ and latent proportion $\pi$.}
+\end{algorithm}
+
+We elaborate on each step.
+
+\emph{Step 1: Discretize.} For the continuous responses with $j \ge 5$, discretize each entry by setting $Y_{j,h} := 1$ if and only if $X_{j,h} > 0$. The threshold can be chosen differently, e.g. one may threshold at the sample average $\bar{X_j}$. 
+
+\emph{Step 2: Penalized EM.} %
+For each $j,h$, define the Bernoulli success probability as $\theta_{j,h} := \PP(Y_{j,h} = 1) \in (0,1)$ and let $\Theta$ be the $J \times 2^K$ matrix with entries $\theta_{j,h}$. Denoting $\ell_N(\pi, \Theta; Y)$ as the discretized log-likelihood (see eq. (9) in \cite{ma2023learning}), we maximize the following penalized log-likelihood
+$$\ell_N(\pi, \Theta; Y) - \lambda \sum_{j=1}^J \sum_{h \neq h'} \min(|\theta_{j,h}-\theta_{j,h'}|, \tau)$$
+via a penalized EM algorithm. The above penalty (referred to as the grouped truncated lasso penalty) induces sparsity in each row of $\Theta$.
+
+We modify Algorithm 1 in \cite{ma2023learning} to compute the above estimator. Note that the cited work considers an additional degeneracy in terms of the proportions $\pi_h$ and encourages their sparsity by adding another penalty. As we consider $\pi_h > 0$ for all $h$ (see \cref{assmp:nondegenerate}), we ignore this redundant penalty by setting $\tilde{\lambda}_1 = 0$. Following the choices in \citep[pg. 196,][]{ma2023learning}, we set the grid for other tuning parameters as $\tilde{\lambda}_2 \in \{1, 10, 10^2, 10^3\}, \tau \in \{0.05, 0.1\}$. As the EM algorithm is known to suffer from convergence up to local optima, we initialize both $\theta$ and $\pi$ to be close enough to the truth. We initialize them as the linear combination of the true parameter and random noise (each with weight $0.7$, $0.3$). This initialization also fixes the label permutation and sign-flipping ambiguities mentioned in \cref{sec:setup}. We set the convergence criteria of the EM algorithm as either satisfying (a) the $l^2$ norm of the proportion estimates $\hat{\pi}$ are smaller than $0.005$, or (b) the algorithm reaches the 10th iteration.
+
+\emph{Step 3: Learn $\Gamma$.} Under Assumptions \ref{assmp:causal markov} and \ref{assmp:nondegenerate}, $\gamma_{j,k} = 0$ if and only if $\theta_{j, (h_{(-k),1})} = \theta_{j, (h_{(-k),0})}$ for all $h_{(-k)} \in \{0,1\}^{K-1}$. Thus, we use the estimated $\hat{\theta}_{j,h}$s to recover $\gamma$. To account for the finite-sample estimation error for each entry of $\hat{\theta}$, we estimate $\gamma_{j,k}$ based on the median of all possible values of $\hat{\theta}_{j, (h_{(-k),1})} - \hat{\theta}_{j, (h_{(-k),0})}$ as follows:
+\begin{align}\label{eq:estimate gamma}
+    \hat{\gamma}_{j,k} := \begin{cases}
+        1 & \text{if} \quad \text{median}\big(\{|\hat{\theta}_{j, (h_{(-k),1})} - \hat{\theta}_{j, (h_{(-k),0})}| :h_{(-k)}\} \big) > \epsilon, \\
+        0 & \text{otherwise}
+    \end{cases}.
+\end{align}
+In practice, we choose the threshold $\epsilon = 0.125$ based on the observation that the maximum threshold in the penalty function in step 2 is $\tau = 0.1$ (and allowing a small margin of error). Empirically, this choice of $\epsilon$ leads to the best accuracy for $\Gamma$ compared to other thresholds.
+
+\emph{Step 4: Learn $\Lambda$.} To learn the latent causal DAG $\Lambda$ from $\hat{\pi}$, we generate 2000 pseudo-samples from the multinomial distribution on $\{0,1\}^K$ with probability $\hat{\pi}$ and apply the Greedy Equivalence Search (GES) algorithm \citep{chickering2002optimal}. 
+{This structure learning method has been recently proposed in \cite{zhang2025causalrep}, alongside consistency gurantees.}
+We implemented this procedure via Python, using the package \texttt{ges}. We compute the final SHD metric between the estimated CPDAG and true $\Lambda$ using the \texttt{count\_accuracy} function from \cite{kivva2021learning}\footnote{https://github.com/30bohdan/latent-dag}.
+
+\begin{remark}[Extensions]
+Note that we assume that $K = 3$ is known for the above estimation pipeline. In practice, the latent dimension $K$ can be chosen based on standard information criteria (such as BIC, EBIC) as well as domain knowledge and interpretability. Additionally, one may modify the above algorithm by considering finer discretization for continuous responses, which may improve estimation accuracy.
+\end{remark}
+
+\subsection{Comparison studies}\label{subsec:comparison}
+We compare the performance of \cref{algo:pem} with existing methods, namely the mixture oracle. We were unable to compare against tensor rank based causal discovery methods \citep{chen2024learning,chen2025identification} due to code unavailability. As the mixture oracle does not exist for binary data as discussed in \cref{sec:literature review}, we slightly modified the simulation setup and assumed that all $X_j$ are continuous and generated them from isotropic Gaussians with varying means. For fair comparison, we assumed that the latent dimension $K$ is known in both methods. Under the chain latent structure, we report the SHD for both methods (ours and mixture oracle) below. Here, the maximum possible value of the SHD is 24, so the values given by the mixture oracle are marginally better than randomly guessing.
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{cccc}
+        \toprule
+         Method $\setminus ~N$ & 1k & 5k & 10k \\
+        \midrule
+        Proposed & 1.7 & 1.7 & 1.4 \\
+        MixOracle & 11.4 & 11.2 & 10.8 \\
+        \bottomrule
+    \end{tabular}
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+    %
+%
+    %
+    %
+    \caption{SHD for estimating $\Gamma$, under the proposed method and the mixture oracle.}
+    \label{tab:mixoracle}
+\end{table}
+
+%
+%
+%
+%
+%
+
+
+
+We believe one critical reason for the unsatisfactory performance of the mixture oracle is the challenge of estimating the number of mixture components for low ($\le 3$)-dimensional marginals. For instance, it frequently estimated 2 mixture components whereas the true number is as large as $2^K=8$. In contrast, our proposed method simultaneously learns the entire mixture of $J$-dimensional distributions (without combining separate information from the marginals), and does not suffer from such issues.
+
+We do note that the simulation setting is somewhat favorable to ours, in the sense that our method knows the cardinality of latent variables, whereas the mixture oracle also estimates this from data. Additionally, the mixture oracle approach has the advantages of allowing general categorical latent variables and estimating their cardinality. However, we believe that our method will be particularly suitable in the challenging case with not-well-separated marginals, as illustrated by the above simulation results. The strength of our method lies in its simplicity and generality, as it only utilizes minimal information required to identify causal structures and can allow arbitrary response types.
+
+\subsection{Runtime}
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{cccc}
+    \toprule
+        $\Lambda \setminus N$ & 1k & 5k & 10k \\
+    \midrule
+    Chain & 1.6 & 3.2 & 5.1 \\
+    Collider & 2.5 & 5.4 & 8.0 \\
+    Dependent & 2.3 & 4.1 & 6.0 \\
+        %
+        %
+        %
+    \bottomrule
+    \end{tabular}
+    \vspace{0.2cm}
+    \caption{Average runtime (in seconds) for steps 1-3 in \cref{algo:pem}.}
+    \label{tab:runtime}
+\end{table}
+
+We report the average runtime (over the 300 replications) in \cref{tab:runtime}. As Step 4 above was implemented in a different language and did not vary across simulation settings, we only report the runtime of steps 1--3. The simulations were implemented in \texttt{MATLAB} on a personal laptop device (Lenovo ThinkPad X1). 
+
+To additionally assess scalability of the proposed method under a larger number of observed/latent variables, we have performed preliminary simulations with $K=8,J=24$. Under this setting, the method only took 3 minutes to run, while accurately estimating 92\% of the entries in $\Gamma$.
+
+\subsection{Entrywise results and uncertainty}
+The following table reports more detailed entrywise estimation accuracy of the $8 \times 3$ bipartite graph $\Gamma$ under the setting of \cref{tab:robust} with $N = 10000$. Instead of reporting the aggregated SHD metric, we report the entrywise error (the empirical average of $I(\hat{\gamma}_{j,k} \neq \gamma_{j,k})$) under each scenario of $\Gamma$. Recall that three true graphical structures for $\Gamma$ are considered: (i) $\Gamma^{DT}$ satisfies our identifiability conditions in Theorem \ref{thm:identifiability}, whereas (ii) $\Gamma^{dense}$, (iii) $\Gamma^{sparse}$ do not satisfy the necessary conditions in Theorems \ref{thm:subset necessary}, \ref{thm:necessary}, respectively (see \eqref{eq:gamma formula} for the exact matrices).
+
+In particular, for the dense case, the subset-condition between the second and third columns (indexed by $k=2,3$) does not hold, which results in several large error values in these two columns. For the sparse case, the latent variable $H_3$ only has two observed children, which leads to a non-trivial error for the entire third column. These results illustrate that theoretical non-identifiability results in an accuracy drop for the graphical structure associated with non-identifiable latent variables.
+
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{c|ccc|ccc|ccc} 
+    \toprule
+    $\Gamma$ && $\Gamma^{\text{DT}}$ &&& $\Gamma^{\text{dense}}$ &&& $\Gamma^{\text{sparse}}$ & \\ 
+    $j\backslash k$ & $1$ & $2$ &$3$&$1$& ${2}$ & ${3}$ &$1$&$2$& ${3}$ \\ 
+    \midrule $1$ &&& &&& &&0.16&0.23 \\ 
+    $2$&&&& 0.36 && 0.70 &&&0.27\\ 
+    $3$&&0.22&&&0.36&&&0.24&0.28\\ 
+    $4$&&&0.41&&&0.73&&&0.40\\ 
+    $5$&&&0.13&& 0.17 &0.23&&0.26&0.33\\ 
+    $6$&&&&0.24&0.51&&0.23&&0.30\\ $7$&0.18&0.17&&0.29&0.57&&0.18&0.56& 0.12\\ 
+    $8$&&&&&&&&0.12&0.14 \\
+    \bottomrule
+    \end{tabular}
+    \caption{Entry-wise estimation error for the bipartite graph $\Gamma$, where three $\Gamma$s are considered. Values < 0.1 are omitted, and larger values mean worse accuracy.}
+    \label{tab:gamma-accuracy-entry}
+\end{table}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.46\linewidth]{boxplot.png}
+    \quad
+    \includegraphics[width=0.46\linewidth]{boxplot_lambda.png}
+    \caption{Box plots of the SHD values corresponding to \cref{tab:shd}, where $N = 5000$. \textbf{Smaller is better.}}
+    \label{fig:boxplot}
+\end{figure}
+We additionally report box plots to complement the average values reported in \cref{tab:shd}. Note that the SHD is integer-valued, so we chose to report the box plots as opposed to the standard deviation. As the quantiles and outliers are also integer-valued, the box plots look very similar for all three sample sizes that we consider. Thus, we only report the box plots for $N = 5000$.
+Note that $\Gamma$ is a bipartite graph between 8 observed variables and 3 latent variables, so the SHD value of 2 means that two edges are incorrect among the 24 possibilities. The SHD value for $\Lambda$ computes the discrepancy between the estimated CPDAG and $\Lambda$, and has the maximum value of 3. 
+
+
+
+
+
+\section{Real data details}\label{sec:real data details}
+The fraction subtraction dataset is publicly available through the \texttt{R} package \texttt{cdm} \citep{george2016r}. We have focused on $17$ of the $20$ items provided in the dataset, to match the analysis in \cite{chen2015statistical}.
+
+Next, we provide the detailed estimates of the $17 \times 3$ bipartite graphical matrix $\Gamma$ under the fraction subtraction dataset. In \cref{tab:fraction}, each row corresponds to one of the $J = 17$ questions, and each column corresponds to a latent skill. Our result resembles that in Table 11 of \cite{chen2015statistical} (see the `existing' panel in \cref{tab:fraction}), except for a few entries which are indicated in bold. Similar to \cite{chen2015statistical}, we can understand each latent skill as: computing common denominator, writing integer as fraction, and subtracting integers. For example, questions 1-3 ask to compute fractions that do not involve integers $\frac{5}{3} - \frac{3}{4}, \frac{3}{4} - \frac{3}{8}, \frac{5}{6}-\frac{1}{9}$, so the estimated row of $\Gamma$ for these questions are $(1,0,0)$. However, for more complex questions such as question 17 which requires computing $3 \frac{3}{8} - 2 \frac{5}{6}$, all skills are required with the corresponding row in $\Gamma$ being $(1,1,1)$. Indeed, there exists only one pure child of the second skill in both estimates of $\Gamma$, as it is typically measured alongside the third skill.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{c|ccc|ccc}
+        \toprule
+        \multirow{2}{*}{$j \setminus k$} &  \multicolumn{3}{c}{Proposed}  &  \multicolumn{3}{c}{Existing} \\
+        \cmidrule{2-7}
+         & 1 & 2 & 3 & 1 & 2 & 3 \\
+        \midrule
+        1 & 1 & 0 & 0 & 1 & 0 & 0 \\
+        2 & 1 & 0 & 0 & 1 & 0 & 0 \\
+        3 & 1 & 0 & 0 & 1 & 0 & 0 \\
+        4 & 0 & 1 & 0 & 0 & 1 & 0 \\
+        5 & \textbf{1} & 0 & 1 & 0 & 0 & 1 \\
+        6 & 0 & 0 & 1 & 0 & 0 & 1 \\
+        7 & 0 & 0 & 1 & 0 & 0 & 1 \\
+        8 & 1 & 0 & \textbf{0} & 1 & 0 & 1 \\
+        9 & 1 & 0 & 1 & 1 & 0 & 1 \\
+        10 & 1 & 0 & 1 & 1 & 0 & 1 \\
+        11 & 0 & 1 & 1 & 0 & 1 & 1 \\
+        12 & 0 & 1 & 1 & 0 & 1 & 1 \\
+        13 & 0 & 1 & 1 & 0 & 1 & 1 \\
+        14 & \textbf{1} & 1 & 1 & 0 & 1 & 1 \\
+        15 & 0 & 1 & 1 & 0 & 1 & 1 \\
+        16 & \textbf{1} & 1 & 1 & 0 & 1 & 1 \\
+        17 & 1 & 1 & 1 & 1 & 1 & 1 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of estimated $\Gamma$ from our method and that in \cite{chen2015statistical}. The bold entries are those that differ.}
+    \label{tab:fraction}
+\end{table}
+
+\section{Justification for the binary latent variable assumption}\label{sec:binary}
+
+The binary latent assumption simplifies our technical proof and algebraic requirements by allowing a clean, \emph{non-generic} statement for Lemma \ref{lem:full rank}. This is our key property that establishes the full-rankness of the augmented conditional distribution $\PP(X_{1:K} \mid H_{1:K})$ when the corresponding observed-to-latent graph is lower-triangular. Its proof relies on showing a non-zero determinant $\text{det} \PP(X_{1:K} \mid H_{1:K}) \neq 0$. When we instead consider categorical latent variables that take $V>2$ values, there are possible counterexamples.
+
+For example, consider a toy setting with $V=3,K=J=2$ and a triangular structure with $H_1 \to X_1, H_2 \to X_1, X_2$, where each $X_k,H_k$ takes values in $\{0,1,2\}$. Setting $\theta_{x,h_1}:=\PP(X_1=x \mid H_1 = h_1), \eta_{x,(h_1,h_2)} := \PP(X_2=x \mid H_1=h_1, H_2=h_2)$, we can show that $\text{det} \PP(X_{1:K} \mid H_{1:K}) \neq 0$ if and only if $$\theta_{0,0}(\theta_{1,1} - \theta_{1,2})+\theta_{0,1}(\theta_{1,2}-\theta_{1,0})+\theta_{0,2}(\theta_{1,0}-\theta_{1,1}) \neq 0,$$ $$\eta_{0,(h,0)}(\eta_{1,(h,1)}-\eta_{1,(h,2)})+\eta_{0,(h,1)}(\eta_{1,(h,2)}-\eta_{1,(h,0)})+\eta_{0,(h,2)}(\eta_{1,(h,0)}-\eta_{1,(h,1)}) \neq 0, \quad \forall h = 0,1,2.$$ In general, we must assume that the values of such alternating polynomials (of degree $V-1$) are nonzero for each observation $X_j$. While this is a generic statement that holds almost surely under fully categorical observations, such conclusions cannot be stated for the continuous or other general responses considered in our paper. Furthermore, this restricts the identifiability guarantees for parametric sub-models. For example, we cannot even take a linear parametrization $\theta_{x, h_1} = \PP(X_1 = x \mid H_1 = h_1) = \beta_{0,x} + h_1 \beta_{1,x}$, under which the above equation for $\theta$ becomes exactly zero. In contrast, under binary latents with $V=2$, this requirement is immediately satisfied by the usual nondegeneracy assumption for the conditional distributions (see Assumption 3(b)).
+
+For Lemma 1 to hold under categorical latents, we also need each $X_k$ to take at least $V$ possible values. If $V>2$, this rules out binary responses. This restriction can be troublesome in many practical scenarios for causal discovery in observational studies. For example, our real data example considers binary responses (correct/incorrect) arising in educational assessments, and it is known to be extremely challenging to establish identifiability when general categorical latent variables are used to model binary data. As another illustration, binary observations/confounders are also common in medical studies, e.g., the binary observation of a patient exhibiting a symptom or not is confounded by binary latent gene mutations.
+\end{document}
