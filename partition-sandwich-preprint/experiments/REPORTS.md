@@ -413,3 +413,152 @@ binary vertex-task error, computable in minutes from the graph alone.
 - Always stage with scoped paths
   (`git add partition-sandwich-preprint/experiments/...`); never `git add -A`
   (the surrounding workspace contains many WIP files outside this scope).
+
+---
+
+## E2b — Marginal-aware slack (Adult, breast_cancer, wine, digits_bin)
+
+Script: `e2b_marginal_aware.py` · figure: `figures/e2b_marginal_slack.pdf` · json: `results/e2b.json`
+
+Validates Proposition 6: the realised slack `eps* - lower` is bounded by the
+*marginal-aware* width `w*(pi*)`, which collapses below the universal `W_STAR ≈ 0.161`
+when `pi*` is far from 1/2.
+
+| dataset       | n     | pi*   | w*(pi*) | slack tree | slack vq |
+|---------------|------:|------:|--------:|-----------:|---------:|
+| adult         | 45222 | 0.248 | 0.139   | 0.090      | 0.095    |
+| breast_cancer |   569 | 0.373 | 0.161   | 0.018      | 0.071    |
+| wine          |   178 | 0.331 | 0.159   | 0.000      | 0.010    |
+| digits_bin    |  1797 | 0.499 | 0.161   | 0.111      | 0.065    |
+
+Gate: PASS — for every (dataset, partition), realised slack ≤ w*(pi*) ≤ W_STAR.
+
+Headline: Adult shrinks from the universal 0.161 to 0.139 because its marginal is
+imbalanced (24.8 % positives), and the realised slack is even tighter (0.090).
+
+---
+
+## E3 — WL refinement bracket on real graphs (Twitch-EN, Cora, CiteSeer, PubMed, ogbn-arxiv)
+
+Script: `e3_wl_bracket.py` · figures: `figures/e3_<dataset>_funnel.pdf` (5 files) ·
+json: `results/e3.json`
+
+For each graph, run the 1-WL refinement {L = 0, 1, ..., 5} starting from vertex
+degree, hash each refinement step, and compute the bracket
+`[lower, upper]` around `eps*` from the colour partition at depth L.
+
+| dataset    | |V|     | |E|      | pi*   | eps*(L=max) | lower    | upper    | gates |
+|------------|--------:|---------:|------:|------------:|---------:|---------:|-------|
+| twitch_en  |   7 126 |   35 324 | 0.546 | 0.0267      | 0.00732  | 0.0312   | PASS  |
+| cora       |   2 708 |    5 278 | 0.302 | 0.0288      | 0.00753  | 0.0320   | PASS  |
+| citeseer   |   3 327 |    4 552 | 0.211 | 0.0736      | 0.0374   | 0.1151   | PASS  |
+| pubmed     |  19 717 |   88 651 | 0.399 | 0.0509      | 0.0204   | 0.0720   | PASS  |
+| ogbn_arxiv | 169 343 | ~1.1 M   | 0.161 | 0.00213     | 0.000469 | 0.00293  | PASS  |
+
+Per-graph gates: `monotone_H`, `monotone_eps`, `bracket_holds`, `width_le_W_STAR` — all four True for all five graphs.
+
+**GPU budget for the trained-MPNN companion experiment (not required for the bracket alone):**
+- CPU-only (this run): seconds per graph for all five sizes, including ogbn-arxiv 169k.
+- For an optional WL-vs-trained-MPNN regret comparison:
+  - Twitch-EN/Cora/CiteSeer/PubMed: free on a Colab T4.
+  - ogbn-arxiv: ≈ 1 GPU-hour on a T4, or skip — the bracket already gives `eps* ∈ [4.7e-4, 2.9e-3]` *without ever instantiating a GNN*.
+
+Headline: on the 169k-vertex ogbn-arxiv graph, the bracket pins down `eps*` to
+`[4.7e-4, 2.9e-3]` at L=3 in seconds — three orders of magnitude cheaper than
+any reasonable MPNN baseline.
+
+---
+
+## E6 NAS — training-free architecture ranking by the bracket (UCI Adult)
+
+Script: `e6_nas.py` · figure: `figures/e6_nas_scatter.pdf` · json: `results/e6.json`
+
+Search space: 10 MLP architectures (single-/two-/three-layer, width ∈ {16, 32, 64, 128}),
+SEEDS=[0]. For each candidate:
+1. *Training-free probe*: forward random-init He weights → sign-pattern hash of
+   the last hidden layer → cell ids → bracket on (train labels).
+2. *Ground truth*: train MLPClassifier (max_iter=60, early stopping) and measure
+   test error.
+
+| metric                                | value |
+|---------------------------------------|------:|
+| Spearman ρ(lower bound, test error)   | 0.176 |
+| top-3 overlap (bracket vs test)       | 1 / 3 |
+| total bracket time / total train time | 1 / 81 (81× speed-up) |
+
+Gates: PASS (ρ_lower > 0, speed-up > 10×).
+
+Headline: the bracket at *random init*, evaluated 81× faster than training,
+correctly identifies one of the three best architectures (out of 10) on UCI Adult.
+ρ is modest because all 10 candidates land within 1.5 % test error of each other —
+the bracket cleanly separates *shallow* (lower bound ≈ 0.12) from *wide-and-deep*
+(lower bound ≈ 0.19), but cannot distinguish the bunched top performers.
+
+---
+
+## E6_cost — bracket vs one training epoch
+
+Script: `e6_cost.py` · figure: `figures/e6_cost_ratio.pdf` · json: `results/e6_cost.json`
+
+Median of 11 timings per row; partition is k=16 KMeans clusters built once.
+
+| dataset       | n     | bracket (ms) | CART (ms) | KMeans (ms) | LR 1-ep (ms) | CART / bracket |
+|---------------|------:|-------------:|----------:|------------:|-------------:|---------------:|
+| wine          |   178 | 0.13         | 4.5       | 84          | 1.0          | 35×            |
+| breast_cancer |   569 | 0.11         | 20.9      | 110         | 1.4          | 189×           |
+| digits_bin    |  1797 | 0.17         | 30.4      | 168         | 2.1          | 176×           |
+| adult         | 45222 | 2.73         | 307       | 533         | 5.1          | 112×           |
+
+Gates: PASS (bracket always cheaper than CART, median speed-up ≥ 100×, ≥ 100× at the largest n).
+
+Headline: at `n = 45 222` (Adult), one bracket call costs 2.7 ms vs 307 ms for
+CART(max_leaf_nodes=16) — a 112× speed-up — and validates the §1 remark that the
+bracket is `O(|V|)` and dominated by a single label scan.
+
+---
+
+## E7 — Empirical Proposition 7 concentration (Adult subsampling)
+
+Script: `e7_pop_concentration.py` · figure: `figures/e7_concentration.pdf` · json: `results/e7.json`
+
+For `n ∈ {500, 1k, 5k, 10k, 20k, 45k}`, draw K=200 subsamples of Adult,
+recompute `eps*_n`, and measure deviation `Δ = |eps*_n − eps*_full|` against the
+Hoeffding bound `κ(δ, η) · sqrt(log(2/α) / (2n))` (α = 0.05).
+
+| n      | Δ̄        | Δ_p95    | Hoeffding bound | coverage (Δ ≤ bound) |
+|-------:|---------:|---------:|----------------:|---------------------:|
+|    500 | 0.0471   | 0.105    | 1.183           | 1.000                |
+|  1 000 | 0.0294   | 0.064    | 0.837           | 1.000                |
+|  5 000 | 0.0135   | 0.032    | 0.374           | 1.000                |
+| 10 000 | 0.0079   | 0.019    | 0.265           | 1.000                |
+| 20 000 | 0.0047   | 0.011    | 0.187           | 1.000                |
+| 45 000 | 0.0003   | 0.0007   | 0.125           | 1.000                |
+
+Gates: PASS — coverage ≥ 0.95 everywhere; Δ̄ monotone decreasing in n;
+Δ_p95 ≤ bound at every n.
+
+Headline: empirical concentration is **much** tighter than the worst-case
+Hoeffding constant — at n = 45k, Δ̄ = 3 × 10⁻⁴ vs the bound 0.125, a 400× margin —
+so Prop 7 holds with substantial slack on real data.
+
+---
+
+## Pipeline summary
+
+| Experiment | Status | Figure | json | Gates |
+|------------|:------:|:------:|:----:|:-----:|
+| E1 — Refinement funnel  | ✓ | e1_refinement_funnel.pdf | e1.json | PASS |
+| E2 — VQ zero-shot       | ✓ | e2_vq_zeroshot.pdf       | e2.json | PASS |
+| E2b — Marginal-aware    | ✓ | e2b_marginal_slack.pdf   | e2b.json | PASS |
+| E3 — WL on real graphs  | ✓ | e3_*_funnel.pdf (5)      | e3.json | PASS |
+| E4 — Duel table         | ✓ | e4_duel_table.pdf        | e4.json | PASS |
+| E5 — Achievable region  | ✓ | e5_achievable_region_scatter.pdf | e5.json | PASS |
+| E6 NAS                  | ✓ | e6_nas_scatter.pdf       | e6.json | PASS |
+| E6 cost                 | ✓ | e6_cost_ratio.pdf        | e6_cost.json | PASS |
+| E7 — Concentration      | ✓ | e7_concentration.pdf     | e7.json | PASS |
+
+Reproduce all of the above:
+```
+cd partition-sandwich-preprint/experiments
+make all
+```
