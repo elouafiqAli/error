@@ -1,11 +1,33 @@
 \documentclass[10pt]{article}
 \usepackage[preprint]{tmlr}
 
-\usepackage{amsmath,amssymb,amsthm}
+% ---------- typography ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{xcolor}
+
+% ---------- math ----------
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
 \usepackage{mathtools}
+\usepackage[nodisplayskipstretch]{setspace}
+
+% ---------- tables and lists ----------
 \usepackage{booktabs}
+\usepackage[shortlabels]{enumitem}
+\setlist[enumerate]{topsep=2pt, partopsep=0pt, itemsep=3pt, parsep=0pt}
+\setlist[itemize]{topsep=2pt, partopsep=0pt, itemsep=3pt, parsep=0pt}
+
+% ---------- references ----------
 \usepackage{hyperref}
+\hypersetup{
+  colorlinks,
+  linkcolor={red!50!black},
+  citecolor={blue!60!black},
+  urlcolor={blue!80!black}
+}
 \usepackage{url}
+\usepackage[noabbrev,capitalize]{cleveref}
 \usepackage{xspace}
 
 % ----- theorem environments -----
@@ -17,6 +39,17 @@
 \newtheorem{definition}[theorem]{Definition}
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
+
+% ----- cleveref display names -----
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{corollary}{Corollary}{Corollaries}
+\crefname{definition}{Definition}{Definitions}
+\crefname{remark}{Remark}{Remarks}
+\crefname{section}{\S}{\S\S}
+\crefname{subsection}{\S}{\S\S}
+\crefname{appendix}{Appendix}{Appendices}
 
 % ----- macros -----
 \newcommand{\Hbin}{H_{\mathrm{bin}}}
@@ -43,26 +76,30 @@
 \maketitle
 
 \begin{abstract}
-It is shown that for any finite partition $\Pi$ of a finite vertex set
-$V$ and any binary task $f : V \to \{0,1\}$, the cell-wise Bayes error
-$\epsP$ and the partition-conditional entropy $H(f \mid \Pi)$ (in bits)
-satisfy the two-sided sandwich
-$\Hbin^{-1}(H(f \mid \Pi)) \le \epsP \le \tfrac{1}{2} H(f \mid \Pi)$.
+It is shown that for any finite partition $\Pi$ of a finite vertex
+set $V$ and any binary task $f : V \to \{0,1\}$, the cell-wise Bayes
+error $\epsP$ and the partition-conditional entropy $H(f \mid \Pi)$
+(in bits) satisfy the two-sided sandwich
+$$
+  \Hbin^{-1}\bigl(H(f \mid \Pi)\bigr) \;\le\; \epsP \;\le\; \tfrac{1}{2}\,H(f \mid \Pi).
+$$
 The upper bound is tight in the strong sense that no inequality
-$\epsP \le c\,H(f \mid \Pi)$ with $c < 1/2$ holds uniformly. The lower
-bound is tight at every $\eps \in [0, 1/2]$ and recovers the Fano
-(1961) / Hellman--Raviv (1970) / Feder--Merhav (1994) entropy--error
-inequalities as the degenerate-partition case. It is further shown
-that specialising $\Pi$ to the partition $\PiA(G, L)$ that a
-depth-$L$ message-passing family $\mathcal{A}$ induces on $V(G)$ ---
-\textbf{Partition-Aware Message-Passing Complexity} (PA-MPC) --- yields
-a training-free, family-indexed two-sided error bracket comparable
-across GCN, GIN, GAT, GatedGCN, and GraphSAGE; the sandwich is
-verified on a finite-graph Lean~4 witness ($C_3,\ldots,C_8$ and
-Petersen, zero \texttt{sorry}) and on a 1000-row exact-rational
-ledger. The accompanying continuous-transfer conjecture C1 is
-mathematically open; its empirical status was frozen on 2026-05-30
-as \emph{supported-by-evidence at $L \ge 3$} on the eight-graph
+$\epsP \le c\,H(f \mid \Pi)$ with $c < 1/2$ holds uniformly.
+The lower bound is tight at every $\eps \in [0, 1/2]$ and recovers the
+Fano~(1961) / Hellman--Raviv~(1970) / Feder--Merhav~(1994)
+entropy--error inequalities as the degenerate-partition case.
+
+It is further shown that specialising $\Pi$ to the partition
+$\PiA(G, L)$ that a depth-$L$ message-passing family $\mathcal{A}$
+induces on $V(G)$ --- \emph{Partition-Aware Message-Passing
+Complexity} (PA-MPC) --- yields a training-free, family-indexed
+two-sided error bracket comparable across GCN, GIN, GAT, GatedGCN,
+and GraphSAGE. The sandwich is verified on a finite-graph Lean~4
+witness ($C_3,\ldots,C_8$ and Petersen, zero \texttt{sorry}) and on
+a 1000-row exact-rational ledger. The accompanying
+continuous-transfer conjecture~C1 is mathematically open; its
+empirical status was frozen on 2026-05-30 as
+\emph{supported-by-evidence at $L \ge 3$} on the eight-graph
 non-vertex-transitive anchor.
 \end{abstract}
 
@@ -92,50 +129,56 @@ remain:
 
 PA-MPC addresses both. By indexing on the \emph{family-level}
 initial partition $\Pi^{(0)}_{\mathcal{A}}$ and applying the same
-LossyWL operator to depth $L$, PA-MPC is well-defined before any
+LossyWL operator to depth~$L$, PA-MPC is well-defined before any
 training and is comparable across families. The bridge inequality of
-\S\ref{sec:theory} pins its operational meaning as a two-sided
-sandwich for the WL-determined task class $\Fwl$, up to one bit.
+\cref{sec:theory} pins its operational meaning as a two-sided
+sandwich for the WL-determined task class~$\Fwl$, up to one bit.
 
-\paragraph{Contributions.}
-\begin{itemize}
-  \item \textbf{Theory.} Definitions, two-sided bridge inequality
-    (Theorem~\ref{thm:sandwich}), refinement monotonicity
-    (Proposition~\ref{prop:refine}), architecture factorisation
-    (Proposition~\ref{prop:archfact}), PA-MPC instantiation
-    (Corollary~\ref{cor:pampc}), sharpness
-    (Proposition~\ref{prop:sharp}), prior-aware Fano sharpening
-    (Proposition~\ref{prop:prior}), scope.
-  \item \textbf{Lean witness.} A Lean~4 discrete bridge witness
+\paragraph{Organisation and contributions.}
+The rest of the paper is organised as follows.
+\cref{sec:related} positions PA-MPC against three immediate
+neighbours; \cref{sec:theory} develops the theory;
+\cref{sec:empirical} summarises the empirical and mechanised
+verification; \cref{sec:c1} reports the frozen status of
+conjecture~C1; \cref{sec:limits,sec:conclusion} close the paper.
+Our contributions are organised around four pillars.
+\begin{enumerate}[(a)]
+  \item \emph{Theory.} Definitions, the two-sided bridge inequality
+    (\cref{thm:sandwich}), refinement monotonicity
+    (\cref{prop:refine}), architecture factorisation
+    (\cref{prop:archfact}), the PA-MPC instantiation
+    (\cref{cor:pampc}), sharpness (\cref{prop:sharp}), the
+    prior-aware Fano sharpening (\cref{prop:prior}), and scope.
+  \item \emph{Lean witness.} A Lean~4 discrete bridge witness
     (\verb|PAMPC-LEAN-WITNESS-C4-K|) on
     $\{C_4,\ldots,C_8,\text{Petersen}\}$, zero \texttt{sorry},
     trusted-kernel-only axiom base.
-  \item \textbf{Empirical.} Three exact-rational ledgers (E03, E07,
-    E09; tier L-I), one float-tier oversmoothing baseline (E01),
+  \item \emph{Empirical.} Three exact-rational ledgers (E03, E07,
+    E09; tier~L-I), one float-tier oversmoothing baseline (E01),
     and three honestly-pilot results (E04, E06, E08).
-  \item \textbf{Reproducibility.} A sealed Merkle artefact store, a
+  \item \emph{Reproducibility.} A sealed Merkle artefact store, a
     deterministic claim-manifest build pipeline, six decision gates,
-    and methodology manuals recording exactly how every number was
-    derived.
-\end{itemize}
+    and methodology manuals recording exactly how every reported
+    number was derived.
+\end{enumerate}
 
-\paragraph{Status discipline.} Throughout, we keep four statuses
-sharply separate:
+\paragraph{Status discipline.}
+Throughout, we keep four statuses sharply separate.
 \begin{itemize}
-  \item \textbf{Proved (claim-pinned).} Theorem~\ref{thm:sandwich},
-    Propositions~\ref{prop:refine}, \ref{prop:archfact},
-    Corollary~\ref{cor:pampc}, Lemma~\ref{lem:purity}.
-  \item \textbf{Proved (paper-only, no claim ID).}
-    Propositions~\ref{prop:sharp} (sharpness) and~\ref{prop:prior}
+  \item \emph{Proved (claim-pinned).} \cref{thm:sandwich},
+    \cref{prop:refine,prop:archfact}, \cref{cor:pampc},
+    \cref{lem:purity}.
+  \item \emph{Proved (paper-only, no claim ID).}
+    \cref{prop:sharp} (sharpness) and \cref{prop:prior}
     (prior-aware) are hand proofs; they are \textbf{deliberately
     not} pinned to a trust tier (L-I / L-II / float) and not part
     of the claim manifest. Their correctness rests on the appendix
-    proof alone; the L-I / L-II / float infrastructure is
-    unaffected by either.
-  \item \textbf{Mechanised / exact-audited.} Lean witness;
+    proof alone; the L-I / L-II / float infrastructure is unaffected
+    by either.
+  \item \emph{Mechanised / exact-audited.} Lean witness;
     exact-$\mathbb{Q}$ ledgers E02, E03, E07, E09 (L-I).
-  \item \textbf{Empirical / conjectural.} Float baseline E01; pilot
-    apparatus E04, E06, E08; the continuous-transfer conjecture C1
+  \item \emph{Empirical / conjectural.} Float baseline E01; pilot
+    apparatus E04, E06, E08; the continuous-transfer conjecture~C1
     (open; empirically frozen 2026-05-30).
 \end{itemize}
 
@@ -143,19 +186,20 @@ sharply separate:
 \section{Related Work}\label{sec:related}
 % ============================================================
 
-We position PA-MPC against three immediate neighbours; an extended
+We position PA-MPC against three immediate neighbours. An extended
 discussion of antecedents (ergodic theory, algorithmic partition
-refinement, oversmoothing/over-squashing, the 2022--2024
+refinement, oversmoothing and over-squashing, the 2022--2024
 partition-indexed GNN wave, and learning-theoretic uses of
-refinement-monotonicity) is deferred to Appendix~\ref{app:extrelated}.
+refinement-monotonicity) is deferred to \cref{app:extrelated}.
 
-\paragraph{Expressivity ceiling.} \citet{xu2019gin}
-and~\citet{morris2019wl} show MPNNs are at most as expressive as
-1-WL on graph discrimination; \citet{azizian2021expressive} sharpen
-this to an exact characterisation. PA-MPC is orthogonal: we
-\emph{quantify} predictability of a fixed task on a fixed graph
-rather than characterise isomorphism power. Higher-order $k$-WL
-\citep{morris2020kwl} is explicitly out of scope; \S\ref{sec:scope}
+\paragraph{Expressivity ceiling.}
+\citet{xu2019gin} and \citet{morris2019wl} show that MPNNs are at
+most as expressive as 1-WL on graph discrimination, and
+\citet{azizian2021expressive} sharpen this to an exact
+characterisation. PA-MPC is orthogonal: we \emph{quantify}
+predictability of a fixed task on a fixed graph rather than
+characterise isomorphism power. Higher-order $k$-WL
+\citep{morris2020kwl} is explicitly out of scope; \cref{sec:scope}
 gives the exclusion criterion.
 
 \paragraph{Partition-explicit MPC.}
@@ -163,16 +207,16 @@ gives the exclusion criterion.
 trained model induces. PA-MPC lifts that framing to an
 \emph{architecture-family / initial-observable pair}
 $(\mathcal{A}, \Pi^{(0)})$ --- well-defined before training and
-comparable across MPNN families --- and packages it with a
-two-sided Bayes-error sandwich (Theorem~\ref{thm:sandwich}).
+comparable across MPNN families --- and packages it with a two-sided
+Bayes-error sandwich (\cref{thm:sandwich}).
 
-\paragraph{Equitable partitions.} The $L \to \infty$ limit of
-$\PiA(G, L)$ for any 1-WL-template family is the equitable
-partition of $G$ \citep{schwenk1974,godsil2001ag}. That object is
-Definition~\ref{def:partition}'s most direct intellectual ancestor;
-the novelty here is the family indexing
-(Proposition~\ref{prop:archfact}) and the Bayes-error packaging
-(Theorem~\ref{thm:sandwich}), not the partition itself.
+\paragraph{Equitable partitions.}
+The $L \to \infty$ limit of $\PiA(G, L)$ for any 1-WL-template
+family is the equitable partition of $G$
+\citep{schwenk1974,godsil2001ag}. That object is the most direct
+intellectual ancestor of \cref{def:partition}. The novelty here is
+the family indexing (\cref{prop:archfact}) and the Bayes-error
+packaging (\cref{thm:sandwich}), not the partition itself.
 
 % ============================================================
 \section{Theory}\label{sec:theory}
@@ -209,7 +253,7 @@ $P_C := \Pr[f = 1 \mid C]$,
   \;=\; \E\!\bigl[\Hbin(P_{C(v)})\bigr],
 \]
 where $\Hbin(p) := -p\log_2 p - (1-p)\log_2(1-p)$. Both forms
-vanish iff $\Pi$ is \emph{pure} for $f$ (Lemma~\ref{lem:purity}).
+vanish iff $\Pi$ is \emph{pure} for $f$ (\cref{lem:purity}).
 \end{definition}
 
 \begin{definition}[PA-MPC]\label{def:pampc}
@@ -227,19 +271,20 @@ set-theoretic --- $f$ factors through $V \twoheadrightarrow \Pi^{\WL}$
 \begin{definition}[admissible architecture family]\label{def:admissible}
 A pair $(\mathcal{A}, \Pi^{(0)}_{\mathcal{A}})$ is an \emph{admissible}
 depth-$L$ architecture-family specification if every member
-$h \in \mathcal{A}_L$ satisfies:
-\textbf{(1)} the depth-0 hidden state $h^{(0)}(v)$ depends on $v$
-only through the cell of $v$ in $\Pi^{(0)}_{\mathcal{A}}$;
-\textbf{(2)} there is a single update map $\phi_\ell$ at each
-layer $\ell$, applied identically at every vertex;
-\textbf{(3)} $\phi_\ell$ acts on the \emph{multiset} of neighbour
-states;
-\textbf{(4)} beyond $\Pi^{(0)}_{\mathcal{A}}$, $\phi_\ell$ has no
-access to vertex names or any feature not already determined by the
-current colour class.
+$h \in \mathcal{A}_L$ satisfies the following four conditions.
+\begin{enumerate}[(1)]
+  \item The depth-0 hidden state $h^{(0)}(v)$ depends on $v$ only
+    through the cell of $v$ in $\Pi^{(0)}_{\mathcal{A}}$.
+  \item There is a single update map $\phi_\ell$ at each layer
+    $\ell$, applied identically at every vertex.
+  \item $\phi_\ell$ acts on the \emph{multiset} of neighbour states.
+  \item Beyond $\Pi^{(0)}_{\mathcal{A}}$, $\phi_\ell$ has no access
+    to vertex names or any feature not already determined by the
+    current colour class.
+\end{enumerate}
 GCN, GIN, GatedGCN, GAT (with permutation-invariant attention
 pooling), and GraphSAGE all admit specifications meeting (1)--(4);
-higher-order $k$-WL variants are out of scope (\S\ref{sec:scope}).
+higher-order $k$-WL variants are out of scope (\cref{sec:scope}).
 \end{definition}
 
 \begin{lemma}[purity $\Leftrightarrow$ zero conditional entropy]\label{lem:purity}
@@ -299,7 +344,7 @@ operator, or $\Fwl$. It is a property of any finite partition and
 any binary labelling. (Upper side: \citealp{hellmanraviv1970}. Lower
 side: \citealp{fano1961} in its binary form, sharpened
 by~\citealp{feder1994}.) The full proof is in
-Appendix~\ref{app:proof}; we sketch the two halves as the two
+\cref{app:proof}; we sketch the two halves as the two
 extremal directions of a single Lagrangian.
 
 \paragraph{Single program, two directions.} Let
@@ -352,23 +397,23 @@ $q_{C'_j}$ summing to $q_C$ and posteriors $P_{C'_j}$ averaging
 (weights $q_{C'_j}/q_C$) to $P_C$. Concavity of $\Hbin$ gives
 $\sum_j q_{C'_j} \Hbin(P_{C'_j}) \le q_C \Hbin(P_C)$; sum over $C$.
 The same argument applies to $\min(p, 1 - p)$ via its concavity on
-$[0,1]$. Full proof in Appendix~\ref{app:proof}.
+$[0,1]$. Full proof in \cref{app:proof}.
 \end{proof}
 
 \begin{proposition}[architecture factorisation]\label{prop:archfact}
 Let $(\mathcal{A}, \Pi^{(0)}_{\mathcal{A}})$ be admissible
-(Definition~\ref{def:admissible}) and let $\Pi = \PiA(G, L)$. Then
+(\cref{def:admissible}) and let $\Pi = \PiA(G, L)$. Then
 every depth-$L$ predictor $h \in \mathcal{A}_L$ is constant on
 every cell of $\Pi$.
 \end{proposition}
 \begin{proof}
 Induction on $\ell$: the layer-$\ell$ hidden state $h^{(\ell)}(v)$
 depends on $v$ only through the cell of $v$ in
-$\Pi^{(\ell)}_{\mathcal{A}}$. Base: Definition~\ref{def:admissible}(1).
+$\Pi^{(\ell)}_{\mathcal{A}}$. Base: \cref{def:admissible}(1).
 Step: if $v, w$ share a cell of $\Pi^{(\ell+1)}_{\mathcal{A}}$ then
 they share a cell of $\Pi^{(\ell)}_{\mathcal{A}}$ and the multisets
 of neighbour-cell labels coincide; by induction, the multisets of
-neighbour \emph{states} coincide; Definition~\ref{def:admissible}(2--4)
+neighbour \emph{states} coincide; \cref{def:admissible}(2--4)
 gives $h^{(\ell+1)}(v) = h^{(\ell+1)}(w)$.
 \end{proof}
 
@@ -386,9 +431,9 @@ increase $\PAMPC$ or $\eps^{*}$;
 $\lim_{L \to \infty} \PAMPC = 0$.
 \end{corollary}
 \begin{proof}
-(i) combines Proposition~\ref{prop:archfact} with the lower bound
-of Theorem~\ref{thm:sandwich}; (ii) is the upper bound; (iii) is
-Proposition~\ref{prop:refine}; (iv) holds because
+(i) combines \cref{prop:archfact} with the lower bound
+of \cref{thm:sandwich}; (ii) is the upper bound; (iii) is
+\cref{prop:refine}; (iv) holds because
 $f \in \Fwl(G)$ is constant on the WL-stable partition.
 \end{proof}
 
@@ -400,26 +445,29 @@ via the lower bound; small $\PAMPC$ forces small $\epsP$ via the
 upper bound; deeper architectures never increase the bound.
 
 \begin{proposition}[no closed-form improvement of the sandwich]\label{prop:sharp}
-Both bounds in Theorem~\ref{thm:sandwich} are uniformly unimprovable
-in the following sense.
-\textbf{(i)} For every constant $c < 1/2$ there exists a finite
-partition $\Pi$ and binary task $f$ on finite $V$ with
-$\epsP > c \cdot H(f \mid \Pi)$.
-\textbf{(ii)} For every \emph{continuous} $\psi : [0,1] \to [0, 1/2]$
-with $\psi(H_0) > \Hbin^{-1}(H_0)$ at some $H_0 \in (0, 1)$, there
-exist $\Pi, f$ with $\epsP < \psi(H(f \mid \Pi))$.
+Both bounds in \cref{thm:sandwich} are uniformly unimprovable in the
+following sense.
+\begin{enumerate}[(i)]
+  \item For every constant $c < 1/2$ there exists a finite partition
+    $\Pi$ and binary task $f$ on finite $V$ with
+    $\epsP > c \cdot H(f \mid \Pi)$.
+  \item For every \emph{continuous} $\psi : [0,1] \to [0, 1/2]$
+    with $\psi(H_0) > \Hbin^{-1}(H_0)$ at some $H_0 \in (0, 1)$,
+    there exist $\Pi$ and $f$ with $\epsP < \psi(H(f \mid \Pi))$.
+\end{enumerate}
 \end{proposition}
 \begin{proof}
 (i) The Hellman--Raviv witnessing family $\Pi_\alpha^{\mathrm{HR}}$
-(Appendix~\ref{app:proof}, Tightness) achieves
+(\cref{app:proof}, Tightness) achieves
 $\eps^{*}_{\Pi_\alpha^{\mathrm{HR}}} = \tfrac{1}{2} H(f \mid \Pi_\alpha^{\mathrm{HR}})$
-for every $\alpha \in (0,1]$. (ii) By continuity, $\psi(H) > \Hbin^{-1}(H)$
-on a neighbourhood of $H_0$; pick $\eps \in \mathbb{Q} \cap (0, 1/2)$
-with $\Hbin(\eps)$ in that neighbourhood and apply the Fano
-witnessing family at any $n$ with $\eps n \in \mathbb{Z}$.
+for every $\alpha \in (0,1]$.
+(ii) By continuity, $\psi(H) > \Hbin^{-1}(H)$ on a neighbourhood of
+$H_0$; pick $\eps \in \mathbb{Q} \cap (0, 1/2)$ with $\Hbin(\eps)$ in
+that neighbourhood and apply the Fano witnessing family at any $n$
+with $\eps n \in \mathbb{Z}$.
 \end{proof}
 
-The rhetorical content of Proposition~\ref{prop:sharp} is
+The rhetorical content of \cref{prop:sharp} is
 Massey-style \citep[\S III]{massey1994}: a positive sharpness claim
 upgraded to a negative non-existence claim. The achievable region
 $\widetilde{A}_2$ is the tightest two-sided closed-form bracket on
@@ -437,33 +485,33 @@ $I(f ; \Pi) := \Hbin(P_f) - H(f \mid \Pi)$,
 where $\dKL(p \,\|\, q) := p \log_2 \tfrac{p}{q} + (1-p) \log_2 \tfrac{1-p}{1-q}$.
 \end{proposition}
 \begin{proof}
-Appendix~\ref{app:proof}, equations (A.10)--(A.12), via
+\cref{app:proof}, equations (A.10)--(A.12), via
 data-processing on the binary error indicator \citep{hanverdu1994}.
 \end{proof}
 
 \paragraph{Status (trust-tier note).}
-Proposition~\ref{prop:prior} is a \textbf{paper-only hand proof}.
+\cref{prop:prior} is a \textbf{paper-only hand proof}.
 It carries no \verb|PAMPC-*| claim ID, is not part of the L-I
 exact-rational ledger, not part of the L-II Lean witness, and not
 behind any G0..G4 decision gate. The L-I / L-II / float trust-tier
 infrastructure neither audits nor depends on it, and a future flaw
 in this proposition would not invalidate any claim-pinned result.
 Substituting the trivial bound $\epsE = 1/2$ in
-Proposition~\ref{prop:prior} recovers exactly
-Theorem~\ref{thm:sandwich}'s lower bound; for skewed marginals the
+\cref{prop:prior} recovers exactly
+\cref{thm:sandwich}'s lower bound; for skewed marginals the
 bound is strictly tighter.
 
 \subsection{Scope}\label{sec:scope}
 
-The partition theorem (Theorem~\ref{thm:sandwich}) and refinement
-proposition (Proposition~\ref{prop:refine}) are stated for
+The partition theorem (\cref{thm:sandwich}) and refinement
+proposition (\cref{prop:refine}) are stated for
 \emph{any} finite partition and \emph{any} binary task on a finite
 vertex set; nothing about graphs, WL, or admissible architectures
 enters those statements. The architecture factorisation
-(Proposition~\ref{prop:archfact}) and PA-MPC sandwich
-(Corollary~\ref{cor:pampc}) require the admissibility conditions
-of Definition~\ref{def:admissible}. The non-vacuity clause
-Corollary~\ref{cor:pampc}(iv) is the one place where
+(\cref{prop:archfact}) and PA-MPC sandwich
+(\cref{cor:pampc}) require the admissibility conditions
+of \cref{def:admissible}. The non-vacuity clause
+\cref{cor:pampc}(iv) is the one place where
 $f \in \Fwl(G)$ is used. Higher-order WL templates
 \citep{morris2020kwl}, which violate admissibility~(4) by
 referencing $k$-tuples, are out of scope. Multi-class extensions
@@ -473,21 +521,23 @@ work.
 
 \subsection{Three named conjectures (registry)}\label{sec:conj}
 
-\begin{center}
-\begin{tabular}{lll}
+\begin{table}[h]
+\centering
+\caption{Conjecture registry. C1 is the only conjecture whose
+resolution gates a phase transition in the programme; its precise
+statement, hypotheses H1--H3, decision rule, and sealed empirical
+verdict are in \cref{sec:c1}.}
+\label{tab:conj}
+\begin{tabular}{@{}lll@{}}
 \toprule
 ID & Title & Falsifier \\
 \midrule
-C1 & Continuous-transfer (open; empirical status frozen 2026-05-30) & E08 (\S\ref{sec:c1}) \\
+C1 & Continuous-transfer (open; frozen 2026-05-30) & E08 (\cref{sec:c1}) \\
 C2 & $K_B$ rank saturation on cycles & E03 \\
 C3 & Feature-richness boundary & E07 \\
 \bottomrule
 \end{tabular}
-\end{center}
-
-C1 is the only conjecture whose resolution gates a phase transition
-in the programme; its precise statement, hypotheses H1--H3, decision
-rule, and sealed empirical verdict are in \S\ref{sec:c1}.
+\end{table}
 
 \subsection{Remark on $\mathrm{MI}^2 \approx 1/2$}\label{sec:mi2}
 
@@ -511,7 +561,7 @@ companion (\verb|PAPER-ARXIV.md|, \S4--\S8) and the
 \paragraph{Exact-rational ledger (tier L-I).} Three sealed ledgers
 verify the theory on a synthetic anchor with L-I-computable WL
 partition and exact-$\mathbb{Q}$ partition-conditional entropy.
-\textbf{E03} (audit of Proposition~\ref{prop:refine}): $280$ rows
+\textbf{E03} (audit of \cref{prop:refine}): $280$ rows
 ($\{P_4,\ldots,P_{12},\text{Petersen}\} \times 4$ tasks $\times 7$
 depths); all three falsifiers PASS (monotonicity, purity on
 vertex-transitive, WL-stability scaling).
@@ -588,23 +638,25 @@ open problem for paper-02.
 \end{enumerate}
 
 % ============================================================
-\section{Conclusion}
+\section{Conclusion}\label{sec:conclusion}
 % ============================================================
 
 PA-MPC is a partition-explicit, architecture-family-indexed
 generalisation of MPC. The discrete bridge inequality
-(Theorem~\ref{thm:sandwich}) pins its operational meaning as a
-two-sided sandwich on WL-determined predictability. The
-exact-rational ledger and the Lean L-II witness verify the theory
-on a synthetic anchor. The continuous-transfer conjecture C1 is
-frozen as of 2026-05-30: supported-by-evidence at $L \ge 3$ on
-$\mathrm{anchor}_8$, with the architectural dichotomy
-$\{\text{GCN}, \text{GIN}, \text{GatedGCN}\} \,/\, \{\text{GAT}, \text{GraphSAGE}\}$.
-The companion conjecture C1' is registered as the headline open
-problem for paper-02. The reproducibility skeleton is closed
-end-to-end. The kill branch of C1 is publishable. The PASS branch
-is publishable. The honest pilot status of E04, E06, E08 is
-publishable.
+(\cref{thm:sandwich}) pins its operational meaning as a two-sided
+sandwich on WL-determined predictability. The exact-rational ledger
+and the Lean L-II witness verify the theory on a synthetic anchor.
+
+The continuous-transfer conjecture~C1 is frozen as of 2026-05-30:
+supported-by-evidence at $L \ge 3$ on $\mathrm{anchor}_8$, with the
+architectural dichotomy
+$\{\text{GCN}, \text{GIN}, \text{GatedGCN}\}$ versus
+$\{\text{GAT}, \text{GraphSAGE}\}$. The companion conjecture~C1' is
+registered as the headline open problem for paper-02.
+
+The reproducibility skeleton is closed end-to-end. The kill branch
+of C1 is publishable; the PASS branch is publishable; and the honest
+pilot status of E04, E06, E08 is publishable.
 
 \bibliographystyle{tmlr}
 \bibliography{main}
