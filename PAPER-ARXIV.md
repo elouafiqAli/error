@@ -8,31 +8,36 @@
 
 ## Abstract
 
-For a binary task $f$ on the vertices of a graph $G$ and a partition
-$\Pi$ of $V(G)$, let $\varepsilon^{*}_{\Pi}$ denote the cell-wise
-Bayes error of $f$ under $\Pi$ and let $H(f \mid \Pi)$ denote the
-partition-conditional entropy. We prove the **partition Bayes-entropy
-sandwich**
+How much of a binary vertex task on a graph remains predictable after
+a depth-$L$ message-passing family $\mathcal{A}$ has done all it can?
+The partition-explicit message-passing complexity (MPC) of Kemper et
+al.\ (2025) answers this for a single trained model. We answer it for
+the **architecture family itself**, before training, and with a
+two-sided guarantee.
+
+Our main result is the **partition Bayes-entropy sandwich**: for every
+finite partition $\Pi$ of a finite vertex set and every binary task $f$,
+the cell-wise Bayes error $\varepsilon^{*}_{\Pi}$ and the
+partition-conditional entropy $H(f \mid \Pi)$ obey
 $H_{\mathrm{bin}}^{-1}\!\bigl(H(f \mid \Pi)\bigr) \le \varepsilon^{*}_{\Pi}
-\le \tfrac{1}{2} H(f \mid \Pi)$,
-valid for every finite partition and every binary task. The two halves
-arise as opposite extrema of a single Jaynes maximum-entropy programme,
-unifying the classical bounds of Fano (1961), Hellman & Raviv (1970),
-and Feder & Merhav (1994); no inequality of the form
-$\varepsilon^{*}_{\Pi} \le c\, H(f \mid \Pi)$ with $c < 1/2$ can hold
-uniformly (Proposition 3.5). Specialising $\Pi$ to the partition
-$\Pi_{\mathcal{A}}(G, L)$ that a depth-$L$ message-passing family
+\le \tfrac{1}{2} H(f \mid \Pi)$.
+The two halves are the opposite extrema of a single Jaynes
+maximum-entropy programme; together they unify the classical
+entropy–error bounds of Fano (1961), Hellman & Raviv (1970), and
+Feder & Merhav (1994), and the slope $1/2$ on the upper side is
+sharp — no inequality $\varepsilon^{*}_{\Pi} \le c\, H(f \mid \Pi)$
+with $c < 1/2$ can hold uniformly (Proposition 3.5).
+
+Specialising $\Pi$ to $\Pi_{\mathcal{A}}(G, L)$, the partition that
 $\mathcal{A}$ induces on $V(G)$ via the identity-leaking LossyWL
-operator yields **Partition-Aware Message-Passing Complexity**
-(PA-MPC) — a training-free, family-indexed refinement of the
-partition-explicit MPC of Kemper et al.\ (2025), and a two-sided
+operator, yields **Partition-Aware MPC** (PA-MPC) — a training-free
 error bracket comparable across GCN, GIN, GAT, GatedGCN, and
 GraphSAGE. The theorem is verified on a finite-graph Lean 4 witness
 ($C_3,\ldots,C_8$ and Petersen, zero `sorry`) and on a 1000-row
 exact-rational ledger; a float-tier oversmoothing baseline and three
 pilot apparatus checks accompany it. The continuous-transfer
-conjecture C1 (§9) is mathematically open; its empirical status was
-frozen on 2026-05-30 as *supported-by-evidence at $L \ge 3$* on the
+conjecture C1 (§9) is mathematically open; on 2026-05-30 we froze its
+empirical status as *supported-by-evidence at $L \ge 3$* on the
 eight-graph non-vertex-transitive anchor, with the architectural
 dichotomy
 $\{\text{GCN},\text{GIN},\text{GatedGCN}\}/\{\text{GAT},\text{GraphSAGE}\}$.
