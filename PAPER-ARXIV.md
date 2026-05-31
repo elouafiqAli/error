@@ -8,38 +8,27 @@
 
 ## Abstract
 
-How much of a binary vertex task on a graph remains predictable after
-a depth-$L$ message-passing family $\mathcal{A}$ has done all it can?
-The partition-explicit message-passing complexity (MPC) of Kemper et
-al.\ (2025) answers this for a single trained model. We answer it for
-the **architecture family itself**, before training, and with a
-two-sided guarantee.
-
-Our main result is the **partition Bayes-entropy sandwich**: for every
-finite partition $\Pi$ of a finite vertex set and every binary task $f$,
-the cell-wise Bayes error $\varepsilon^{*}_{\Pi}$ and the
-partition-conditional entropy $H(f \mid \Pi)$ obey
-$H_{\mathrm{bin}}^{-1}\!\bigl(H(f \mid \Pi)\bigr) \le \varepsilon^{*}_{\Pi}
-\le \tfrac{1}{2} H(f \mid \Pi)$.
-The two halves are the opposite extrema of a single Jaynes
-maximum-entropy programme; together they unify the classical
-entropy–error bounds of Fano (1961), Hellman & Raviv (1970), and
-Feder & Merhav (1994), and the slope $1/2$ on the upper side is
-sharp — no inequality $\varepsilon^{*}_{\Pi} \le c\, H(f \mid \Pi)$
-with $c < 1/2$ can hold uniformly (Proposition 3.5).
-
-Specialising $\Pi$ to $\Pi_{\mathcal{A}}(G, L)$, the partition that
-$\mathcal{A}$ induces on $V(G)$ via the identity-leaking LossyWL
-operator, yields **Partition-Aware MPC** (PA-MPC) — a training-free
-error bracket comparable across GCN, GIN, GAT, GatedGCN, and
-GraphSAGE. The theorem is verified on a finite-graph Lean 4 witness
+It is shown that for any finite partition $\Pi$ of a finite vertex
+set $V$ and any binary task $f : V \to \{0, 1\}$, the cell-wise
+Bayes error $\varepsilon^{*}_{\Pi}$ and the partition-conditional
+entropy $H(f \mid \Pi)$ (in bits) satisfy the two-sided sandwich
+$H_{\mathrm{bin}}^{-1}(H(f \mid \Pi)) \le \varepsilon^{*}_{\Pi} \le \tfrac{1}{2} H(f \mid \Pi)$.
+The upper bound is tight in the strong sense that no inequality
+$\varepsilon^{*}_{\Pi} \le c\,H(f \mid \Pi)$ with $c < 1/2$ holds
+uniformly. The lower bound is tight at every $\varepsilon \in [0,1/2]$
+and recovers the Fano (1961) / Hellman–Raviv (1970) / Feder–Merhav
+(1994) entropy–error inequalities as the degenerate-partition case.
+It is further shown that specialising $\Pi$ to the partition
+$\Pi_{\mathcal{A}}(G, L)$ that a depth-$L$ message-passing family
+$\mathcal{A}$ induces on $V(G)$ — **Partition-Aware Message-Passing
+Complexity** (PA-MPC) — yields a training-free, family-indexed
+two-sided error bracket comparable across GCN, GIN, GAT, GatedGCN, and
+GraphSAGE; the sandwich is verified on a finite-graph Lean 4 witness
 ($C_3,\ldots,C_8$ and Petersen, zero `sorry`) and on a 1000-row
-exact-rational ledger; a float-tier oversmoothing baseline and three
-pilot apparatus checks accompany it. The continuous-transfer
-conjecture C1 (§9) is mathematically open; on 2026-05-30 we froze its
-empirical status as *supported-by-evidence at $L \ge 3$* on the
-eight-graph non-vertex-transitive anchor, with the architectural
-dichotomy
+exact-rational ledger. The accompanying continuous-transfer conjecture
+C1 (§9) is mathematically open; its empirical status was frozen on
+2026-05-30 as *supported-by-evidence at $L \ge 3$* on the eight-graph
+non-vertex-transitive anchor, with the architectural dichotomy
 $\{\text{GCN},\text{GIN},\text{GatedGCN}\}/\{\text{GAT},\text{GraphSAGE}\}$.
 
 ---
@@ -83,11 +72,18 @@ The paper makes four contributions:
   methodology manuals that record exactly how every number was derived
   (§8).
 
-Throughout, we keep three statuses sharply separate:
+Throughout, we keep four statuses sharply separate:
 
-- **Proved.** Theorem 1 (partition Bayes-entropy sandwich), Proposition 3.2
-  (refinement monotonicity), Proposition 3.3 (architecture factorisation),
-  Corollary 3.4 (PA-MPC instantiation), and the purity Lemma 3.1.
+- **Proved (claim-pinned).** Theorem 1 (partition Bayes-entropy sandwich),
+  Proposition 3.2 (refinement monotonicity), Proposition 3.3 (architecture
+  factorisation), Corollary 3.4 (PA-MPC instantiation), and the purity
+  Lemma 3.1 — each backed by a `PAMPC-*` claim ID in the registry.
+- **Proved (paper-only, no claim ID).** Proposition 3.5 (sharpness of the
+  upper bound) and Proposition 3.6 (prior-aware Fano sharpening) are
+  hand proofs in Appendix A; they are **deliberately not** pinned to a
+  trust tier (L-I / L-II / float) and **not** part of the claim manifest
+  or decision-gate set. Their correctness rests on the appendix proof
+  alone; the L-I / L-II / float infrastructure is unaffected by either.
 - **Mechanised / exact-audited.** Lean witness on $\{C_4,\ldots,C_8,\text{Petersen}\}$;
   exact-$\mathbb{Q}$ ledgers E02, E03, E07, E09 (tier L-I).
 - **Empirical / conjectural.** Float baseline E01; pilot apparatus E04, E06, E08;
@@ -498,15 +494,24 @@ is the binary KL divergence (bits).*
 *Proof.* In Appendix A, equations (A.10)–(A.12), via data-processing
 on the binary error indicator (Han & Verdú 1994). $\square$
 
+*Status (trust-tier note).* Proposition 3.6 is a **paper-only hand
+proof**. It carries no `PAMPC-*` claim ID, is not part of the L-I
+exact-rational ledger, not part of the L-II Lean witness, and not
+behind any G0..G4 decision gate. The L-I / L-II / float trust-tier
+infrastructure neither audits nor depends on it, and a future flaw in
+this proposition would not invalidate any claim-pinned result.
+
 Proposition 3.6 sharpens the Fano lower side of Theorem 1 whenever
 $P_f$ is bounded away from $1/2$: substituting the trivial bound
 $\varepsilon^{*}_{\varnothing} = 1/2$ recovers exactly Theorem 1's lower
 bound (since $d_{\mathrm{KL}}(\varepsilon \| 1/2) = 1 - H_{\mathrm{bin}}(\varepsilon)$,
 so the inequality reads $1 - H_{\mathrm{bin}}(\varepsilon^{*}_\Pi) \leq 1 - H(f\mid\Pi)$,
 i.e.\ $H(f\mid\Pi) \leq H_{\mathrm{bin}}(\varepsilon^{*}_\Pi)$); for skewed
-marginals the bound is strictly tighter. Lean mechanisation of
-Proposition 3.6 and a dedicated E02 demo row are deferred (see
-§10 *Known Limitations* and `notes/paper-arxiv-review/15-future-work-borrowed-techniques.md`,
+marginals the bound is strictly tighter. Lean mechanisation and an E02
+demo row are listed as **optional** future work — should either be
+undertaken, a new claim ID would be minted at that point; until then
+Proposition 3.6 remains paper-only by design (see §10 *Known
+Limitations* and `notes/paper-arxiv-review/15-future-work-borrowed-techniques.md`,
 item I-5).
 
 ### 3.3 Scope
@@ -1017,6 +1022,11 @@ We have iterated this programme four times. The current narrowings are:
    companion conjecture C1' (E10) is an open companion experiment.
 6. **No real-world graph results.** ZINC/OGB/TUDataset are in scope for
    paper-02; paper-01 is theory plus the synthetic anchor.
+7. **Propositions 3.5 and 3.6 are paper-only.** Both are hand proofs in
+   Appendix A and **by design** carry no `PAMPC-*` claim ID, no trust
+   tier, and no decision gate. Lean mechanisation and an E02 demo row
+   for Proposition 3.6 are listed as *optional* future work; the L-I /
+   L-II / float infrastructure is unaffected by either of them.
 
 ---
 
