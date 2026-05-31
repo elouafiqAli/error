@@ -91,75 +91,33 @@ Throughout, we keep three statuses sharply separate:
 
 ## 2. Related Work
 
-The classical results we build on:
+We position PA-MPC against three immediate neighbours; an extended
+discussion of antecedents (ergodic theory, algorithmic partition
+refinement, oversmoothing/over-squashing, the 2022–2024
+partition-indexed GNN wave, and learning-theoretic uses of
+refinement-monotonicity) is deferred to Appendix G.
 
 **Expressivity ceiling.** Xu et al. (2019) and Morris et al. (2019)
-establish that MPNNs are at most as expressive as 1-WL on graph
-discrimination. Azizian & Lelarge (2021) characterise the classes
-exactly. Our contribution is orthogonal: we *quantify* predictability
-for fixed tasks on fixed graphs rather than characterise graph
-isomorphism power.
+show MPNNs are at most as expressive as 1-WL on graph discrimination;
+Azizian & Lelarge (2021) sharpen this to an exact characterisation.
+PA-MPC is orthogonal: we *quantify* predictability of a fixed task on
+a fixed graph rather than characterise isomorphism power. Higher-order
+$k$-WL (Morris et al. 2020) is explicitly out of scope; §3.3 gives
+the exclusion criterion.
 
-**Partition-explicit message-passing complexity.** Kemper et al. (2025)
-introduce the partition-explicit MPC framing on which we build, defining
-complexity in terms of the partition a model induces rather than the model
-itself. PA-MPC extends that framing by indexing on the architecture family
-and its declared initial observable partition rather than a single model,
-and by providing a two-sided Bayes-error sandwich (Theorem 1).
+**Partition-explicit MPC.** Kemper et al. (2025) frame complexity by
+the partition a single trained model induces. PA-MPC lifts that
+framing to an **architecture-family / initial-observable pair**
+$(\mathcal{A}, \Pi^{(0)})$ — well-defined before training and
+comparable across MPNN families — and packages it with a **two-sided
+Bayes-error sandwich** (Theorem 1).
 
-**Oversmoothing.** Cai & Wang (2020) and Oono & Suzuki (2020)
-characterise depth-induced embedding collapse on bipartite graphs;
-our float-tier experiment E01 confirms this qualitatively.
-
-**Information bottlenecks and over-squashing.** Alon & Yahav (2021).
-We are agnostic about bottleneck architecture; the bridge inequality
-holds for any MPNN that computes via depth-$L$ rooted coloured
-neighbourhood aggregation.
-
-**Higher-order WL.** Morris et al. (2020). Explicitly *out of scope* —
-all propositions are stated for 1-WL-template architectures; §3.3
-gives the exclusion criterion precisely.
-
-**Partition-refinement antecedents.** The use of partitions as a primary
-information-theoretic object has three deep prior lineages we build on.
-*(i) Ergodic theory:* Kolmogorov (1958), Sinai (1959), and Rokhlin
-(1967) defined entropy as a supremum over refining partitions, and
-**refinement-monotonicity of $H(\Pi)$** is the structural axiom of that
-construction; our Proposition 3.2 is the finite, combinatorial
-cousin (no $\sigma$-additivity used — see §3.1 *Remark*). *(ii) Algorithmic partition refinement:* Hopcroft (1971) and
-Paige & Tarjan (1987) gave the algorithmic schema; 1-WL is the
-graph specialisation, used in McKay's *nauty* (1981) for isomorphism
-testing and sharpened into the $k$-WL hierarchy by Cai, Fürer &
-Immerman (1992) and Grohe (2017). *(iii) Algebraic graph theory:* the
-$L \to \infty$ limit of $\Pi_{\mathcal{A}}(G, L)$ for any admissible
-1-WL-template family is the **equitable partition** of $G$ (Schwenk
-1974; Godsil & Royle 2001, ch. 9) — the single most direct
-intellectual ancestor of Definition 3.1. The novelty here is not the
-partition object but its **architecture-family indexing** (Proposition
-3.3) and its **two-sided Bayes-error packaging** (Theorem 1).
-
-**Modern partition-indexed GNN theory (2022–2024).** A recent wave of
-GNN-expressivity work uses partitions in essentially the same role:
-Geerts & Reutter (2022) characterise MPNN expressivity by per-layer
-partition refinement; Morris, Lipman, Maron, Rieck, Kriege, Grohe, Fey
-& Borgwardt (2023) survey the field with equitable partitions as the
-WL fixpoint; Grohe (2021) connects partition refinement to
-counting-logic; Böker, Levie, Huang, Villar & Morris (2024) define a
-metric on partitions and quantify how close MPNNs come to separating
-points — the closest existing work in spirit to our Bayes-error
-packaging. None of this wave gives a **two-sided Bayes-error bracket** indexed by
-$\Pi_{\mathcal{A}}(G, L)$, an **exact-rational ledger** on small
-graphs, or a **mechanised** statement; those are the unique
-contributions of PA-MPC against this otherwise crowded field. Outside
-GNNs, Steinke & Zakynthinou (2020) and Asadi, Abbe & Verdú (2018)
-apply refinement-monotonicity arguments to partitions of hypothesis
-classes for generalisation bounds — the same Proposition-3.2 move
-applied in learning theory.
-
-Compared to MPC, PA-MPC is **partition-explicit** and
-**architecture-family-indexed**. Compared to existing GNN identifiability
-work, PA-MPC is **two-sided** (bridge inequality, Theorem 1) and
-**exact on small graphs** (E02 ledger).
+**Equitable partitions.** The $L \to \infty$ limit of
+$\Pi_{\mathcal{A}}(G, L)$ for any 1-WL-template family is the
+equitable partition of $G$ (Schwenk 1974; Godsil & Royle 2001, ch. 9).
+That object is Definition 3.1's most direct intellectual ancestor; the
+novelty here is the family indexing (Proposition 3.3) and the
+Bayes-error packaging (Theorem 1), not the partition itself.
 
 The $\mathrm{MI}^2 \approx \tfrac{1}{2}$ identity that was the centrepiece of an
 earlier programme has been **explicitly demoted** to a cautionary note
@@ -1371,6 +1329,60 @@ leaves, verifies the `byte_identical` predicate against the registered
 baseline, and confirms all six decision gates PASS. A tamper test
 (append "TAMPER" to `paper.manifest.txt`) correctly returns
 `SHA-MISMATCH`.
+
+---
+
+## Appendix G — Extended Related Work
+
+This appendix collects context that §2 only gestures at. None of it is
+load-bearing for the proofs (Theorem 1, Propositions 3.2–3.6) or for
+the empirical claims; it is included for completeness and to credit
+prior lineages we draw on.
+
+**Oversmoothing and over-squashing.** Cai & Wang (2020) and Oono &
+Suzuki (2020) characterise depth-induced embedding collapse on
+bipartite graphs; our float-tier experiment E01 reproduces this
+qualitatively. Alon & Yahav (2021) frame over-squashing as an
+information-bottleneck phenomenon. The bridge inequality is agnostic
+to bottleneck architecture: it holds for any MPNN computing via
+depth-$L$ rooted coloured neighbourhood aggregation.
+
+**Partition-refinement antecedents (three lineages).**
+*(i) Ergodic theory.* Kolmogorov (1958), Sinai (1959), and Rokhlin
+(1967) defined entropy as a supremum over refining partitions;
+refinement-monotonicity of $H(\Pi)$ is the structural axiom of that
+construction. Proposition 3.2 is the finite, combinatorial cousin (no
+$\sigma$-additivity used — see §3.1 *Remark*).
+*(ii) Algorithmic partition refinement.* Hopcroft (1971) and Paige &
+Tarjan (1987) gave the algorithmic schema. 1-WL is the graph
+specialisation, used in McKay's *nauty* (1981) for isomorphism testing
+and sharpened into the $k$-WL hierarchy by Cai, Fürer & Immerman
+(1992) and Grohe (2017).
+*(iii) Algebraic graph theory.* The equitable-partition ancestry is
+already foregrounded in §2; we add only that Schwenk's 1974
+characterisation and the textbook treatment in Godsil & Royle (2001,
+ch. 9) are the direct sources for the $L \to \infty$ fixpoint
+statement.
+
+**Modern partition-indexed GNN theory (2022–2024).** A recent wave of
+GNN-expressivity work uses partitions in essentially the same role:
+Geerts & Reutter (2022) characterise MPNN expressivity by per-layer
+partition refinement; Morris, Lipman, Maron, Rieck, Kriege, Grohe, Fey
+& Borgwardt (2023) survey the field with equitable partitions as the
+WL fixpoint; Grohe (2021) connects partition refinement to
+counting-logic; Böker, Levie, Huang, Villar & Morris (2024) define a
+metric on partitions and quantify how close MPNNs come to separating
+points — the closest existing work in spirit to our Bayes-error
+packaging. None of this wave delivers all three of (a) a **two-sided**
+Bayes-error bracket indexed by $\Pi_{\mathcal{A}}(G, L)$, (b) an
+**exact-rational** ledger on small graphs, and (c) a **mechanised**
+statement; that triple is the unique contribution of PA-MPC.
+
+**Learning-theoretic uses of refinement-monotonicity.** Outside GNNs,
+Steinke & Zakynthinou (2020) and Asadi, Abbe & Verdú (2018) apply
+refinement-monotonicity arguments to partitions of hypothesis classes
+for generalisation bounds — the same Proposition-3.2 move applied in
+learning theory.
 
 ---
 
