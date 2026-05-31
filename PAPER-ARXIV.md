@@ -8,32 +8,34 @@
 
 ## Abstract
 
-We define **Partition-Aware Message-Passing Complexity** (PA-MPC) as the
-partition-conditional entropy $H(f \mid \Pi_{\mathcal{A}}(G, L))$ of a
-binary task $f$ given the partition that a depth-$L$ message-passing
-family $\mathcal{A}$ induces on $V(G)$ via the identity-leaking LossyWL
-operator, generalising the partition-explicit framing of Kemper et al.
-(2025) from a single trained model to an architecture-family/initial-observable
-pair. Our main result is a **partition Bayes-entropy sandwich**
-$H_{\mathrm{bin}}^{-1}(H(f \mid \Pi)) \leq \varepsilon^{*}_{\Pi} \leq \tfrac{1}{2}H(f \mid \Pi)$,
-valid for any finite partition and binary task; the two halves arise as
-opposite extrema of a single Jaynes max-entropy program, unifying the
-classical bounds of Hellman–Raviv (1970) and Feder–Merhav (1994), and
-no inequality of the form $\varepsilon^{*}_{\Pi} \leq cH$ with $c < 1/2$
-holds uniformly (Proposition 3.5). The sandwich instantiates to PA-MPC
-via a constant-on-cells architecture factorisation, giving a training-free
-two-sided error bracket comparable across MPNN families (GCN, GIN, GAT,
-GatedGCN, GraphSAGE). We verify the theorem on a finite-graph Lean 4
-witness ($C_3,\ldots,C_8$ and the Petersen graph, zero `sorry`) and on a
-1000-row exact-rational ledger (E02, E03, E07, E09; tier L-I, sealed
-Merkle leaves), accompanied by a float-tier oversmoothing baseline (E01)
-and pilot apparatus checks (E04, E06, E08). The headline
-**continuous-transfer conjecture** (C1, §9) is mathematically open;
-under the literal §9 protocol its empirical status was frozen on
-2026-05-30 as *supported-by-evidence at $L \geq 3$ on the eight-graph
-non-vertex-transitive anchor* $\text{anchor}_8$, with the architectural
-dichotomy $\{\text{GCN},\text{GIN},\text{GatedGCN}\}/\{\text{GAT},\text{GraphSAGE}\}$
-(§9.E).
+For a binary task $f$ on the vertices of a graph $G$ and a partition
+$\Pi$ of $V(G)$, let $\varepsilon^{*}_{\Pi}$ denote the cell-wise
+Bayes error of $f$ under $\Pi$ and let $H(f \mid \Pi)$ denote the
+partition-conditional entropy. We prove the **partition Bayes-entropy
+sandwich**
+$H_{\mathrm{bin}}^{-1}\!\bigl(H(f \mid \Pi)\bigr) \le \varepsilon^{*}_{\Pi}
+\le \tfrac{1}{2} H(f \mid \Pi)$,
+valid for every finite partition and every binary task. The two halves
+arise as opposite extrema of a single Jaynes maximum-entropy programme,
+unifying the classical bounds of Fano (1961), Hellman & Raviv (1970),
+and Feder & Merhav (1994); no inequality of the form
+$\varepsilon^{*}_{\Pi} \le c\, H(f \mid \Pi)$ with $c < 1/2$ can hold
+uniformly (Proposition 3.5). Specialising $\Pi$ to the partition
+$\Pi_{\mathcal{A}}(G, L)$ that a depth-$L$ message-passing family
+$\mathcal{A}$ induces on $V(G)$ via the identity-leaking LossyWL
+operator yields **Partition-Aware Message-Passing Complexity**
+(PA-MPC) — a training-free, family-indexed refinement of the
+partition-explicit MPC of Kemper et al.\ (2025), and a two-sided
+error bracket comparable across GCN, GIN, GAT, GatedGCN, and
+GraphSAGE. The theorem is verified on a finite-graph Lean 4 witness
+($C_3,\ldots,C_8$ and Petersen, zero `sorry`) and on a 1000-row
+exact-rational ledger; a float-tier oversmoothing baseline and three
+pilot apparatus checks accompany it. The continuous-transfer
+conjecture C1 (§9) is mathematically open; its empirical status was
+frozen on 2026-05-30 as *supported-by-evidence at $L \ge 3$* on the
+eight-graph non-vertex-transitive anchor, with the architectural
+dichotomy
+$\{\text{GCN},\text{GIN},\text{GatedGCN}\}/\{\text{GAT},\text{GraphSAGE}\}$.
 
 ---
 
