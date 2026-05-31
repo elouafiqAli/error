@@ -1,0 +1,9 @@
+# core stack
+numpy>=1.24
+scipy>=1.10
+matplotlib>=3.7
+pandas>=2.0
+scikit-learn>=1.3
+
+# UCI Adult fetcher; small + reliable
+ucimlrepo>=0.0.7
