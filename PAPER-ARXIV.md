@@ -507,12 +507,15 @@ $\varepsilon^{*}_{\varnothing} = 1/2$ recovers exactly Theorem 1's lower
 bound (since $d_{\mathrm{KL}}(\varepsilon \| 1/2) = 1 - H_{\mathrm{bin}}(\varepsilon)$,
 so the inequality reads $1 - H_{\mathrm{bin}}(\varepsilon^{*}_\Pi) \leq 1 - H(f\mid\Pi)$,
 i.e.\ $H(f\mid\Pi) \leq H_{\mathrm{bin}}(\varepsilon^{*}_\Pi)$); for skewed
-marginals the bound is strictly tighter. Lean mechanisation and an E02
-demo row are listed as **optional** future work — should either be
-undertaken, a new claim ID would be minted at that point; until then
-Proposition 3.6 remains paper-only by design (see §10 *Known
-Limitations* and `notes/paper-arxiv-review/15-future-work-borrowed-techniques.md`,
-item I-5).
+marginals the bound is strictly tighter. Proposition 3.6 is **out of
+scope** for the Lean chain and the exact-rational ledger by design: it
+will not be mechanised in `PaMpc.BayesErrorBridge` and no E02 row will
+be added for it in this programme. Any prior-aware result that needs
+Lean coverage must be introduced as a *separate* claim ID (e.g.
+`PAMPC-PRIOR-*`) in a successor paper, not as a retrofit to the
+existing bridge module. See §10 *Known Limitations* item 7 and
+`notes/paper-arxiv-review/15-future-work-borrowed-techniques.md`,
+item I-5.
 
 ### 3.3 Scope
 
@@ -1024,9 +1027,14 @@ We have iterated this programme four times. The current narrowings are:
    paper-02; paper-01 is theory plus the synthetic anchor.
 7. **Propositions 3.5 and 3.6 are paper-only.** Both are hand proofs in
    Appendix A and **by design** carry no `PAMPC-*` claim ID, no trust
-   tier, and no decision gate. Lean mechanisation and an E02 demo row
-   for Proposition 3.6 are listed as *optional* future work; the L-I /
-   L-II / float infrastructure is unaffected by either of them.
+   tier, and no decision gate. Proposition 3.6 is **out of scope** for
+   the Lean chain and the exact-rational ledger: it will not be
+   mechanised in `PaMpc.BayesErrorBridge` and no E02 row will be added
+   for it in this programme. Any prior-aware result that needs Lean
+   coverage must be introduced as a *separate* claim ID (e.g.
+   `PAMPC-PRIOR-*`) in a successor paper, not as a retrofit to the
+   existing bridge module. The L-I / L-II / float infrastructure is
+   thereby a closed system with respect to either proposition.
 
 ---
 

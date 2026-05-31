@@ -518,9 +518,15 @@ data-processing on the binary error indicator \citep{hanverdu1994}.
 \cref{prop:prior} is a \textbf{paper-only hand proof}.
 It carries no \verb|PAMPC-*| claim ID, is not part of the L-I
 exact-rational ledger, not part of the L-II Lean witness, and not
-behind any G0..G4 decision gate. The L-I / L-II / float trust-tier
-infrastructure neither audits nor depends on it, and a future flaw
-in this proposition would not invalidate any claim-pinned result.
+behind any G0..G4 decision gate.
+
+\cref{prop:prior} is moreover \emph{out of scope} for the Lean chain
+and the exact-rational ledger by design: it will not be mechanised in
+\verb|PaMpc.BayesErrorBridge| and no E02 row will be added for it in
+this programme. Any prior-aware result that needs Lean coverage must
+be introduced as a separate claim ID (e.g.\ \verb|PAMPC-PRIOR-*|) in a
+successor paper, not as a retrofit to the existing bridge module.
+
 Substituting the trivial bound $\epsE = 1/2$ in
 \cref{prop:prior} recovers exactly
 \cref{thm:sandwich}'s lower bound; for skewed marginals the
@@ -653,14 +659,17 @@ open problem for paper-02.
 \item \textbf{No real-world graph results.} ZINC/OGB/TUDataset are
   in scope for paper-02; this paper is theory plus the synthetic
   anchor.
-\item \textbf{Propositions~\ref{prop:sharp} and~\ref{prop:prior}
-  are paper-only.} Both are hand proofs in
-  Appendix~\ref{app:proof} and \textbf{by design} carry no
+\item \textbf{\cref{prop:sharp,prop:prior} are paper-only.} Both are
+  hand proofs in \cref{app:proof} and \textbf{by design} carry no
   \verb|PAMPC-*| claim ID, no trust tier, and no decision gate.
-  Lean mechanisation and an E02 demo row for
-  Proposition~\ref{prop:prior} are listed as \emph{optional}
-  future work; the L-I / L-II / float infrastructure is unaffected
-  by either.
+  \cref{prop:prior} is moreover \emph{out of scope} for the Lean
+  chain and the exact-rational ledger: it will not be mechanised in
+  \verb|PaMpc.BayesErrorBridge| and no E02 row will be added for it
+  in this programme. Any prior-aware result that needs Lean coverage
+  must be introduced as a separate claim ID (e.g.\
+  \verb|PAMPC-PRIOR-*|) in a successor paper, not as a retrofit to
+  the existing bridge module. The L-I / L-II / float infrastructure
+  is thereby a closed system with respect to either proposition.
 \end{enumerate}
 
 % ============================================================
