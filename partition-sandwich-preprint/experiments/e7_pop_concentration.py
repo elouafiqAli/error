@@ -2,8 +2,19 @@
 e7_pop_concentration.py — Proposition 7 empirical companion on UCI Adult.
 
 Treats the full dataset as the "population" and verifies that the
-empirical bracket on subsamples concentrates around the full-data
-bracket at the Hoeffding rate.
+empirical Bayes error on a fixed partition concentrates around the
+full-data value at the Hoeffding rate.
+
+Key choices (post-audit revision):
+  * Subsamples drawn with REPLACEMENT (bootstrap), so n may approach
+    n_full without the without-replacement degeneracy.
+  * Deviation measured as |Δε*| only (the quantity Prop 7 bounds);
+    we drop |ΔH| from the LHS.
+  * Hoeffding bound for ε* on a FIXED partition of m cells:
+        |ε*_n − ε*| ≤ √( log(4m/α) / (2n) )
+    via per-cell Hoeffding + union over m cells (no κ ≈ 9.9 surrogate).
+  * Grid capped at 20 000 (≄44 % of n_full=45 222) so that bootstrap
+    diversity remains non-trivial.
 """
 
 from __future__ import annotations
@@ -24,21 +35,16 @@ RESULTS = HERE / "results"; RESULTS.mkdir(exist_ok=True)
 FIGURES = HERE / "figures"; FIGURES.mkdir(exist_ok=True)
 
 K_LEAVES = 16
-N_GRID = [500, 1000, 5000, 10000, 20000, 45000]
-K_TRIALS = 200
+N_GRID = [200, 500, 1000, 2000, 5000, 10000, 20000]
+K_TRIALS = 400
 DELTA_CONF = 0.05
 SEED = 0
 
 
-def kappa(delta_mass: float, eta: float) -> float:
-    """Lipschitz constant from Proposition 7 (rough version).
-    Bracket varies with cell statistics; bound both terms by their
-    Lipschitz constants on the safe region."""
-    # |Hbin'(p)| ≤ log2((1-eta)/eta); ε* is 1-Lipschitz in cell mass.
-    eta = max(eta, 1e-3)
-    dHmax = math.log2((1.0 - eta) / eta)
-    # combined constant for |Δε*| + |ΔH|: 1 + dHmax (rough union)
-    return 1.0 + dHmax
+def hoeffding_bound_eps(n: int, m: int, alpha: float) -> float:
+    """|ε*_n − ε*| ≤ √( log(4m/α) / (2n) )  — fixed-partition Hoeffding
+    with union bound over the m cells."""
+    return math.sqrt(math.log(4.0 * m / alpha) / (2.0 * n))
 
 
 def main() -> None:
@@ -62,9 +68,9 @@ def main() -> None:
         y[cell_full == u].mean() for u in uniq
     ])
     eta = float(np.minimum(P_cell, 1.0 - P_cell).min())
-    print(f"  δ_mass={delta_mass:.4f}  η_mean={eta:.4f}")
+    print(f"  δ_mass={delta_mass:.4f}  η_min={eta:.4f}")
 
-    kap = kappa(delta_mass, eta)
+    m = len(uniq)
     rng = np.random.default_rng(SEED)
 
     rows = []
@@ -73,14 +79,11 @@ def main() -> None:
             continue
         deltas = np.empty(K_TRIALS)
         for k in range(K_TRIALS):
-            idx = rng.choice(n_full, size=n, replace=False)
+            # bootstrap: WITH replacement
+            idx = rng.integers(0, n_full, size=n)
             br_sub = bracket_from_cells(cell_full[idx], y[idx])
-            deltas[k] = (abs(br_full.eps_star - br_sub.eps_star)
-                         + abs(br_full.H - br_sub.H))
-        # Hoeffding-style bound
-        bound = kap * math.sqrt(
-            math.log(4.0 * K_LEAVES / DELTA_CONF) / n
-        )
+            deltas[k] = abs(br_full.eps_star - br_sub.eps_star)
+        bound = hoeffding_bound_eps(n, m, DELTA_CONF)
         coverage = float((deltas <= bound).mean())
         rows.append({
             "n": int(n),
@@ -90,9 +93,9 @@ def main() -> None:
             "bound": float(bound),
             "coverage": coverage,
         })
-        print(f"    n={n:6d}  Δmean={rows[-1]['delta_mean']:.4f}  "
-              f"Δp95={rows[-1]['delta_p95']:.4f}  "
-              f"bound={bound:.4f}  cov={coverage:.3f}")
+        print(f"    n={n:6d}  Δmean={rows[-1]['delta_mean']:.5f}  "
+              f"Δp95={rows[-1]['delta_p95']:.5f}  "
+              f"bound={bound:.5f}  cov={coverage:.3f}")
 
     gates = {
         "all_coverage_ge_1_minus_alpha": all(
@@ -107,9 +110,12 @@ def main() -> None:
         ),
     }
     summary = {
-        "experiment": "E7 real-data Proposition 7 concentration",
-        "dataset": "adult", "m": K_LEAVES, "delta_conf": DELTA_CONF,
-        "delta_mass": delta_mass, "eta_min": eta, "kappa": kap,
+        "experiment": "E7 real-data Proposition 7 concentration (bootstrap)",
+        "dataset": "adult", "m": int(m), "delta_conf": DELTA_CONF,
+        "delta_mass": delta_mass, "eta_min": eta,
+        "sampling": "bootstrap (with replacement)",
+        "deviation": "|Δε*|",
+        "bound": "sqrt(log(4m/alpha) / (2n))",
         "full": br_full.as_dict(),
         "rows": rows, "gates": gates,
     }
