@@ -125,7 +125,7 @@ def main() -> None:
     fig, ax = plt.subplots(figsize=(6.4, 4.2))
     ax.loglog(ns, p95,    "o-",  color="C0", label=r"$\Delta_n^{(p95)}$ (empirical)")
     ax.loglog(ns, means,  "s--", color="C2", label=r"$\overline{\Delta_n}$ (mean)")
-    ax.loglog(ns, bounds, "k:",  label=r"Hoeffding bound $\sim 1/\sqrt n$")
+    ax.loglog(ns, bounds, "k:",  label=r"Hoeffding bound $\sim 1/\sqrt{n}$")
     ax.set_xlabel("subsample size $n$")
     ax.set_ylabel(r"bracket deviation $|\Delta\varepsilon^*| + |\Delta H|$")
     ax.set_title("E7: empirical Proposition-7 concentration on UCI Adult")
