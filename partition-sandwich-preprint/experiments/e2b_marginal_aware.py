@@ -21,7 +21,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
-from sklearn.datasets import fetch_openml
+from sklearn.datasets import load_breast_cancer, load_digits, load_wine
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 
@@ -46,38 +46,29 @@ def marginal_aware_slack(pi_star: float) -> float:
 
 
 # ----------------------------------------------------------- loaders
-def _openml_xy(name: str, version: int | None = None) -> tuple[np.ndarray, np.ndarray]:
-    import pandas as pd
-    cache = DATA_DIR / f"{name}.pkl"
-    if cache.exists():
-        import pickle
-        with cache.open("rb") as f:
-            return pickle.load(f)
-    ds = fetch_openml(name, version=version, as_frame=True)
-    X = ds.data.copy()
-    # Numeric only; one-hot any objects
-    X = pd.get_dummies(X, drop_first=True).astype(float).to_numpy()
-    X = StandardScaler().fit_transform(X).astype(np.float32)
-    y_raw = ds.target
-    # binarise: positive class = most common non-zero string, fallback to first unique
-    y = np.asarray(y_raw).astype(str)
-    classes = sorted(set(y))
-    # For 2-class openml sets, take the lexicographically larger as positive
-    pos = classes[-1]
-    y = (y == pos).astype(np.int8)
-    out = (X, y)
-    import pickle
-    with cache.open("wb") as f:
-        pickle.dump(out, f)
-    return out
+# Local sklearn datasets only — no network dependency.
+def load_breast_cancer_bin() -> tuple[np.ndarray, np.ndarray]:
+    """π ≈ 0.373 (212 malignant / 569)."""
+    ds = load_breast_cancer()
+    X = StandardScaler().fit_transform(ds.data).astype(np.float32)
+    y = (ds.target == 0).astype(np.int8)   # malignant = positive (minority)
+    return X, y
 
 
-def load_spambase() -> tuple[np.ndarray, np.ndarray]:
-    return _openml_xy("spambase", version=1)
+def load_digits_bin() -> tuple[np.ndarray, np.ndarray]:
+    """Digit ≥ 5 vs < 5; π ≈ 0.501."""
+    ds = load_digits()
+    X = StandardScaler().fit_transform(ds.data).astype(np.float32)
+    y = (ds.target >= 5).astype(np.int8)
+    return X, y
 
 
-def load_phishing() -> tuple[np.ndarray, np.ndarray]:
-    return _openml_xy("PhishingWebsites", version=1)
+def load_wine_bin() -> tuple[np.ndarray, np.ndarray]:
+    """Class 0 vs rest of 3-class wine; π ≈ 0.331 (59/178)."""
+    ds = load_wine()
+    X = StandardScaler().fit_transform(ds.data).astype(np.float32)
+    y = (ds.target == 0).astype(np.int8)
+    return X, y
 
 
 # ----------------------------------------------------------- driver
@@ -112,9 +103,10 @@ def evaluate(X: np.ndarray, y: np.ndarray) -> dict:
 
 def main() -> None:
     loaders = [
-        ("adult",    lambda: (load_adult()[0], load_adult()[1])),
-        ("spambase", load_spambase),
-        ("phishing", load_phishing),
+        ("adult",         lambda: (load_adult()[0], load_adult()[1])),
+        ("breast_cancer", load_breast_cancer_bin),
+        ("wine",          load_wine_bin),
+        ("digits_bin",    load_digits_bin),
     ]
     rows = []
     for name, ld in loaders:
