@@ -30,6 +30,22 @@
 \usepackage[noabbrev,capitalize]{cleveref}
 \usepackage{xspace}
 
+% ---------- airier spacing & smaller section headings ----------
+\linespread{1.04}
+\setlength{\parskip}{0.45em plus 0.15em minus 0.05em}
+\setlength{\parindent}{0pt}
+\makeatletter
+% Override TMLR's oversized sectional fonts (default \large for \section).
+\def\section{\@startsection{section}{1}{\z@}%
+  {-2.2ex plus -0.6ex minus -.2ex}{1.4ex plus 0.3ex minus 0.2ex}%
+  {\normalsize\bf\raggedright\sffamily}}
+\def\subsection{\@startsection{subsection}{2}{\z@}%
+  {-1.8ex plus -0.5ex minus -.2ex}{0.9ex plus .2ex}%
+  {\normalsize\bf\raggedright\sffamily}}
+\def\paragraph{\@startsection{paragraph}{4}{\z@}%
+  {1.2ex plus 0.4ex minus .1ex}{-0.7em}{\normalsize\bf}}
+\makeatother
+
 % ----- theorem environments -----
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}[theorem]{Proposition}
@@ -110,11 +126,12 @@ non-vertex-transitive anchor.
 The expressivity of message-passing neural networks (MPNNs) has a
 well-developed structural ceiling: the 1-Weisfeiler--Leman (WL)
 discrimination power bounds what depth-$L$ MPNNs can resolve about
-graphs~\citep{xu2019gin,morris2019wl}. The partition-explicit
-message-passing complexity (MPC) framing of~\citet{kemper2025mpc}
-refines this picture by quantifying, for the partition a model
-induces, how much task information remains. Two practical problems
-remain:
+graphs~\citep{xu2019gin,morris2019wl}.
+The partition-explicit message-passing complexity (MPC) framing
+of~\citet{kemper2025mpc} refines this picture by quantifying, for the
+partition a model induces, how much task information remains.
+
+Two practical problems remain.
 \begin{enumerate}
   \item \textbf{Architecture occlusion.} MPC depends on a particular
     model; its value cannot be compared meaningfully across families
@@ -227,10 +244,11 @@ packaging (\cref{thm:sandwich}), not the partition itself.
 \begin{remark}[finite, measure-free setting]\label{rem:measurefree}
 Throughout, $V$ is finite and we write $\Pr[\cdot] := |\{v : \cdot\}|/|V|$.
 We use no $\sigma$-algebras, no countable additivity, no dominated
-convergence, no Radon--Nikodým arguments. Vertex weighting is
-uniform, $q_v := 1/|V|$; non-uniform weighting amounts to
-replacing the counting normaliser by a positive weight summing to
-$1$, with no other change in any proof.
+convergence, no Radon--Nikodým arguments.
+
+Vertex weighting is uniform, $q_v := 1/|V|$; non-uniform weighting
+amounts to replacing the counting normaliser by a positive weight
+summing to $1$, with no other change in any proof.
 \end{remark}
 
 \begin{definition}[admissible partition family $\PiA$]\label{def:partition}
@@ -303,18 +321,22 @@ constant on $C$ (it equals its mean). The same argument applies
 to $\E[\Var(f \mid \Pi)]$ via $P_C(1 - P_C) \ge 0$.
 \end{proof}
 
-\paragraph{Naming.} The condition ``$f$ is constant on every cell of
-$\Pi$'' has several established names across nearby literatures, all
-equivalent on a finite vertex set: \textbf{$\Pi$ resolves $f$}
-(partition-lattice combinatorics; $\ker f$ is coarsened by $\Pi$);
+\paragraph{Naming.}
+The condition ``$f$ is constant on every cell of $\Pi$'' has several
+established names across nearby literatures, all equivalent on a
+finite vertex set:
+\textbf{$\Pi$ resolves $f$} (partition-lattice combinatorics; $\ker f$
+is coarsened by $\Pi$);
 \textbf{$f$-equitable partition} (algebraic graph theory:
-\citealp{schwenk1974,godsil2001ag}); \textbf{pure partition}
-(decision-tree induction: \citealp{breiman1984cart});
-\textbf{zero-equivocation partition} \citep{shannon1948}. We use
-\emph{pure} as the display term --- the decision-tree mnemonic is
-the closest match for a binary task --- but readers from any of
-these lineages may substitute their own term verbatim; nothing in
-the proofs depends on the choice.
+\citealp{schwenk1974,godsil2001ag});
+\textbf{pure partition} (decision-tree induction:
+\citealp{breiman1984cart});
+\textbf{zero-equivocation partition} \citep{shannon1948}.
+
+We use \emph{pure} as the display term --- the decision-tree mnemonic
+is the closest match for a binary task --- but readers from any of
+these lineages may substitute their own term verbatim; nothing in the
+proofs depends on the choice.
 
 \subsection{The Partition Bayes-Entropy Sandwich}\label{sec:sandwich}
 
@@ -437,12 +459,15 @@ of \cref{thm:sandwich}; (ii) is the upper bound; (iii) is
 $f \in \Fwl(G)$ is constant on the WL-stable partition.
 \end{proof}
 
-\paragraph{Operational reading.} PA-MPC sandwiches the irreducible
-partition Bayes error of depth-$L$ message passing on both sides ---
-no additive bit-slack, no $\log$-axis ambiguity. $\PAMPC = 0$ iff
-the partition is pure; positive $\PAMPC$ forces positive $\epsP$
-via the lower bound; small $\PAMPC$ forces small $\epsP$ via the
-upper bound; deeper architectures never increase the bound.
+\paragraph{Operational reading.}
+PA-MPC sandwiches the irreducible partition Bayes error of depth-$L$
+message passing on both sides --- no additive bit-slack, no
+$\log$-axis ambiguity.
+
+$\PAMPC = 0$ iff the partition is pure; positive $\PAMPC$ forces
+positive $\epsP$ via the lower bound; small $\PAMPC$ forces small
+$\epsP$ via the upper bound; deeper architectures never increase the
+bound.
 
 \begin{proposition}[no closed-form improvement of the sandwich]\label{prop:sharp}
 Both bounds in \cref{thm:sandwich} are uniformly unimprovable in the
@@ -504,20 +529,21 @@ bound is strictly tighter.
 \subsection{Scope}\label{sec:scope}
 
 The partition theorem (\cref{thm:sandwich}) and refinement
-proposition (\cref{prop:refine}) are stated for
-\emph{any} finite partition and \emph{any} binary task on a finite
-vertex set; nothing about graphs, WL, or admissible architectures
-enters those statements. The architecture factorisation
-(\cref{prop:archfact}) and PA-MPC sandwich
-(\cref{cor:pampc}) require the admissibility conditions
-of \cref{def:admissible}. The non-vacuity clause
-\cref{cor:pampc}(iv) is the one place where
-$f \in \Fwl(G)$ is used. Higher-order WL templates
-\citep{morris2020kwl}, which violate admissibility~(4) by
-referencing $k$-tuples, are out of scope. Multi-class extensions
-$(|\mathcal{Y}| > 2)$ are routine via the concave-envelope
-construction of~\citet{feder1994} and are deferred to follow-up
-work.
+proposition (\cref{prop:refine}) are stated for \emph{any} finite
+partition and \emph{any} binary task on a finite vertex set; nothing
+about graphs, WL, or admissible architectures enters those
+statements.
+
+The architecture factorisation (\cref{prop:archfact}) and the PA-MPC
+sandwich (\cref{cor:pampc}) require the admissibility conditions of
+\cref{def:admissible}. The non-vacuity clause \cref{cor:pampc}(iv) is
+the one place where $f \in \Fwl(G)$ is used.
+
+Higher-order WL templates \citep{morris2020kwl}, which violate
+admissibility~(4) by referencing $k$-tuples, are out of scope.
+Multi-class extensions $(|\mathcal{Y}| > 2)$ are routine via the
+concave-envelope construction of~\citet{feder1994} and are deferred
+to follow-up work.
 
 \subsection{Three named conjectures (registry)}\label{sec:conj}
 
