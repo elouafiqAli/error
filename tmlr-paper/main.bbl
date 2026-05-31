@@ -1,0 +1,207 @@
+\begin{thebibliography}{33}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Alon \& Yahav(2021)Alon and Yahav]{alon2021bottleneck}
+Uri Alon and Eran Yahav.
+\newblock On the bottleneck of graph neural networks and its practical
+  implications.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2021.
+
+\bibitem[Asadi et~al.(2018)Asadi, Abbe, and Verd{\'u}]{asadi2018chaining}
+Amir~R. Asadi, Emmanuel Abbe, and Sergio Verd{\'u}.
+\newblock Chaining mutual information and tightening generalization bounds.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2018.
+
+\bibitem[Azizian \& Lelarge(2021)Azizian and Lelarge]{azizian2021expressive}
+Wa{\"i}ss Azizian and Marc Lelarge.
+\newblock Expressive power of invariant and equivariant graph neural networks.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2021.
+
+\bibitem[B{\"o}ker et~al.(2023)B{\"o}ker, Levie, Huang, Villar, and
+  Morris]{boker2024finegrained}
+Jan B{\"o}ker, Ron Levie, Ningyuan Huang, Soledad Villar, and Christopher
+  Morris.
+\newblock Fine-grained expressivity of graph neural networks.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2023.
+
+\bibitem[Breiman et~al.(1984)Breiman, Friedman, Olshen, and
+  Stone]{breiman1984cart}
+Leo Breiman, Jerome~H. Friedman, Richard~A. Olshen, and Charles~J. Stone.
+\newblock \emph{Classification and Regression Trees}.
+\newblock Wadsworth, 1984.
+
+\bibitem[Cai \& Wang(2020)Cai and Wang]{cai2020oversmooth}
+Chen Cai and Yusu Wang.
+\newblock A note on over-smoothing for graph neural networks.
+\newblock \emph{arXiv preprint arXiv:2006.13318}, 2020.
+
+\bibitem[Cai et~al.(1992)Cai, F{\"u}rer, and Immerman]{caifurer1992}
+Jin-Yi Cai, Martin F{\"u}rer, and Neil Immerman.
+\newblock An optimal lower bound on the number of variables for graph
+  identification.
+\newblock \emph{Combinatorica}, 12\penalty0 (4):\penalty0 389--410, 1992.
+
+\bibitem[Cover \& Thomas(2006)Cover and Thomas]{cover2006eit}
+Thomas~M. Cover and Joy~A. Thomas.
+\newblock \emph{Elements of Information Theory}.
+\newblock Wiley, 2 edition, 2006.
+
+\bibitem[Devroye et~al.(1996)Devroye, Gy{\"o}rfi, and Lugosi]{devroye1996ptpr}
+Luc Devroye, L{\'a}szl{\'o} Gy{\"o}rfi, and G{\'a}bor Lugosi.
+\newblock \emph{A Probabilistic Theory of Pattern Recognition}.
+\newblock Springer, 1996.
+
+\bibitem[Fano(1961)]{fano1961}
+Robert~M. Fano.
+\newblock \emph{Transmission of Information}.
+\newblock MIT Press, 1961.
+
+\bibitem[Feder \& Merhav(1994)Feder and Merhav]{feder1994}
+Meir Feder and Neri Merhav.
+\newblock Relations between entropy and error probability.
+\newblock \emph{IEEE Transactions on Information Theory}, 40\penalty0
+  (1):\penalty0 259--266, 1994.
+
+\bibitem[Geerts \& Reutter(2022)Geerts and Reutter]{geerts2022}
+Floris Geerts and Juan~L. Reutter.
+\newblock Expressiveness and approximation properties of graph neural networks.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2022.
+
+\bibitem[Godsil \& Royle(2001)Godsil and Royle]{godsil2001ag}
+Chris Godsil and Gordon Royle.
+\newblock \emph{Algebraic Graph Theory}.
+\newblock Springer, 2001.
+\newblock Ch.~9: Equitable Partitions.
+
+\bibitem[Grohe(2017)]{grohe2017}
+Martin Grohe.
+\newblock \emph{Descriptive Complexity, Canonisation, and Definable Graph
+  Structure Theory}.
+\newblock Cambridge University Press, 2017.
+
+\bibitem[Grohe(2021)]{grohe2021logic}
+Martin Grohe.
+\newblock The logic of graph neural networks.
+\newblock \emph{Proceedings of the 36th Annual ACM/IEEE Symposium on Logic in
+  Computer Science (LICS)}, 2021.
+
+\bibitem[Han \& Verd{\'u}(1994)Han and Verd{\'u}]{hanverdu1994}
+Te~Sun Han and Sergio Verd{\'u}.
+\newblock Generalizing the {Fano} inequality.
+\newblock \emph{IEEE Transactions on Information Theory}, 40\penalty0
+  (4):\penalty0 1247--1251, 1994.
+
+\bibitem[Hellman \& Raviv(1970)Hellman and Raviv]{hellmanraviv1970}
+Martin~E. Hellman and Josef Raviv.
+\newblock Probability of error, equivocation, and the {Chernoff} bound.
+\newblock \emph{IEEE Transactions on Information Theory}, 16\penalty0
+  (4):\penalty0 368--372, 1970.
+
+\bibitem[Hopcroft(1971)]{hopcroft1971}
+John Hopcroft.
+\newblock An $n \log n$ algorithm for minimizing states in a finite automaton.
+\newblock \emph{Theory of Machines and Computations}, pp.\  189--196, 1971.
+
+\bibitem[Kemper et~al.(2025)]{kemper2025mpc}
+Tobias Kemper et~al.
+\newblock Partition-explicit message-passing complexity, 2025.
+\newblock Manuscript.
+
+\bibitem[Kolmogorov(1958)]{kolmogorov1958}
+Andrey~N. Kolmogorov.
+\newblock A new metric invariant of transitive dynamical systems and
+  automorphisms in {Lebesgue} spaces.
+\newblock \emph{Doklady Akademii Nauk SSSR}, 119:\penalty0 861--864, 1958.
+
+\bibitem[Massey(1994)]{massey1994}
+James~L. Massey.
+\newblock Guessing and entropy.
+\newblock In \emph{IEEE International Symposium on Information Theory (ISIT)},
+  pp.\  204, 1994.
+
+\bibitem[McKay(1981)]{mckay1981}
+Brendan~D. McKay.
+\newblock Practical graph isomorphism.
+\newblock Technical report, Department of Computer Science, Vanderbilt
+  University, 1981.
+
+\bibitem[Morris et~al.(2019)Morris, Ritzert, Fey, Hamilton, Lenssen, Rattan,
+  and Grohe]{morris2019wl}
+Christopher Morris, Martin Ritzert, Matthias Fey, William~L. Hamilton, Jan~Eric
+  Lenssen, Gaurav Rattan, and Martin Grohe.
+\newblock {Weisfeiler and Leman} go neural: Higher-order graph neural networks.
+\newblock In \emph{AAAI Conference on Artificial Intelligence}, 2019.
+
+\bibitem[Morris et~al.(2020)Morris, Rattan, and Mutzel]{morris2020kwl}
+Christopher Morris, Gaurav Rattan, and Petra Mutzel.
+\newblock {Weisfeiler and Leman} go sparse: Towards scalable higher-order graph
+  embeddings.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2020.
+
+\bibitem[Morris et~al.(2023)Morris, Lipman, Maron, Rieck, Kriege, Grohe, Fey,
+  and Borgwardt]{morris2023survey}
+Christopher Morris, Yaron Lipman, Haggai Maron, Bastian Rieck, Nils~M. Kriege,
+  Martin Grohe, Matthias Fey, and Karsten Borgwardt.
+\newblock Weisfeiler and {Leman} go machine learning: The story so far.
+\newblock \emph{Journal of Machine Learning Research}, 24:\penalty0 1--59,
+  2023.
+
+\bibitem[Oono \& Suzuki(2020)Oono and Suzuki]{oono2020graph}
+Kenta Oono and Taiji Suzuki.
+\newblock Graph neural networks exponentially lose expressive power for node
+  classification.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2020.
+
+\bibitem[Paige \& Tarjan(1987)Paige and Tarjan]{paige1987}
+Robert Paige and Robert~E. Tarjan.
+\newblock Three partition refinement algorithms.
+\newblock \emph{SIAM Journal on Computing}, 16\penalty0 (6):\penalty0 973--989,
+  1987.
+
+\bibitem[Rokhlin(1967)]{rokhlin1967}
+Vladimir~A. Rokhlin.
+\newblock Lectures on the entropy theory of measure-preserving transformations.
+\newblock \emph{Russian Mathematical Surveys}, 22\penalty0 (5):\penalty0 1--52,
+  1967.
+
+\bibitem[Schwenk(1974)]{schwenk1974}
+Allen~J. Schwenk.
+\newblock Computing the characteristic polynomial of a graph.
+\newblock In \emph{Graphs and Combinatorics}, volume 406 of \emph{Lecture Notes
+  in Mathematics}, pp.\  153--172. Springer, 1974.
+
+\bibitem[Shannon(1948)]{shannon1948}
+Claude~E. Shannon.
+\newblock A mathematical theory of communication.
+\newblock \emph{Bell System Technical Journal}, 27\penalty0 (3):\penalty0
+  379--423, 1948.
+
+\bibitem[Sinai(1959)]{sinai1959}
+Yakov~G. Sinai.
+\newblock On the concept of entropy for a dynamical system.
+\newblock \emph{Doklady Akademii Nauk SSSR}, 124:\penalty0 768--771, 1959.
+
+\bibitem[Steinke \& Zakynthinou(2020)Steinke and
+  Zakynthinou]{steinke2020chaining}
+Thomas Steinke and Lydia Zakynthinou.
+\newblock Reasoning about generalization via conditional mutual information.
+\newblock In \emph{Conference on Learning Theory (COLT)}, 2020.
+
+\bibitem[Xu et~al.(2019)Xu, Hu, Leskovec, and Jegelka]{xu2019gin}
+Keyulu Xu, Weihua Hu, Jure Leskovec, and Stefanie Jegelka.
+\newblock How powerful are graph neural networks?
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2019.
+
+\end{thebibliography}
