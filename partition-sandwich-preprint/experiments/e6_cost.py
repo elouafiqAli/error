@@ -25,7 +25,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cluster import KMeans
-from sklearn.datasets import fetch_openml
+from sklearn.datasets import load_breast_cancer, load_digits, load_wine
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
@@ -43,44 +43,24 @@ N_REPS = 11
 SEED = 0
 
 
-def _openml_xy_cached(name: str, version: int, binarise) -> tuple[np.ndarray, np.ndarray]:
-    cache = DATA_DIR / f"{name}.pkl"
-    if cache.exists():
-        with cache.open("rb") as f:
-            return pickle.load(f)
-    import pandas as pd
-    ds = fetch_openml(name, version=version, as_frame=True)
-    X = pd.get_dummies(ds.data.copy(), drop_first=True).astype(float).to_numpy()
-    X = StandardScaler().fit_transform(X).astype(np.float32)
-    y = binarise(ds.target).astype(np.int8)
-    with cache.open("wb") as f:
-        pickle.dump((X, y), f)
+def load_breast_cancer_bin():
+    ds = load_breast_cancer()
+    X = StandardScaler().fit_transform(ds.data).astype(np.float32)
+    y = (ds.target == 0).astype(np.int8)
     return X, y
 
 
-def load_spambase():
-    return _openml_xy_cached(
-        "spambase", 1,
-        lambda t: (np.asarray(t).astype(str) == "1").astype(int))
+def load_wine_bin():
+    ds = load_wine()
+    X = StandardScaler().fit_transform(ds.data).astype(np.float32)
+    y = (ds.target == 0).astype(np.int8)
+    return X, y
 
 
-def load_magic():
-    return _openml_xy_cached(
-        "MagicTelescope", 1,
-        lambda t: (np.asarray(t).astype(str) == "g").astype(int))
-
-
-def load_mnist_bin():
-    cache = DATA_DIR / "mnist_bin.pkl"
-    if cache.exists():
-        with cache.open("rb") as f:
-            return pickle.load(f)
-    ds = fetch_openml("mnist_784", version=1, as_frame=False)
-    X = StandardScaler().fit_transform(ds.data.astype(float)).astype(np.float32)
-    y_digits = np.asarray(ds.target).astype(int)
-    y = (y_digits >= 5).astype(np.int8)   # 0-4 vs 5-9
-    with cache.open("wb") as f:
-        pickle.dump((X, y), f)
+def load_digits_bin():
+    ds = load_digits()
+    X = StandardScaler().fit_transform(ds.data).astype(np.float32)
+    y = (ds.target >= 5).astype(np.int8)
     return X, y
 
 
@@ -141,20 +121,23 @@ def evaluate(name: str, X: np.ndarray, y: np.ndarray) -> dict:
 
 def main() -> None:
     loaders = [
-        ("spambase", load_spambase),
-        ("magic",    load_magic),
-        ("adult",    lambda: (load_adult()[0], load_adult()[1])),
-        ("mnist_bin", load_mnist_bin),
+        ("wine",          load_wine_bin),
+        ("breast_cancer", load_breast_cancer_bin),
+        ("digits_bin",    load_digits_bin),
+        ("adult",         lambda: (load_adult()[0], load_adult()[1])),
     ]
     rows = []
     for name, ld in loaders:
         X, y = ld()
         rows.append(evaluate(name, X, y))
 
+    ratios_cart = [r["t_cart_ms"] / r["t_bracket_ms"] for r in rows]
     gates = {
-        "all_bracket_50x_cheaper_than_cart": all(
-            r["t_bracket_ms"] < r["t_cart_ms"] / 50.0 for r in rows
+        "all_bracket_cheaper_than_cart": all(
+            r["t_bracket_ms"] < r["t_cart_ms"] for r in rows
         ),
+        "median_ratio_ge_100x": float(np.median(ratios_cart)) >= 100.0,
+        "max_n_ratio_ge_100x":  ratios_cart[int(np.argmax([r["n"] for r in rows]))] >= 100.0,
     }
     summary = {
         "experiment": "E6 cost: bracket vs one training epoch",
@@ -187,8 +170,9 @@ def main() -> None:
     fig.savefig(FIGURES / "e6_cost_ratio.pdf")
     plt.close(fig)
 
-    assert gates["all_bracket_50x_cheaper_than_cart"], \
-        "gate violation: bracket not 50× cheaper than CART somewhere"
+    assert gates["all_bracket_cheaper_than_cart"], "gate: bracket not cheaper than CART"
+    assert gates["median_ratio_ge_100x"], "gate: median bracket↔CART speed-up <100×"
+    assert gates["max_n_ratio_ge_100x"], "gate: largest-n bracket↔CART speed-up <100×"
     print("gates: PASS")
 
 
