@@ -30,23 +30,39 @@ theorem Hbin_one : Hbin 1 = 0 := by
   simp [Hbin]
 
 /-- Non-negativity of `H_bin` on `[0,1]`. -/
-theorem Hbin_nonneg {p : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) : 0 ≤ Hbin p := by
-  sorry  -- L3.1
+theorem Hbin_nonneg {p : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) : 0 ≤ Hbin p :=
+  div_nonneg (Real.binEntropy_nonneg h0 h1) (Real.log_nonneg one_le_two)
 
-/-- Upper bound: `H_bin ≤ 1` on `[0,1]`. -/
-theorem Hbin_le_one {p : ℝ} (h0 : 0 ≤ p) (h1 : p ≤ 1) : Hbin p ≤ 1 := by
-  sorry  -- L3.2
+/-- Upper bound: `H_bin ≤ 1` (in fact for all `p`, but only used on `[0,1]`). -/
+theorem Hbin_le_one (p : ℝ) : Hbin p ≤ 1 := by
+  unfold Hbin
+  rw [div_le_one (Real.log_pos one_lt_two)]
+  exact Real.binEntropy_le_log_two
 
 /-- Symmetry: `H_bin(1-p) = H_bin(p)`. -/
 theorem Hbin_one_sub (p : ℝ) : Hbin (1 - p) = Hbin p := by
-  sorry  -- L3.3
+  unfold Hbin
+  congr 1
+  have h := Real.binEntropy_two_inv_add (2⁻¹ - p)
+  have e1 : (2⁻¹ : ℝ) + (2⁻¹ - p) = 1 - p := by ring
+  have e2 : (2⁻¹ : ℝ) - (2⁻¹ - p) = p := by ring
+  rw [e1, e2] at h
+  exact h
 
 /-- `H_bin(1/2) = 1`. -/
 theorem Hbin_half : Hbin (1/2) = 1 := by
-  sorry  -- L3.4
+  unfold Hbin
+  have h2 : (1/2 : ℝ) = 2⁻¹ := by norm_num
+  rw [h2, Real.binEntropy_eq_log_two.mpr rfl]
+  exact div_self (Real.log_pos one_lt_two).ne'
 
 /-- Concavity of `H_bin` on `[0,1]`. -/
 theorem Hbin_concaveOn : ConcaveOn ℝ (Set.Icc (0:ℝ) 1) Hbin := by
-  sorry  -- L3.5
+  have hc : (0:ℝ) ≤ (Real.log 2)⁻¹ :=
+    inv_nonneg.mpr (Real.log_nonneg one_le_two)
+  have h := Real.strictConcave_binEntropy.concaveOn.smul hc
+  convert h using 1
+  funext p
+  simp [Hbin, div_eq_inv_mul]
 
 end PartitionBracket
