@@ -230,6 +230,17 @@ is $\rho_{\mathcal{M}} = 1$[^bk-rhoM] (no silent mutants).
   `CVa_wrong_identity`), logged at JSON path
   `audit/external_audit/T3_stress.json :: mutation_test.all_caught == true`.
   Comprehensiveness is OP-mut, §7.
+  *Independent corroboration:* the same line of attack on
+  Paper A's results, namely the Kochenderfer falsification
+  protocol (`audit/paper_a_harvest/eK.snapshot.json`, Paper-A
+  SHA `e8763fe`), classifies **408** rows (4 sources × 4
+  $\tau$-levels) as 121 falsified / 89 verified / 198
+  inconclusive; at the tightest threshold $\tau = 0.10$,
+  Paper A's E6 (NAS) row-set is **50 / 50 falsified**, and at
+  $\tau = 0.25$ Paper A's E3 (WL bracket) row-set is **20 / 27
+  verified** — a falsification screen of completely different
+  shape that nevertheless agrees with $\rho_{\mathcal{M}_{\mathrm{B}}} = 1$
+  in spirit (no false negative on the mutated identities).
 
 > *Status (Phase 2b-md.G2).* The mutation screen
 > $\mathcal{M}_{\mathrm{B}}$ in `audit/stress.py` ships
@@ -372,7 +383,7 @@ halfwidth $h_{\mathrm{union}} := \sqrt{\ln(2 K_T / \alpha) /
 $h_{\mathrm{union}} \approx 7.12 \times 10^{-3}$, a multiplicative
 inflation of only $\sqrt{\ln(8/\alpha)/\ln(2/\alpha)} \approx 1.17$
 over the single-statistic $h \approx 6.07 \times 10^{-3}$. The
-prose $4 \times$ is therefore **strictly conservative**: it
+prose $4 \times$ is therefore **strictly conservative**[^bk-e7]: it
 budgets a halfwidth $\tau = 4h \approx 2.43 \times 10^{-2}$
 that covers the $K_T = 4$ events at the *original* $\alpha$
 with $4 / 1.17 \approx 3.4 \times$ extra slack. The choice
@@ -381,6 +392,19 @@ $K_T$, not the union-bound multiplier itself; $3 \times$ would
 also satisfy the Bonferroni budget at $K_T = 4$, while $5 \times$
 would waste statistical efficiency on the upstream contracts
 ($K_T \leq 2$).
+
+[^bk-e7]: This "conservative by a small constant factor" shape
+  is corroborated by an independent real-data anchor harvested
+  from Paper A's Proposition 7 concentration experiment on UCI
+  Adult (`audit/paper_a_harvest/e7.snapshot.json`, Paper-A SHA
+  `e8763fe`, 7 subsample sizes $n \in \{200, \ldots, 20000\}$,
+  $K = 400$ bootstrap reps, $m = 16$, $\alpha = 0.05$). All 7
+  rows attain `coverage = 1.0 \geq 1 - \alpha`; the ratio
+  $h_{\mathrm{bound}} / \widehat{\Delta}_{p95}$ stays in
+  $[2.53, 2.94]$ (geometric mean $\approx 2.72$), matching our
+  synthetic $4h / h_{\mathrm{union}} \approx 3.4$ to within the
+  difference between Hoeffding and bootstrap p95. Re-derive with
+  `python3 audit/paper_a_harvest/harvest_aggregate.py`.
 
 *Adversarial caveat.* Proposition 0.4 controls *false
 rejections* (Type I): a true population identity being
@@ -1458,6 +1482,20 @@ $r_T \in \{\Delta, 1, 1\}$[^bk-rT] table is identical.
   see `verify_b_t1.json :: results[?(name=="L11_aggregator_deltaL")]`.
   Symbol-for-symbol parity with Paper A's `lem:mpnn-wl-robust`
   table is checked manually (no cross-paper verifier shipped).
+  *Honest looseness disclaimer (real graphs).* Paper A's in-vivo
+  test of the same lemma
+  (`audit/paper_a_harvest/e3e.snapshot.json`, Paper-A SHA
+  `e8763fe`; cora $n = 2708$, citeseer $n = 3327$, $L = 3$,
+  $d_{\mathrm{hidden}} = 32$, $\delta_0 \in \{0, 10^{-3},
+  10^{-2}, 10^{-1}, 1\}$) confirms the bound is **never
+  violated** across the entire $(\text{dataset} \times \delta
+  \times L)$ grid, but is **loose by up to $\approx 7$ orders
+  of magnitude** at $L = 3$ on cora (observed $D = 4.03$ vs
+  bound $3.7 \times 10^7$, ratio $9.2 \times 10^6$). L11 is
+  therefore *correct but conservative* on real graphs; the
+  looseness is dominated by the $\Delta_{\max} = 168$ factor
+  for sum-aggregation, which mean/sym-norm avoid by
+  construction.
 
 *Failure mode.* If $C_\ell$ is not $L^c_\ell$-Lipschitz in arg
 1 (e.g. uses a non-Lipschitz activation like the unconstrained
