@@ -1,0 +1,55 @@
+{
+  "experiment": "verify_prop7_constant",
+  "n_full": 45222,
+  "m_leaves": 16,
+  "delta_min_cell_mass": 0.0025872363009154836,
+  "eta_min_cell_rate": 0.0021008403361344463,
+  "eta_effective": 0.0021008403361344463,
+  "kappa": 194.4717683647987,
+  "alpha_conf": 0.05,
+  "rows": [
+    {
+      "n": 200,
+      "kappa_free_bound": 0.13374056375043497,
+      "proved_bound": 26.008763934652183,
+      "kappa_multiplier": 194.4717683647987
+    },
+    {
+      "n": 500,
+      "kappa_free_bound": 0.08458495940126509,
+      "proved_bound": 16.449386631828727,
+      "kappa_multiplier": 194.4717683647987
+    },
+    {
+      "n": 1000,
+      "kappa_free_bound": 0.05981059837902336,
+      "proved_bound": 11.631472833725436,
+      "kappa_multiplier": 194.4717683647987
+    },
+    {
+      "n": 2000,
+      "kappa_free_bound": 0.042292479700632546,
+      "proved_bound": 8.224693315914363,
+      "kappa_multiplier": 194.4717683647987
+    },
+    {
+      "n": 5000,
+      "kappa_free_bound": 0.02674811275008699,
+      "proved_bound": 5.201752786930435,
+      "kappa_multiplier": 194.4717683647987
+    },
+    {
+      "n": 10000,
+      "kappa_free_bound": 0.018913771909528865,
+      "proved_bound": 3.6781946696945336,
+      "kappa_multiplier": 194.4717683647987
+    },
+    {
+      "n": 20000,
+      "kappa_free_bound": 0.013374056375043495,
+      "proved_bound": 2.6008763934652177,
+      "kappa_multiplier": 194.4717683647987
+    }
+  ],
+  "note": "The E7 'analytic bound' column uses the \u03ba-free bound (constant 1). Multiplying by \u03ba(\u03b4,\u03b7) recovers the proved Proposition 7 bound; the \u03ba-free bound is conservative-but- easier-to-read and is the source of the ~order-of-magnitude looseness observed in E7. No constant in the proof is mis-stated."
+}

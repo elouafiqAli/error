@@ -2324,12 +2324,20 @@ $n$ & $\overline{\Delta_{n}}$ & $\Delta_{n}^{(p_{95})}$
 to the full-data bracket on UCI Adult. Mean deviation shrinks
 as $\Theta(1/\sqrt{n})$ exactly as \cref{prop:pop} predicts;
 the $p_{95}$ deviation stays comfortably inside the
-($\kappa$-free, hence conservative) Hoeffding bound at every
-sample size --- the bound has constant $1$ instead of
-$\kappa(\delta, \eta) > 1$ from the proof, and is
-consequently loose by roughly an order of magnitude in this
-regime. Empirical coverage is $1.000$ at every $n$ versus the
-nominal $0.95$ target.}
+$\kappa$-free Hoeffding bound at every sample size. The
+$\kappa$-free column uses constant $1$ in place of the proved
+multiplier $\kappa(\delta,\eta) = (1/\sqrt{\delta})(1+\log_{2}((1-\eta)/\eta))$
+of \cref{prop:pop}; on the Adult CART partition
+(\texttt{verify\_prop7\_constant.py}) the empirical
+$(\delta_{\min}, \eta_{\min}) = (2.59\!\times\!10^{-3},\,
+2.10\!\times\!10^{-3})$ give $\kappa \approx 194$, so the
+proved bound is vacuous ($>1$) for every $n$ in the grid: it is
+the $\eta_{\min} \to 0$ degeneracy --- one near-pure CART leaf
+\citep{antos2001convergence} --- not a mis-stated proof
+constant. The $\kappa$-free bound is the practically useful
+version in this regime and covers $p_{95}$ everywhere; empirical
+coverage is $1.000$ at every $n$ versus the nominal $0.95$
+target.}
 \label{tab:e7}
 \end{table}
 

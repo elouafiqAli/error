@@ -1620,11 +1620,22 @@ on every row", "mean deviation monotone in $n$", and
 
 Mean deviation shrinks as $\Theta(1/\sqrt{n})$ exactly as
 Proposition 7 predicts; the $p_{95}$ deviation stays comfortably
-inside the ($\kappa$-free, hence conservative) Hoeffding bound
-at every sample size — the bound has constant $1$ instead of
-$\kappa(\delta, \eta) > 1$ from the proof, so is loose by roughly
-an order of magnitude in this regime. Empirical coverage is
-1.000 at every $n$ versus the nominal 0.95 target.
+inside the $\kappa$-free Hoeffding bound at every sample size.
+The "analytic bound" column uses constant $1$ in place of the
+proved multiplier
+$\kappa(\delta, \eta) = (1/\sqrt{\delta})(1 + \log_2((1-\eta)/\eta))$;
+on the realised Adult CART partition (`verify_prop7_constant.py`)
+the empirical $(\delta_{\min}, \eta_{\min}) = (2.59 \times 10^{-3},
+2.10 \times 10^{-3})$ give $\kappa \approx 194$, so the *proved*
+bound is **vacuous** ($> 1$) on every $n$ in the grid. The
+mechanism is the $\eta_{\min} \to 0$ degeneracy — one near-pure
+CART leaf — flagged in §Limitations and treated by
+[Antos–Kontoyiannis (2001)](https://doi.org/10.1002/rsa.1019);
+the proof constant is correct, the bound is just loose in the
+$\eta \to 0$ regime. The $\kappa$-free Hoeffding bound is the
+practically useful version here and covers $p_{95}$ on every
+row; empirical coverage is 1.000 at every $n$ versus the
+nominal 0.95 target.
 
 ![E7 concentration](experiments/figures/e7_concentration.pdf)
 

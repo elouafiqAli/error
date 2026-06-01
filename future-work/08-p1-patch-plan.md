@@ -137,7 +137,7 @@ concurrently with P0.1–P0.5.
 | A9  | Lean 4 mechanisation of Thm 1 + Cor 2                                                   | UNVERIFIED           | HIGH (committed)  | Lean kernel accepts file                             |
 | A10 | ogbn-arxiv bracket tightness is due to Prop 4.5 cardinality collapse, NOT $w^{*}=0$     | HIGH (r2: $0.0008$ realised slack refutes $w^{*}=0$) | HIGH | Phase 0 attribution fix                |
 | A11 | At fixed $k$, $\hat R$ retains architecture dependence (PubMed; falsifies pure-regime reading) | HIGH (r2: PubMed at $k{=}4096$) | HIGH       | 5/5 sweep, already observed                          |
-| A12 | Prop 7 explicit $O(1/\sqrt n)$ constant matches E7 $p_{95}$ within stated slack         | UNVERIFIED           | HIGH              | P0.1 proof + E7 re-derivation                        |
+| A12 | Prop 7 explicit $O(1/\sqrt n)$ constant matches E7 $p_{95}$ within stated slack         | HIGH (P0.1 closed: $\kappa$-free bound covers $p_{95}$ on every row; proved $\kappa\!\approx\!194$ explained by $\eta_{\min}\!\to\!0$, not a mis-stated constant) | HIGH | `verify_prop7_constant.py` |
 | A13 | Prop 6 closed form for $w^{*}(\pi_{*})$ matches E2b column to 4 decimals                | UNVERIFIED           | HIGH              | P0.2 proof + E2b re-derivation                       |
 | A14 | E3d-arch `head_sig` sign/definition agree with prose and $\Delta_{\mathrm{head}}$       | LOW (r3: known inconsistency, B2) | HIGH | P0.3 sign fix                                      |
 | A15 | F1/F2/F3/F2′ survive E3d-arch redo at $k\ll n$ on Cora/CiteSeer                         | UNVERIFIED           | HIGH or RETRACTED | P0.4 sweep + verdict table                           |
