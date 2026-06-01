@@ -56,35 +56,66 @@ verdicts from the PI read of the just-committed Synthesis section
 Phase 0 below codifies these corrections as the first, immediate,
 P0-independent action of this plan.
 
+**Revision r3 (P0 enumeration, incorporated).** The five P0
+correctness-and-integrity items previously referenced abstractly as
+"P0-B1, P0-B2, P0-B3" are now enumerated explicitly as Phases
+**P0.1–P0.5** and elevated *ahead* of every PATCH phase. They are
+the highest-priority work in this plan ("must close before any
+submission"). See §2.0 below for the full ledger. The dependency
+map in §0 is rewritten to reflect the explicit dependency edges
+from P0.1–P0.5 into the PATCH phases.
+
+**E3 reassessment is mandatory and lives inside P0.3 + P0.4.** The
+entire E3 family (E3, E3b, E3c, E3d, E3d-arch, E3d-arch-full) was
+last aggregated in commits up to `3212fdf` *without* the
+`head_sig` sign fix (P0.3) and *without* the $k\ll n$ re-evaluation
+(P0.4). Every E3 finding currently in main.{tex,md} must be re-read
+after P0.3/P0.4 land; F1/F2/F3/F2′ either survive verbatim, are
+restated, or are retracted. Phase 0 (synthesis hedge) is a
+*stopgap*; the substantive E3 re-assessment is part of P0.3 + P0.4.
+
 ---
 
 ## §0 Dependency map (read this first)
 
 ```
-P0-B1 (Prop 6, Prop 7) ────────────────────┐
-        │                                  │
-        ▼                                  ▼
-   Phase 6 (PATCH H, NAS reframing)    Phase 1 (PATCH A abstract,
-                                       PATCH B intro pivot — soft
-                                       refs to Prop 7)
-P0-B2/B3 (E3d-arch sign + cardinality) ────┐
-        │                                  │
-        ▼                                  ▼
-   Phase 3 (PATCH C, §8.3.1 decomp)    Phase 4 (PATCH D, Lemma 6″
-                                       empirical augmentation)
+[P0 — correctness & integrity; must close before any submission]
 
-Independent of P0:
-  Phase 0  Synthesis corrections (S3 retraction, S1 hedge, C2/C3 downgrade)  [r2, IMMEDIATE]
-  Phase 2  PATCH F   (w* honesty)
-  Phase 5  PATCH E   (related-work GNN-stability)
-  Phase 7  PATCH G   (E1/E2 honest reframing)
-  Phase 8  Lean 4 commitment (Thm 1 + Cor 2; 6″a stretch)
+  P0.1 Prop 7 (finite-sample concentration; O(1/√n) rate)
+  P0.2 Prop 6 (marginal-aware ceiling w*(π*) ≤ w*)
+  P0.3 E3d-arch head_sig sign/interpretation fix
+  P0.4 E3d-arch[-full] redo at k << n on Cora/CiteSeer (+ uniform caveat)
+  P0.5 Population object ε*_Π,pop split + Prop 7 tie-in across E1–E3
+
+[Phase 0 — stopgap synthesis hedges] (S3 retract, S1 hedge,
+   C2/C3 downgrade in S7) — superseded in part by P0.3/P0.4
+
+[PATCH phases — gated]
+
+  Phase 1   PATCH A (abstract) + PATCH B (intro pivot)
+              gated on: P0.1, P0.5
+  Phase 2   PATCH F  (w* honesty)                       [P0-independent]
+  Phase 3a  PATCH C theory (§8.3.1 (★) decomposition)
+              gated on: P0.3, P0.5
+  Phase 3b  PATCH C experiment (k≪n redo + decomp table)
+              IS P0.4's experimental backbone; commit jointly
+  Phase 4a  PATCH D theory (Lemma 6″)                   [P0-independent]
+  Phase 4b  PATCH D experiment (D(L) vs λ_max(A))
+              gated on: P0.4 run (re-uses same sweep)
+  Phase 5   PATCH E  (related-work GNN-stability)       [P0-independent]
+  Phase 6   PATCH H  (NAS reframing)                    gated on: P0.1
+  Phase 7   PATCH G  (E1/E2 honest reframing)           [P0-independent]
+  Phase 8   Lean 4 (Thm 1 + Cor 2; 6″a stretch)         [P0-independent]
 ```
 
-**Rule.** Phases 1, 3, 6 are gated by P0 items and MUST NOT be
-committed until those gates clear. Phase 0 is the highest-priority
-immediate action (referee-visible synthesis errors). Phases 0, 2, 5,
-7 are P0-independent and form the first concurrent wavefront.
+**Rule.** P0.1–P0.5 are the **highest-priority work in the entire
+plan** ("must close before any submission"). They execute on
+Wavefront -1 (before everything else that depends on them).
+Phase 0 is a stopgap for referee-visible synthesis errors and lands
+immediately on Wavefront 0; it does NOT substitute for the
+substantive E3 re-assessment, which lives in P0.3 + P0.4.
+Phases 2, 5, 7, 8.1, 8.2, and Phase 4a are P0-independent and run
+concurrently with P0.1–P0.5.
 
 ---
 
@@ -106,6 +137,11 @@ immediate action (referee-visible synthesis errors). Phases 0, 2, 5,
 | A9  | Lean 4 mechanisation of Thm 1 + Cor 2                                                   | UNVERIFIED           | HIGH (committed)  | Lean kernel accepts file                             |
 | A10 | ogbn-arxiv bracket tightness is due to Prop 4.5 cardinality collapse, NOT $w^{*}=0$     | HIGH (r2: $0.0008$ realised slack refutes $w^{*}=0$) | HIGH | Phase 0 attribution fix                |
 | A11 | At fixed $k$, $\hat R$ retains architecture dependence (PubMed; falsifies pure-regime reading) | HIGH (r2: PubMed at $k{=}4096$) | HIGH       | 5/5 sweep, already observed                          |
+| A12 | Prop 7 explicit $O(1/\sqrt n)$ constant matches E7 $p_{95}$ within stated slack         | UNVERIFIED           | HIGH              | P0.1 proof + E7 re-derivation                        |
+| A13 | Prop 6 closed form for $w^{*}(\pi_{*})$ matches E2b column to 4 decimals                | UNVERIFIED           | HIGH              | P0.2 proof + E2b re-derivation                       |
+| A14 | E3d-arch `head_sig` sign/definition agree with prose and $\Delta_{\mathrm{head}}$       | LOW (r3: known inconsistency, B2) | HIGH | P0.3 sign fix                                      |
+| A15 | F1/F2/F3/F2′ survive E3d-arch redo at $k\ll n$ on Cora/CiteSeer                         | UNVERIFIED           | HIGH or RETRACTED | P0.4 sweep + verdict table                           |
+| A16 | $\varepsilon^{*}_{\Pi}$ in E1–E3 disambiguated as empirical vs population              | LOW (r3: currently conflated) | HIGH       | P0.5 notation rewrite                               |
 
 ---
 
@@ -115,7 +151,116 @@ Each phase has: **scope**, **inputs**, **outputs**, **gate** (what
 must pass before commit), **commit template**, **adversarial review
 checklist**, and **rollback plan**.
 
-### Phase 0 — Synthesis corrections (r2) **[IMMEDIATE, P0-independent]**
+### §2.0 P0 phases (correctness & integrity — must close before submission)
+
+Five enumerated P0 items. Execute on **Wavefront -1**, ahead of every
+PATCH phase that depends on them. Each is its own commit.
+
+#### P0.1 — State and prove Proposition 7 (finite-sample concentration)
+
+- **Scope.** State \Cref{prop:finite-sample-concentration}
+  formally: empirical bracket endpoints concentrate to the
+  population bracket at $\Theta(1/\sqrt n)$ via Hoeffding (or
+  McDiarmid on the partition cells, whichever the constant chases).
+  Prove inline; record the explicit constant.
+- **Audit.** E7 currently reports empirical $p_{95}$ at $\sim 10\times$
+  inside the claimed bound. Confirm whether this slack is:
+  (a) the $\kappa$-free simplification (acceptable; document it),
+  (b) a mis-stated constant in the previous draft (must be fixed),
+  or (c) a tighter regime not covered by Hoeffding (state
+  separately).
+- **Outputs.** New proposition + proof in main.{tex,md};
+  E7 numbers re-derived against the proved constant; recompute
+  `verify_t1_python.py` or add `verify_prop7.py`.
+- **Gate.** (i) Proof reads cleanly; (ii) E7 $p_{95}$ ratio either
+  matches the new constant or has a written, defended reason for
+  the gap; (iii) `make` clean.
+- **Commit.** `paper-a P0.1: state + prove Proposition 7 (Θ(1/√n), Hoeffding constant verified)`
+
+#### P0.2 — State and prove Proposition 6 (marginal-aware ceiling)
+
+- **Scope.** State \Cref{prop:marginal-aware-ceiling}:
+  $w^{*}(\pi_{*}) \le w^{*}$, with the explicit closed form for
+  $w^{*}(\pi_{*})$ over $\pi_{*}\in (0,1)$. Prove and prove the
+  reduction $w^{*}(\pi_{*})\to w^{*}$ as $\pi_{*}\to 1/2$.
+- **Outputs.** E2b table re-derived against the proved
+  $w^{*}(\pi_{*})$ column; any mismatched row flagged and fixed.
+  `verify_prop6.py` added.
+- **Gate.** (i) E2b's $w^{*}(\pi_{*})$ column matches the
+  formula to four decimals on every row; (ii) the $\pi_{*}\to 1/2$
+  limit is exhibited numerically; (iii) `make` clean.
+- **Commit.** `paper-a P0.2: state + prove Proposition 6 (w*(π*) ≤ w*, with closed form)`
+
+#### P0.3 — E3d-arch `head_sig` sign / interpretation fix (B2)
+
+- **Scope.** Decide on the *intended* claim for `head_sig`. Two
+  options on the table:
+  (i) `head_sig := ε*_Π^Z_k - ̂R` (positive = head extracts
+      sub-cell structure beyond cluster Bayes; sign matches the
+      original prose).
+  (ii) `head_sig := ̂R - ε*_Π^Z_k` (positive = head slack;
+      matches the (⋆) decomposition in PATCH C).
+  Resolve in favour of (ii) for compatibility with PATCH C
+  $\Delta_{\mathrm{head}}$, OR document why (i) is preserved and
+  flip the sign in the post-hoc reader.
+- **Outputs.** Updated definition + restated F3/F3′ in main.{tex,md}
+  so the table, prose, and definition agree; reader file
+  (`e3d_arch_full.5of5.summary.md`) re-computed with the chosen
+  convention.
+- **Gate.** (i) Definition, table caption, and prose all show the
+  same sign convention; (ii) cross-reference to PATCH C
+  $\Delta_{\mathrm{head}}$ is consistent.
+- **Commit.** `paper-a P0.3: fix E3d-arch head_sig sign + restate F3/F3' uniformly`
+
+#### P0.4 — E3d-arch[-full] redo at $k\ll n$ (B3) **— the empirical backbone**
+
+- **Scope.** Re-run GCN/GAT/GIN/SAGE at $k\in\{8,16,32,64\}$
+  (extend to 128 if budget allows) on Cora and CiteSeer
+  (PubMed, Twitch-EN extension nice-to-have; ogbn-arxiv reuses
+  5/5 cache rows that are already $k\ll n$ by virtue of $k/n=1/39$).
+  Evaluate $\varepsilon_{\mathrm{WL}}$ and $\varepsilon^Z_k$ at
+  the **same** $k$ (kills the cell-budget confound). Same
+  $L=3, h=128, 200$ epochs, $5$ seeds per cell.
+- **Outputs.** `experiments/results/e3d_arch_kll_n.json` +
+  `e3d_arch_kll_n.summary.md` + new table in §8.3.1 (replacing
+  the misleading $k\approx n$ rows of E3d-arch).
+- **E3 reassessment (mandatory).** Re-read F1/F2/F3 against the
+  new data:
+  - F1 (bracket holds): expected to survive trivially.
+  - F2 (features beat WL at matched $k$): now testable as an
+    expressivity claim, not a memorisation artefact.
+  - F2′ (architecture dependence at fixed $k$): re-check on the
+    new sweep, not on the 5/5 cache.
+  - F3/F3′ (head slack interpretation): depends on P0.3 sign fix.
+  Each finding either *survives verbatim*, is *restated*, or is
+  *retracted in writing*. No silent edits.
+  Apply the cardinality-confound caveat **uniformly** — including
+  Cora at $k/n=0.87$, which the previous draft exempted.
+- **Gate.** (i) Every reported row has $k/n \le 0.1$ (or is
+  explicitly labelled as a memorisation-regime sanity check);
+  (ii) $\varepsilon_{\mathrm{WL}}$ and $\varepsilon^Z_k$ share
+  the same $k$ on every row; (iii) F1–F3′ verdict table written;
+  (iv) the Synthesis section in main.{tex,md} updated to cite
+  the new E3d-arch table, not the old one.
+- **Commit.** `paper-a P0.4: E3d-arch redo at k<<n; F1/F2/F3/F2' re-assessed against new sweep`
+
+#### P0.5 — Population object $\varepsilon^{*,\mathrm{pop}}_{\Pi}$ + Prop 7 tie-in
+
+- **Scope.** Define
+  $\varepsilon^{*,\mathrm{pop}}_{\Pi} := \mathbb E[\min(\eta(C), 1-\eta(C))]$
+  in §3 (or wherever $\varepsilon^{*}_{\Pi}$ is first introduced).
+  Rewrite the practitioner-claim text of E1–E3 to distinguish
+  empirical from population. Add a sentence in each of E1, E2, E3
+  citing Proposition 7 for the empirical→population gap.
+- **Outputs.** Notation paragraph in §3; E1–E3 claim text updated.
+- **Gate.** Every E1–E3 sentence asserting "the bracket bounds
+  ..." specifies which object is being bounded (empirical or
+  population).
+- **Commit.** `paper-a P0.5: define ε*_Π,pop; rewrite E1–E3 with empirical/population split tied to Prop 7`
+
+---
+
+### Phase 0 — Synthesis corrections (r2 stopgap) **[Wavefront 0, P0-independent]**
 
 Referee-visible errors introduced by the S1/S3/S7 synthesis in
 commit `3212fdf`. Repair before any new patch lands.
@@ -392,11 +537,23 @@ This phase has two sub-phases that MUST be committed separately.
 
 ## §3 Concurrent wavefronts (which phases parallelise)
 
-Wavefront 0 (start NOW, blocks everything else — referee-visible errors):
-- Phase 0 (synthesis corrections; S3 retract, S1 hedge, C2/C3 downgrade)
+Wavefront -1 (highest priority — correctness & integrity, must close before submission):
+- P0.1 (Prop 7)
+- P0.2 (Prop 6)
+- P0.3 (head_sig sign)
+- P0.4 (k≪n redo + E3 reassessment) — longest pole
+- P0.5 (population vs empirical split)
+
+P0.1, P0.2, P0.5 parallelise freely (disjoint manuscript regions);
+P0.3 + P0.4 commit jointly (sign fix lands in the redo). P0.5
+should land *before* Phase 1 abstract rewrite.
+
+Wavefront 0 (start NOW — referee-visible stopgap):
+- Phase 0 (synthesis corrections; superseded in part by P0.3/P0.4 later)
 
 Wavefront 1 (start immediately after Phase 0, no P0 dependency):
 - Phase 2 (PATCH F, $w^*$ honesty)
+- Phase 4a (Lemma 6″ theory — P0-independent)
 - Phase 5 (PATCH E, related work)
 - Phase 7 (PATCH G, E1/E2 reframing)
 - Phase 8.1 / 8.2 (Lean 4 Thm 1 + Cor 2 — independent of LaTeX content)
@@ -404,7 +561,6 @@ Wavefront 1 (start immediately after Phase 0, no P0 dependency):
 Wavefront 2 (after P0-B2/B3 lands):
 - Phase 3a (theory)
 - Phase 4a (Lemma 6″ theory)
-
 Wavefront 3 (after P0-B1 lands AND Phase 3a):
 - Phase 1 (abstract + intro pivot)
 - Phase 6 (NAS reframing)
@@ -453,7 +609,8 @@ independent changes are an anti-pattern (per
 ## §5 Definition of done
 
 The plan is complete when:
-- [ ] Phase 0 synthesis corrections landed (S3 retracted, S1 hedged, C2/C3 downgraded in S7).
+- [ ] **P0.1–P0.5 closed** (Prop 7, Prop 6, head_sig sign, k≪n redo + E3 reassessment, population object).
+- [ ] Phase 0 synthesis corrections landed (stopgap; superseded by P0.3/P0.4 where they overlap).
 - [ ] All eight patches (A–H) are in `main.{tex,md}`.
 - [ ] §1 audit table has no UNVERIFIED rows.
 - [ ] `make` is clean; `verify.jl` is green; `lake build` is green
