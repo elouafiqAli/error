@@ -15,6 +15,11 @@ main.pdf
 # Experiment results (generated; not source)
 experiments/results/
 
+# Verifier JSON manifests are generated; not source
+verify_b_t1.json
+verify_b_t3.json
+verify_b.json
+
 # Editor / OS noise
 .DS_Store
 *.swp
