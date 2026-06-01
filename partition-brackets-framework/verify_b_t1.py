@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""
+r"""
 verify_b_t1.py — Paper B Tier B-T1 (symbolic identities + property tests)
 =========================================================================
 
-STATUS: PARTIAL (Phase 2b-md.T3). T3 contracts
-(`check_T3_jensen_lower`, `check_T3_upper_constant`) are PROVEN
-and pass on 1000 random examples per seed. Remaining check_*
-functions return ContractResult(status='skipped') until the
-corresponding main.md claim is promoted from SKELETON to
-PROVEN. Each subsequent Phase 2b-md commit lands one check_*
-and its main.md proof together.
+STATUS: COMPLETE (Phase 2b-md.G2 CLOSED). All 8 contracts
+(`T3_jensen_lower`, `T3_upper_constant`, `CSh_reduces_to_paperA`,
+`CVa_bayes_variance_identity`, `CPi_pinsker_constant`,
+`P10_refinement_monotonicity`, `L11_aggregator_deltaL`,
+`T7_noise_correction_symbolic`) PASS on 1000 random examples
+per seed; SymPy + Hypothesis (derandomize=True, xor-mask
+salts). Mutation tests in `audit/stress.py` catch sign flips,
+wrong $c_\phi$, and wrong C-Va functional.
 
 This file is the *only* tier on the Gate G2 critical path
 besides B-T2 (Monte-Carlo). It carries TWO responsibilities:

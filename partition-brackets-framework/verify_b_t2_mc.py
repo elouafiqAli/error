@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""
+r"""
 verify_b_t2_mc.py — Paper B Tier B-T2 (Monte-Carlo population concentration)
 ============================================================================
 
-STATUS: STUB (Phase 2b-md.A013). All check_* functions return
-ContractResult(status="skipped") until the corresponding main.md
-claim is promoted from SKELETON to PROVEN.
+STATUS: COMPLETE (Phase 2b-md.G2 CLOSED). All 6 contracts
+(`CVa_variance_identity_population`, `T6_MSE_identity_population`,
+`T6_MAE_upper_population`, `T7_noise_correction_population`,
+`T7_shannon_matches_paperA`, `T9_kernel_bracket_population`)
+PASS at production MC (200–500 trials per contract, Hoeffding
+95% half-width $\sqrt{\ln(2/0.05)/(2n)}$).
 
 Tier renaming (A013): what was 'B-T3' in A012 is now 'B-T2'.
 The previous B-T2 (Julia interval arithmetic) is demoted to

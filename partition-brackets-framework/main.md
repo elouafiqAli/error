@@ -8,13 +8,25 @@
 > bracket), **P10** (refinement consistency), **L11** (MPNN
 > aggregator-typed Lipschitz) — are PROVEN with mechanically
 > checked verifier contracts. Critical-path ladder is GREEN:
-> `verify_b_t1.py` pass=8/8, `verify_b_t2_mc.py` pass=5/5 on
+> `verify_b_t1.py` pass=8/8, `verify_b_t2_mc.py` pass=6/6 on
 > seed 0. See [`FORMALISATION.md`](FORMALISATION.md) §3 for the
 > closed G2 gate-table.
 
 This is the **markdown twin** for the Phase 2b work. The LaTeX
 source is frozen at the Phase 2a scaffold; mirroring is deferred
 to Phase 2d.
+
+> **Real-data anchor (D.10, post-G2).** All three T3 instances
+> (C-Sh, C-Va, C-Pi) have been verified against the real Bayes
+> error on 20 (dataset, depth) rows spanning Cora, CiteSeer,
+> PubMed, Twitch-EN, and ogbn-arxiv, with cell-level
+> $(q_C, P_C)$ extracted from Paper A's vectorised 1-WL
+> refinement. Manifest: `audit/anchor_real_data_full.json`
+> (zero failures, wall ≈ 10 s on a single CPU core; no GPU,
+> no new training). C-Pi is genuinely vacuous (raw lower < 0)
+> for deep-$L$ rows where $H$ falls below ≈ $0.279$; the
+> contract uses the 0-clipped envelope, which is the
+> publishable convention.
 
 ---
 
@@ -493,7 +505,7 @@ OP-BH in §7.
 **Verifier contract.** Mechanically checked by
 `verify_b_t1.py::check_CPi_pinsker_constant`:
 
-- SymPy verifies Pinsker $\eta \mapsto 1 - H_{\mathrm{bin}}(\eta)
+- NumPy verifies Pinsker $\eta \mapsto 1 - H_{\mathrm{bin}}(\eta)
   - (2/\ln 2)(\eta - \tfrac12)^2 \geq 0$ on a $10^4$-point grid
   to $5 \times 10^{-4}$ (with rounded-down endpoint guard);
 
@@ -787,8 +799,12 @@ requires the T3 hypotheses (H1)–(H5) and $c_\varphi < \infty$.
   divide by $1 - 2\rho > 0$. $\square$
 
 *Identification with Paper A.* For $\varphi = H_{\mathrm{bin}}$,
-T7.bracket recovers Paper A's Proposition 7 (noise-corrected
-Shannon bracket) symbol-for-symbol via C-Sh.
+T7.bracket recovers, via C-Sh, the noise-corrected Shannon
+bracket that Paper A previews in §13 (Towards a framework:
+Paper B) as a forward reference to this paper; Paper A itself
+states only the binary-entropy instance without a separate
+numbered noise-correction proposition. T7 is the meta-
+theoretic statement of that previewed bracket.
 
 *Failure modes (adversarial).*
 - $\rho = \tfrac12$: the denominator vanishes and
@@ -821,7 +837,11 @@ Shannon bracket) symbol-for-symbol via C-Sh.
 
 - `verify_b_t2_mc.py::check_T7_shannon_matches_paperA` — the
   Shannon corollary of T7.bracket numerically matches Paper
-  A's Proposition 7 to 4 decimals on the same cohort.
+  A's binary-entropy bracket (`thm:sandwich`, Paper A
+  Theorem~1, evaluated under the affine relabelling (T7.affine))
+  to 4 decimals on the same cohort. Worst gap on production
+  cohort: $|\Delta_{\mathrm{lower}}| = 7.8\times 10^{-16}$,
+  $|\Delta_{\mathrm{upper}}| = 0$.
 
 ---
 
@@ -932,8 +952,9 @@ rescaling; taking $\kappa = 1$ is a wlog normalisation.*
 
 **Hypotheses used.** None of (H1)–(H5) is invoked. L11 is
 the one Paper B result that lives outside the $\varphi$-bracket
-proper: it ports Paper A's Lemma 6$'$ aggregator-typed bound to
-the meta-theorem's notation so that the noise / refinement
+proper: it ports Paper A's $\varepsilon$-robust MPNN–WL
+constancy lemma (`lem:mpnn-wl-robust`) aggregator-typed bound
+to the meta-theorem's notation so that the noise / refinement
 chain rules of the bracket can be evaluated under realistic
 MPNN feature perturbations.
 
@@ -978,9 +999,10 @@ $\square$
 
 *Identification with Paper A.* In the Shannon special case
 ($\varphi = H_{\mathrm{bin}}$), L11 reproduces Paper A's
-Lemma 6$'$ (the aggregator-typed cumulative Lipschitz
-constant in Paper A §6) symbol-for-symbol; the $r_T \in
-\{\Delta, 1, 1\}$ table is identical.
+$\varepsilon$-robust MPNN–WL constancy lemma
+(`lem:mpnn-wl-robust`, the aggregator-typed cumulative
+Lipschitz constant in Paper A §6) symbol-for-symbol; the
+$r_T \in \{\Delta, 1, 1\}$ table is identical.
 
 *Failure mode.* If $C_\ell$ is not $L^c_\ell$-Lipschitz in arg
 1 (e.g. uses a non-Lipschitz activation like the unconstrained
