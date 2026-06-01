@@ -10,9 +10,51 @@ review constructively, audit adversarially; let no stone unturned;
 document progressively; commit at each gate, milestone, or feature.*
 
 This plan covers eight content patches (A–H) supplied verbatim by the
-review, broken into seven phases with explicit gates, commit points,
-and adversarial-audit hooks. Numbering is content-anchored; renumber
+review, broken into nine phases (Phase 0 added in revision r2 to
+repair two synthesis errors flagged by the PI review of the
+5/5 closure) with explicit gates, commit points, and
+adversarial-audit hooks. Numbering is content-anchored; renumber
 theorems / propositions only after P0-B1 lands.
+
+**Revision r2 (PI review of 5/5 closure, incorporated).** Two
+verdicts from the PI read of the just-committed Synthesis section
+(commit `3212fdf`) force a plan adjustment, captured here in full:
+
+- **S3 is wrong.** The ogbn-arxiv bracket tightness was attributed
+  to $w^{*}(\pi{=}0.161)=0$ (marginal-aware Prop 6, which does not
+  yet even *exist* in the manuscript). The realised slack is
+  $0.0029-0.0021 = 0.0008 > 0$, directly refuting the $w^{*}=0$
+  reading; E2b independently shows $w^{*}(\pi{=}0.248)=0.1392 \gg 0$
+  in the same regime. The actual mechanism is **Prop 4.5
+  cardinality collapse**: $H(f\mid\Pi)\to 0$ on ogbn-arxiv because
+  $|\Pi|/|V|$ approaches $1$. The marginal-aware reading must be
+  retracted from main.{tex,md} and the attribution corrected.
+- **S1 over-states "regime-determined, not architecture-determined."**
+  The PubMed at-fixed-$k$ rows show architecture-dependent
+  variation, which undercuts F2′ (the practitioner-relevant
+  architecture-comparison claim). S1 must be hedged: the *sign* of
+  `feat_gap` is dominated by the $(k, k_{\mathrm{WL}})$ regime, but
+  the *magnitude* at fixed $k$ retains architecture dependence.
+- **C2 (features beat WL) is NOT resolved by the closure.** The
+  matched-$k$ rows (Cora $k/n=0.87$, CiteSeer $k/n=0.61$) are both
+  inside the memorisation regime; "matched $k$" here means *both
+  partitions near-memorise*, not *coarse enough to test
+  expressivity*. State C2 conservatively as a
+  **fixed-cell-budget** claim until the PATCH C $k\ll n$ redo
+  (Phase 3b) lands. The current S7 verdict ("verified at matched
+  $k$") is too strong and must be downgraded.
+- **C3 strengthening is real but indirect.** $\sigma_{\hat R}$ is a
+  *proxy* for the within-cell diameter $\delta_L$ that Lemma 6′/6″
+  actually bounds. The airtight test is Phase 4b
+  (PATCH D augmentation: measure $D(L)$ directly, compare to the
+  $\lambda_{\max}(A)$ envelope). Until then C3 is *suggestive
+  and consistent with theory*, not *confirmed*.
+- **C1, C4 — confirmed at scale (100/100), but they are theorems.**
+  Robustness demonstration, not new evidence. Re-write S7 rows to
+  reflect this.
+
+Phase 0 below codifies these corrections as the first, immediate,
+P0-independent action of this plan.
 
 ---
 
@@ -32,6 +74,7 @@ P0-B2/B3 (E3d-arch sign + cardinality) ────┐
                                        empirical augmentation)
 
 Independent of P0:
+  Phase 0  Synthesis corrections (S3 retraction, S1 hedge, C2/C3 downgrade)  [r2, IMMEDIATE]
   Phase 2  PATCH F   (w* honesty)
   Phase 5  PATCH E   (related-work GNN-stability)
   Phase 7  PATCH G   (E1/E2 honest reframing)
@@ -39,8 +82,9 @@ Independent of P0:
 ```
 
 **Rule.** Phases 1, 3, 6 are gated by P0 items and MUST NOT be
-committed until those gates clear. Phases 2, 5, 7 are P0-independent
-and form the first concurrent wavefront.
+committed until those gates clear. Phase 0 is the highest-priority
+immediate action (referee-visible synthesis errors). Phases 0, 2, 5,
+7 are P0-independent and form the first concurrent wavefront.
 
 ---
 
@@ -51,12 +95,17 @@ and form the first concurrent wavefront.
 | A1  | $w^{*}=\tfrac12 H_{\mathrm{bin}}(1/5)-1/5\approx 0.1610$ is max width of binary region  | HIGH                 | HIGH              | Prop 1.5 reproof in `verify.jl`                      |
 | A2  | Quantitative WL ceiling = $H_{\mathrm{bin}}^{-1}(H(f\mid\Pi^{\mathrm{WL}}_L))$          | HIGH                 | HIGH              | Theorem 1 + Cor 7 substitution                       |
 | A3  | Three-term decomposition $(\star)$ is an exact identity                                 | HIGH                 | HIGH              | One-line algebraic check; Lean target                |
-| A4  | Sign of $\Delta_{\mathrm{feat}}$ at matched $k$ (positive) on Cora/CiteSeer             | MEDIUM               | HIGH              | E3d redo, Phase 3                                    |
+| A4  | Sign of $\Delta_{\mathrm{feat}}$ at matched $k$ (positive) on Cora/CiteSeer             | LOW (r2: matched-$k$ is in memorisation regime) | MEDIUM (fixed-budget claim only, pending Phase 3b) | E3d redo at $k\ll n$, Phase 3b |
+| A4b | C2 graduated: features carry label structure WL lacks, at $k\ll n$                      | UNVERIFIED           | HIGH              | E3d redo, Phase 3b                                   |
 | A5  | Lemma 6″c is orders tighter than 6′ on near-regular graphs                              | MEDIUM               | HIGH              | E3d augmentation, Phase 4                            |
+| A5b | C3 airtight: direct $D(L)$ measurement matches $\lambda_{\max}(A)$ envelope             | LOW (r2: $\sigma_{\hat R}$ is indirect proxy) | HIGH | Phase 4b $D(L)$ measurement                      |
+| A5c | C3 indirect: GIN $\sigma_{\hat R}$ vs others scales with $\Delta_{\max}$                | HIGH (10.7× on ogbn-arxiv)   | HIGH         | 5/5 sweep, already observed                          |
 | A6  | NAS pre-filter regime characterised by $n_{\mathrm{tr}}$ and non-memorising family      | MEDIUM               | HIGH              | Gated on Prop 7 (P0-B1)                              |
 | A7  | Lemma 6′/6″ orthogonal to GNN-stability literature                                      | MEDIUM               | HIGH              | Literature sweep, Phase 5                            |
 | A8  | E1/E2 are identities, not evidence                                                      | HIGH                 | HIGH              | Definitional; PATCH G                                |
 | A9  | Lean 4 mechanisation of Thm 1 + Cor 2                                                   | UNVERIFIED           | HIGH (committed)  | Lean kernel accepts file                             |
+| A10 | ogbn-arxiv bracket tightness is due to Prop 4.5 cardinality collapse, NOT $w^{*}=0$     | HIGH (r2: $0.0008$ realised slack refutes $w^{*}=0$) | HIGH | Phase 0 attribution fix                |
+| A11 | At fixed $k$, $\hat R$ retains architecture dependence (PubMed; falsifies pure-regime reading) | HIGH (r2: PubMed at $k{=}4096$) | HIGH       | 5/5 sweep, already observed                          |
 
 ---
 
@@ -65,6 +114,82 @@ and form the first concurrent wavefront.
 Each phase has: **scope**, **inputs**, **outputs**, **gate** (what
 must pass before commit), **commit template**, **adversarial review
 checklist**, and **rollback plan**.
+
+### Phase 0 — Synthesis corrections (r2) **[IMMEDIATE, P0-independent]**
+
+Referee-visible errors introduced by the S1/S3/S7 synthesis in
+commit `3212fdf`. Repair before any new patch lands.
+
+- **Scope.**
+  - **S3 retraction.** Delete the marginal-aware
+    $w^{*}(\pi{=}0.161)=0$ reading from main.{tex,md}. Replace with
+    the Prop 4.5 cardinality-collapse attribution
+    ($H(f\mid\Pi)\to 0$ as $|\Pi|/|V|\to 1$). State the realised
+    slack $0.0029-0.0021=0.0008>0$ explicitly as the falsifier of
+    the previous (incorrect) reading.
+  - **S1 hedge.** Restate as: *the sign of $\mathtt{feat\_gap}$ is
+    regime-determined; the magnitude at fixed $k$ remains
+    architecture-dependent (PubMed, $k=4096$, shows non-trivial
+    spread across GCN/GAT/GIN/SAGE).* Preserves F2′.
+  - **C2 downgrade in S7.** Replace "verified at matched $k$,
+    falsified at $k\ll k_{\mathrm{WL}}$" with: "verified as a
+    **fixed-cell-budget** statement only; the matched-$k$ rows
+    (Cora $k/n=0.87$, CiteSeer $k/n=0.61$) sit inside the
+    memorisation regime and do not test expressivity. The
+    expressivity claim is **pending Phase 3b** ($k\ll n$ redo)."
+  - **C3 hedge in S7.** Replace "quantitatively verified" with:
+    "suggestive and consistent with Lemma 6′/6″ via the
+    $\sigma_{\hat R}$ proxy; **airtight confirmation pending
+    Phase 4b** (direct $D(L)$ measurement vs $\lambda_{\max}(A)$
+    envelope)." The $10.7\times$ headline stays; only the verdict
+    word changes.
+  - **C1/C4 hedge in S7.** Add "— these are theorems; 100/100 is
+    robustness-at-scale, not new evidence."
+- **Inputs.** Current main.{tex,md} (post `3212fdf`), this revision
+  table.
+- **Outputs.** main.{tex,md} updated in lock-step; one-paragraph
+  erratum block added to
+  [partition-sandwich-preprint/VERIFICATION.md](../partition-sandwich-preprint/VERIFICATION.md)
+  recording the S3 retraction and the C2/C3 hedges as audit-trail.
+- **Gate.** (i) `grep -n "0.161" main.md main.tex` returns no
+  marginal-aware $w^{*}=0$ claim; (ii) `make` clean; (iii)
+  audit-table rows A4, A5b, A10, A11 reflected in the manuscript
+  text, not just this plan.
+- **Commit.**
+  ```
+  paper-a Phase 0: synthesis corrections (S3 retract, S1 hedge, C2/C3 downgrade)
+
+  Repairs three issues flagged by the PI review of the 5/5 closure
+  synthesis (commit 3212fdf):
+  - S3: ogbn-arxiv bracket tightness attributed to Prop 4.5
+    cardinality collapse, not w*(0.161)=0 (marginal-aware reading
+    retracted; realised slack 0.0008>0 falsifies w*=0; Prop 6 not
+    yet stated so the claim was uncheckable anyway).
+  - S1: sign of feat_gap is regime-determined; magnitude at fixed
+    k retains architecture dependence (PubMed at k=4096) —
+    preserves F2'.
+  - S7: C2 downgraded to fixed-cell-budget claim (matched-k rows
+    sit in memorisation regime, Cora k/n=0.87, CiteSeer 0.61);
+    expressivity claim deferred to Phase 3b. C3 hedged to
+    "suggestive via sigma proxy"; airtight test deferred to
+    Phase 4b D(L) vs lambda_max(A). C1/C4 re-labelled as
+    robustness-at-scale, not new evidence.
+
+  Erratum recorded in VERIFICATION.md.
+  ```
+- **Adversarial checklist.**
+  - [ ] S3 text no longer mentions $w^{*}(\pi)$ or marginal-aware
+    Prop 6 (Prop 6 doesn't exist yet — a manuscript that
+    references it would be incoherent).
+  - [ ] S1 text names PubMed at fixed $k$ as the falsifier of the
+    pure-regime reading.
+  - [ ] S7 verdict column for C2 contains the word
+    "fixed-cell-budget" (not "matched-$k$").
+  - [ ] S7 verdict column for C3 contains "suggestive" or
+    "consistent with", not "confirmed".
+  - [ ] VERIFICATION.md erratum entry exists.
+- **Rollback.** All edits are in two contiguous Synthesis regions
+  (one per file); `git revert` is safe.
 
 ### Phase 1 — Abstract + intro pivot (PATCH A, PATCH B)
 
@@ -267,7 +392,10 @@ This phase has two sub-phases that MUST be committed separately.
 
 ## §3 Concurrent wavefronts (which phases parallelise)
 
-Wavefront 1 (start immediately, no P0 dependency):
+Wavefront 0 (start NOW, blocks everything else — referee-visible errors):
+- Phase 0 (synthesis corrections; S3 retract, S1 hedge, C2/C3 downgrade)
+
+Wavefront 1 (start immediately after Phase 0, no P0 dependency):
 - Phase 2 (PATCH F, $w^*$ honesty)
 - Phase 5 (PATCH E, related work)
 - Phase 7 (PATCH G, E1/E2 reframing)
@@ -325,6 +453,7 @@ independent changes are an anti-pattern (per
 ## §5 Definition of done
 
 The plan is complete when:
+- [ ] Phase 0 synthesis corrections landed (S3 retracted, S1 hedged, C2/C3 downgraded in S7).
 - [ ] All eight patches (A–H) are in `main.{tex,md}`.
 - [ ] §1 audit table has no UNVERIFIED rows.
 - [ ] `make` is clean; `verify.jl` is green; `lake build` is green
