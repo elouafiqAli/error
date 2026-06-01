@@ -1,0 +1,11 @@
+# Lake / Lean build artefacts
+.lake/
+build/
+lake-packages/
+*.olean
+*.ilean
+*.hash
+
+# Editor
+.vscode/
+.idea/

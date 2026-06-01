@@ -1,0 +1,53 @@
+name: Lean (PartitionBracket)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'partition-sandwich-preprint/formal/**'
+      - '.github/workflows/lean.yml'
+  pull_request:
+    paths:
+      - 'partition-sandwich-preprint/formal/**'
+      - '.github/workflows/lean.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: partition-sandwich-preprint/formal
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan (Lean toolchain manager)
+        run: |
+          set -eo pipefail
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf \
+            | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Show Lean version (pulls toolchain pinned in lean-toolchain)
+        run: lean --version
+
+      - name: Cache Mathlib build artefacts
+        uses: actions/cache@v4
+        with:
+          path: partition-sandwich-preprint/formal/.lake
+          key: lake-${{ runner.os }}-${{ hashFiles('partition-sandwich-preprint/formal/lean-toolchain', 'partition-sandwich-preprint/formal/lake-manifest.json') }}
+          restore-keys: |
+            lake-${{ runner.os }}-
+
+      - name: Fetch precompiled Mathlib
+        run: lake exe cache get || true
+
+      - name: Build
+        run: lake build
+
+      - name: Refuse stray `sorry`
+        run: |
+          if grep -RIn --include='*.lean' '\bsorry\b' PartitionBracket; then
+            echo "::error::found `sorry` in PartitionBracket/"
+            exit 1
+          fi
