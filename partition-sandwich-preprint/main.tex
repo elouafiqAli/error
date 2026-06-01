@@ -782,6 +782,47 @@ inequality \citep[Thm.\ 2.8.1]{cover2006eit}. We use it in
 \cref{sec:apps} to track how the bracket tightens under
 model-class growth.
 
+\begin{proposition}[Refinement to the discrete partition]\label{prop:refine-discrete}
+Let $\Pi_{0} \preceq \Pi_{1} \preceq \cdots \preceq \Pi_{L}$ be
+a chain of partitions of a finite $V$ with $\Pi_{L}$ the
+\emph{discrete} partition $\{\{v\} : v \in V\}$. For every
+binary label $f : V \to \{0, 1\}$,
+\[
+  H(f \mid \Pi_{L}) \;=\; 0,
+  \qquad
+  \eps^{\!*}_{\Pi_{L}} \;=\; 0,
+\]
+so both endpoints of the bracket \eqref{eq:sandwich} collapse
+to $0$ at level $L$. Consequently the bracket width
+$\tfrac{1}{2} H(f \mid \Pi_{\ell}) - \Hinv(H(f \mid \Pi_{\ell}))$
+is monotonically non-increasing in $\ell$ along the chain and
+tends to $0$ as $\Pi_{\ell}$ approaches discreteness.
+\end{proposition}
+
+\begin{proof}
+On a singleton cell $\{v\}$, $P_{\{v\}} = f(v) \in \{0, 1\}$,
+so $\Hbin(P_{\{v\}}) = 0$ and $\min(P_{\{v\}}, 1 - P_{\{v\}}) = 0$;
+summing over $v$ gives the two equalities. Monotonicity of the
+bracket endpoints along the chain is \cref{prop:refine};
+combined with $\Hinv(0) = 0$ and $\tfrac{1}{2} \cdot 0 = 0$,
+the bracket width vanishes.
+\end{proof}
+
+\Cref{prop:refine-discrete} is a consistency check, not a
+positive result: it certifies that the bracket reports
+\emph{exactly zero} on a partition refined to singletons,
+which is the correct value of the Bayes error (any deterministic
+labelling has zero training-set risk on its own preimage). This
+makes the empirically observed pinch at the discrete-partition
+extreme (\cref{tab:e3}, ogbn-arxiv at depth $3$ with $95.6\%$
+singleton cells) a \emph{verification} of the bracket's
+asymptotic behaviour rather than a failure mode. The
+informative regime is the intermediate one, where
+$|\Pi_{\ell}| / |V|$ is bounded away from both $0$ (trivial
+partition) and $1$ (discrete partition); the bracket width is a
+quantitative diagnostic for how far $\Pi_{\ell}$ has progressed
+along the chain.
+
 % ============================================================
 \section{Sharpness}\label{sec:sharp}
 % ============================================================
@@ -2264,6 +2305,30 @@ mechanised proof in Lean 4 / mathlib4, leveraging the recent
 additions of \texttt{Real.binEntropy} and the \texttt{ConcaveOn}
 API, would give a kernel-checked counterpart to \path{verify.jl}
 and is in preparation.
+
+\paragraph{Towards a framework: Paper B.} The bracket of
+\cref{thm:sandwich} is one instance of a broader recipe:
+given a partition $\Pi$ and a real-valued summary $\phi(P_{C})$
+that is bounded, concave (or convex) in $P_{C}$, and matches a
+$\mathrm{Bayes}$-risk-like target $\rho(P_{C})$ on the endpoints
+$P_{C} \in \{0, 1\}$, partition-conditional Jensen + Fano-style
+inversion yields a two-sided $\phi$--bracket on the risk
+target. Replacing $(\Hbin, \min)$ by other compatible pairs
+gives (i) a \emph{variance} bracket on $\mathrm{MSE}$ /
+$\mathrm{MAE}$ for regression (with the well-known
+$\mathrm{MSE} = \E[\mathrm{Var}]$ identity recovering the
+upper side exactly), (ii) a \emph{noise-corrected} bracket
+$\eps^{*}(\widetilde{f}) = \eta + (1 - 2\eta)\,\eps^{*}(f)$
+that is exact at the population level under symmetric label
+flips with rate $\eta < \tfrac{1}{2}$, and (iii) a
+\emph{soft-partition} bracket via Markov kernels. A companion
+paper in preparation organises these instances under a single
+$\phi$-bracket meta-theorem; we restrict the present paper to
+the binary-entropy instance for which Hellman--Raviv and
+Feder--Merhav give a closed-form sandwich. The k-WL /
+HDX-trickle-down structural variant of the bracket
+\citep[k\text{-}WL refinement chain]{morris2019wl} is the
+subject of a further sequel.
 
 % ============================================================
 \section{Conclusion}\label{sec:conclusion}
