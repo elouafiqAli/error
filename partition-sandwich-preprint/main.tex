@@ -2074,6 +2074,41 @@ architectures (here: GAT on PubMed) that fail to refine
 structure --- demonstrating that the framework is a
 \emph{discriminating} post-hoc audit, not merely a lower bound.
 
+\paragraph{E3d-arch-full --- Synthesis on the 5/5 closure (regime, trichotomy, verdict).}
+The five-dataset closure ($100$ runs total) admits a clean
+adversarial reading along three axes. \emph{(i) Regime.} The
+sign of \texttt{feat\_gap} is determined by the
+$(k, k_{\mathrm{WL}})$ pair, not by the architecture: on
+matched-budget rows (Cora, CiteSeer; $k = k_{\mathrm{WL}}$) all
+$8/8$ cells have \texttt{feat\_gap} $> 0$ (mean $+0.043$);
+on coarsened-budget rows (PubMed, Twitch-EN, ogbn-arxiv) the
+$\varepsilon^{*}_{\Pi^{\mathrm{tr}}_{k}}$ proxy lives on a
+strictly coarser partition than $\Pi^{\mathrm{WL}}$ and the sign
+flips by construction. The honest restatement of C2 is
+therefore regime-conditional, and the ogbn-arxiv anchor
+($k_{\mathrm{WL}}/k = 39$, $n = 169\,343$) reproduces this
+deterministically across all $20$ runs.
+\emph{(ii) Trichotomy.} Lemma~6$'$ predicts that GIN's sum
+aggregator has per-layer Lipschitz constant $\Delta_{\max}$
+while GCN / GAT / SAGE have constant $1$. On ogbn-arxiv this
+predicts a noisier $\hat R$ for GIN; observed
+$\sigma(\mathrm{GIN}) = 0.0365$ vs $\sigma(\mathrm{GCN/GAT/SAGE}) \le 0.0034$,
+a $10.7\times$ ratio, with the mean $\hat R$ also $3\times$ higher.
+This is the most quantitatively clean confirmation of the
+aggregator-typed lemma in the paper.
+\emph{(iii) Verdict on contributions.} C1 (bracket holds):
+verified on $100/100$ runs. C2 (features beat WL): verified at
+matched $k$, falsified at $k \ll k_{\mathrm{WL}}$, regime-
+conditional form holds. C3 (Lemma 6$'$ trichotomy):
+quantitatively verified. C4 (refinement monotonicity): verified
+on $100/100$ runs. C5/C6 are out of scope for this sweep. The
+Twitch-EN block ($\hat R \approx 0.41$ against trivial
+$1 - \pi = 0.454$) is correctly flagged by the bracket as
+near-trivial learning, not as a bracket pathology --- evidence
+of the bracket's diagnostic role. The full per-row machine-
+readable summary lives at
+\texttt{experiments/results/e3d\_arch\_full.5of5.summary.md}.
+
 \paragraph{E4 --- Cross-architecture duel at fixed cell budget
 (UCI Adult, $K=16$).} Materialises practitioner claim (E3): at a
 fixed cell budget the bracket ranks architectures
