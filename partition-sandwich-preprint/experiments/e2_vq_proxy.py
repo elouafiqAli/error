@@ -54,8 +54,8 @@ def main() -> None:
         t0 = time.perf_counter()
         OH = OneHotEncoder(sparse_output=True, handle_unknown="ignore")
         X_oh = OH.fit_transform(cells.reshape(-1, 1))
-        lr = LogisticRegression(max_iter=2000, solver="liblinear",
-                                random_state=SEED)
+        lr = LogisticRegression(max_iter=5000, solver="lbfgs",
+                                tol=1e-8, C=1e6, random_state=SEED)
         lr.fit(X_oh, y)
         lr_err = float(np.mean(lr.predict(X_oh) != y))
         t_lr = time.perf_counter() - t0

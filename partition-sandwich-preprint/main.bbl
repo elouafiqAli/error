@@ -1,4 +1,4 @@
-\begin{thebibliography}{21}
+\begin{thebibliography}{28}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -35,6 +35,20 @@ Leo Breiman, Jerome~H. Friedman, Richard~A. Olshen, and Charles~J. Stone.
 \newblock \emph{Classification and Regression Trees}.
 \newblock Wadsworth, 1984.
 
+\bibitem[Cai et~al.(1992)Cai, F{\"u}rer, and Immerman]{cai1992optimal}
+Jin-Yi Cai, Martin F{\"u}rer, and Neil Immerman.
+\newblock An optimal lower bound on the number of variables for graph
+  identification.
+\newblock \emph{Combinatorica}, 12\penalty0 (4):\penalty0 389--410, 1992.
+
+\bibitem[Corso et~al.(2020)Corso, Cavalleri, Beaini, Li{\`o}, and Veli{\v
+  c}kovi{\'c}]{corso2020pna}
+Gabriele Corso, Luca Cavalleri, Dominique Beaini, Pietro Li{\`o}, and Petar
+  Veli{\v c}kovi{\'c}.
+\newblock Principal neighbourhood aggregation for graph nets.
+\newblock In \emph{Advances in Neural Information Processing Systems
+  (NeurIPS)}, 2020.
+
 \bibitem[Cover \& Thomas(2006)Cover and Thomas]{cover2006eit}
 Thomas~M. Cover and Joy~A. Thomas.
 \newblock \emph{Elements of Information Theory}.
@@ -44,6 +58,12 @@ Thomas~M. Cover and Joy~A. Thomas.
 Luc Devroye, L{\'a}szl{\'o} Gy{\"o}rfi, and G{\'a}bor Lugosi.
 \newblock \emph{A Probabilistic Theory of Pattern Recognition}.
 \newblock Springer, 1996.
+
+\bibitem[Errica et~al.(2020)Errica, Podda, Bacciu, and Micheli]{errica2020fair}
+Federico Errica, Marco Podda, Davide Bacciu, and Alessio Micheli.
+\newblock A fair comparison of graph neural networks for graph classification.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2020.
 
 \bibitem[Fano(1961)]{fano1961}
 Robert~M. Fano.
@@ -93,6 +113,12 @@ Herv{\'e} J{\'e}gou, Matthijs Douze, and Cordelia Schmid.
 \newblock \emph{IEEE Transactions on Pattern Analysis and Machine
   Intelligence}, 33\penalty0 (1):\penalty0 117--128, 2011.
 
+\bibitem[Kochenderfer et~al.(2022)Kochenderfer, Wheeler, and
+  Wray]{kochenderfer2022algorithms}
+Mykel~J. Kochenderfer, Tim~A. Wheeler, and Kyle~H. Wray.
+\newblock \emph{Algorithms for Decision Making}.
+\newblock MIT Press, 2022.
+
 \bibitem[Kovalevskij(1968)]{kovalevskij1968}
 V.~A. Kovalevskij.
 \newblock The problem of character recognition from the point of view of
@@ -128,6 +154,20 @@ Igal Sason and Sergio Verd{\'u}.
 \newblock \emph{IEEE Transactions on Information Theory}, 64\penalty0
   (1):\penalty0 4--25, 2018.
 
+\bibitem[Sato et~al.(2021)Sato, Yamada, and Kashima]{sato2020random}
+Ryoma Sato, Makoto Yamada, and Hisashi Kashima.
+\newblock Random features strengthen graph neural networks.
+\newblock In \emph{Proceedings of the 2021 SIAM International Conference on
+  Data Mining (SDM)}, 2021.
+\newblock arXiv:2002.03155 (2020).
+
+\bibitem[Shchur et~al.(2018)Shchur, Mumme, Bojchevski, and
+  G{\"u}nnemann]{shchur2018gnn}
+Oleksandr Shchur, Maximilian Mumme, Aleksandar Bojchevski, and Stephan
+  G{\"u}nnemann.
+\newblock Pitfalls of graph neural network evaluation.
+\newblock In \emph{Relational Representation Learning Workshop, NeurIPS}, 2018.
+
 \bibitem[Tebbe \& Dwyer~III(1968)Tebbe and Dwyer~III]{tebbe1968uncertainty}
 D.~L. Tebbe and S.~J. Dwyer~III.
 \newblock Uncertainty and the probability of error.
@@ -139,5 +179,12 @@ Keyulu Xu, Weihua Hu, Jure Leskovec, and Stefanie Jegelka.
 \newblock How powerful are graph neural networks?
 \newblock In \emph{International Conference on Learning Representations
   (ICLR)}, 2019.
+
+\bibitem[You et~al.(2021)You, Gomes-Selman, Ying, and
+  Leskovec]{you2021identityaware}
+Jiaxuan You, Jonathan Gomes-Selman, Rex Ying, and Jure Leskovec.
+\newblock Identity-aware graph neural networks.
+\newblock In \emph{Proceedings of the AAAI Conference on Artificial
+  Intelligence}, 2021.
 
 \end{thebibliography}

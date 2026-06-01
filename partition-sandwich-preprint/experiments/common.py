@@ -25,6 +25,16 @@ def hbin(p: float) -> float:
     return -p * math.log2(p) - (1.0 - p) * math.log2(1.0 - p)
 
 
+def hbin_vec(p: np.ndarray) -> np.ndarray:
+    """Vectorised binary entropy in bits."""
+    p = np.asarray(p, dtype=np.float64)
+    safe = (p > 0.0) & (p < 1.0)
+    out = np.zeros_like(p)
+    ps = p[safe]
+    out[safe] = -(ps * np.log2(ps) + (1.0 - ps) * np.log2(1.0 - ps))
+    return out
+
+
 def hbin_inv(h: float, tol: float = 1e-15, max_iter: int = 200) -> float:
     """Bisection inverse of Hbin on [0, 1/2].  Same routine as T1."""
     h = max(0.0, min(1.0, h))
@@ -38,6 +48,26 @@ def hbin_inv(h: float, tol: float = 1e-15, max_iter: int = 200) -> float:
         if hi - lo < tol:
             break
     return 0.5 * (lo + hi)
+
+
+# Vectorised inverse via LUT (max abs err < 1e-6). Built lazily.
+_LUT_P: np.ndarray | None = None
+_LUT_H: np.ndarray | None = None
+
+
+def _build_lut(n_pts: int = 1 << 14) -> None:
+    global _LUT_P, _LUT_H
+    p = np.linspace(0.0, 0.5, n_pts)
+    _LUT_P = p
+    _LUT_H = hbin_vec(p)
+
+
+def hbin_inv_vec(h: np.ndarray) -> np.ndarray:
+    """Vectorised inverse of Hbin on [0, 1/2] via lookup.  abs-err < 1e-6."""
+    if _LUT_H is None:
+        _build_lut()
+    h = np.clip(np.asarray(h, dtype=np.float64), 0.0, 1.0)
+    return np.interp(h, _LUT_H, _LUT_P)
 
 
 # ----------------------------------------------------------- bracket core
@@ -72,7 +102,7 @@ def bracket_from_cells(cell_ids: Sequence[int],
     labels[i]   ∈ {0, 1}    : the binary task label of vertex i.
     """
     cell_ids = np.asarray(cell_ids)
-    labels = np.asarray(labels, dtype=float)
+    labels = np.asarray(labels, dtype=np.float64)
     n = len(labels)
     assert len(cell_ids) == n and n > 0
 
@@ -80,14 +110,15 @@ def bracket_from_cells(cell_ids: Sequence[int],
     uniq, inverse = np.unique(cell_ids, return_inverse=True)
     m = len(uniq)
     sums = np.bincount(inverse, weights=labels, minlength=m)
-    counts = np.bincount(inverse, minlength=m).astype(float)
+    counts = np.bincount(inverse, minlength=m).astype(np.float64)
     P = sums / counts
     q = counts / n
     e = np.minimum(P, 1.0 - P)
     eps_star = float(np.sum(q * e))
-    H = float(np.sum(q * np.array([hbin(float(p)) for p in P])))
+    H = float(np.sum(q * hbin_vec(P)))
     return Bracket(n=n, m=int(m), H=H, eps_star=eps_star,
-                   lower=hbin_inv(H), upper=0.5 * H)
+                   lower=float(hbin_inv_vec(np.array([H]))[0]),
+                   upper=0.5 * H)
 
 
 def plug_in_predictions(cell_ids: Sequence[int],

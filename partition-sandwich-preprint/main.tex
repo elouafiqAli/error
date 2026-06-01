@@ -1836,9 +1836,13 @@ memorises the task'' on real graph benchmarks.
 
 \paragraph{E3d --- In-vivo audit of \cref{lem:mpnn-wl-robust}.}
 \cref{lem:mpnn-wl-robust} gives a worst-case envelope
-$\delta_{L} = \delta_{0} \prod_{\ell=1}^{L} L_{\ell} (1+\Delta)$
+$\delta_{L} = \delta_{0} \prod_{\ell=1}^{L}
+   (L_{\ell}^{c} + r_{T}\, L_{\ell}^{m})$
 on the within-WL-cell embedding diameter under bounded
-perturbations of $h^{(0)}$. We test it directly: fix a random-
+perturbations of $h^{(0)}$, with central / multiset-aggregator
+Lipschitz constants $L_{\ell}^{c}, L_{\ell}^{m}$ and aggregator
+factor $r_{T} \in \{\Delta, 1, 1\}$ for sum / mean / sym-norm.
+We test it directly: fix a random-
 init two-layer GIN on Cora and CiteSeer (raw-degree initial
 features lifted to a one-hot in $\mathbb{R}^{32}$); add
 Gaussian noise $\xi_{v} \sim \mathcal{N}(0, \delta_{0}^{2} I)$
@@ -1852,7 +1856,7 @@ forward audit.}
 \toprule
 Graph & $\delta_{0}$ & $D(L)$ & $\delta_{L}$ bound
       & looseness $\delta_{L}/D(L)$ & $\gamma_{\mathrm{eff}}^{(L)}$
-      & $(1+\Delta_{\max})\bar{L}_{\ell}$ \\
+      & $(L^{c}_{\ell}{+}\Delta_{\max} L^{m}_{\ell})$ \\
 \midrule
 Cora ($\Delta_{\max}=168$)
    & $0$       & $1.0\!\times\!10^{-14}$ & $0$ & ---
@@ -1890,7 +1894,11 @@ empirical max embedding-diameter over WL-equivalent pairs;
 $\delta_{L}$ is the lemma's worst-case bound;
 $\gamma_{\mathrm{eff}}^{(L)} := (D(L)/D(0))^{1/L}$ is the
 empirical per-round amplification factor, comparable to the
-worst-case $(1+\Delta_{\max})\bar{L}_{\ell}$. The lemma holds at
+worst-case sum-aggregator step
+$L^{c}_{\ell} + \Delta_{\max} L^{m}_{\ell}$ (here
+$L^{c}_{\ell} \approx (1{+}\varepsilon)\|W_{\ell}\|_{\rm op}$,
+$L^{m}_{\ell} \approx \|W_{\ell}\|_{\rm op}$, with the trainable
+GIN $\varepsilon \approx 0$ at random init). The lemma holds at
 every sweep point ($\delta_{0} = 0$ recovers strict equality at
 machine precision); the bound is loose by $6$--$7$ orders of
 magnitude, because $1+\Delta_{\max}$ is the worst-case fan-in,
@@ -1899,8 +1907,8 @@ across both graphs and all noise scales --- close to the
 identity per round --- suggesting that an
 average-degree (rather than max-degree) refinement of
 \cref{lem:mpnn-wl-robust} would tighten the bound by roughly
-$\bigl((1+\Delta_{\max})/\gamma_{\mathrm{eff}}\bigr)^{L}$ on
-real sparse graphs --- a $\approx 10^{6}\times$ improvement on
+$\bigl((L^{c}{+}\Delta_{\max} L^{m})/\gamma_{\mathrm{eff}}\bigr)^{L}$
+on real sparse graphs --- a $\approx 10^{6}\times$ improvement on
 Cora at $L=3$. We leave such a mean-Lipschitz refinement to
 future work; raw outputs in
 \texttt{experiments/results/e3e.json}.}
