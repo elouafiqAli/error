@@ -16,19 +16,40 @@ Re-derived each non-trivial claim from scratch. Final
 confidences (probability the claim survives a rigorous TCS
 reviewer):
 
-| Claim | Final confidence | Notes |
-|---|---|---|
-| T1 variance bracket $p(1-p)\le\min(p,1-p)\le 2p(1-p)$ | 0.98 | Trivial proof. Additive slack $\le 1/4$ vs entropy $\le 0.161$ — entropy strictly tighter additively. |
-| T2 Pinsker $H_2^{-1}(H)\ge \tfrac12 - \tfrac12\sqrt{\ln 4\cdot(1-H)}$ | 0.95 | Standard binary Pinsker. |
-| T3 meta-theorem $\phi$-bracket | 0.92 | True; requires explicit hypothesis: $\phi$ concave, $\phi(0)=0$, $\phi^{-1}$ defined on image for Jensen-sharp lower side. |
-| T4 noise correction $\varepsilon^\*(\tilde f) = \eta + (1-2\eta)\varepsilon^\*(f)$ | 0.95 pop / 0.80 finite | Holds **exactly** at the population level — no proviso needed (my prior claim of $\min_C\|P_C-1/2\| > \eta$ was wrong). Finite-sample sign flips are the standard concentration concern. |
-| T5 Rand-index partition stability | **0.40** | Unverified. Drop unless proven. |
-| T6 refinement-to-discreteness pinch | 0.99 | Trivial. |
-| T7 regression bracket | 0.95 reformulated / 0.50 as originally stated | Honest form: MSE = $\mathbb E[\mathrm{Var}]$ identity (no bracket); MAE Cauchy–Schwarz upper only. |
-| T8 soft-partition / Markov-kernel bracket | 0.90 | Holds with explicit definition $\varepsilon^\*_K := \sum_C q_C^K \min(P_C^K, 1-P_C^K)$. |
-| T9 Lemma 6′ exponential blow-up | 0.95 | Correct for *sum* aggregator; trivialised for *mean*; depends on aggregator type — paper's blanket statement needs splitting. |
+| Claim | Pre-G2 confidence | Post-G2 confidence | Verification status (2026-06-01) |
+|---|---|---|---|
+| T1 variance bracket $p(1-p)\le\min(p,1-p)\le 2p(1-p)$ | 0.98 | 0.99 | Trivial; subsumed by C-Va inside T3. |
+| T2 Pinsker $H_2^{-1}(H)\ge \tfrac12 - \tfrac12\sqrt{\ln 4\cdot(1-H)}$ | 0.95 | 0.97 | Standard binary Pinsker; encoded in C-Pi (`verify_b_t1.CPi_pinsker_constant`). |
+| T3 meta-theorem $\phi$-bracket | 0.92 | **0.98 (HIGH)** | Proved in `partition-brackets-framework/main.md §2` with explicit (H1)–(H4); SymPy contracts `T3_jensen_lower`, `T3_upper_constant`, `T3_upper_constant_arbitrary_phi`; 15-seed sweep + mutation (`T3_wrong_c_phi`) caught at audit/stress.json. |
+| T4 noise correction $\varepsilon^\*(\tilde f) = \eta + (1-2\eta)\varepsilon^\*(f)$ | 0.95 pop / 0.80 finite | **0.98 (HIGH)** | Promoted to T7 in Paper B; symbolic (`T7_noise_correction_symbolic`) and population MC (`T7_noise_correction_population` over 200 trials × 3 ρ) green; mutation `T7_wrong_sign` caught; cross-paper reconciliation against `partition-sandwich-preprint/verify_t1_float.py` agrees to 7.5e-16 (`T7_shannon_matches_paperA`). |
+| T5 Rand-index partition stability | **0.40** | **0.40** (deferred to Paper C) | Still unverified; not part of Paper B Gate G2. |
+| T6 refinement-to-discreteness pinch | 0.99 | **0.99 (HIGH)** | Proved as P10 in `main.md §6`; `verify_b_t1.P10_refinement_monotonicity` and boundary `P10_refinement_to_atoms_phi_zero` green. |
+| T7 regression bracket (Paper B's T6, the MSE/MAE one) | 0.95 reformulated / 0.50 as originally stated | **0.95 (HIGH)** | Reformulated honestly: `T6_MSE_identity_population` (identity, not bracket) + `T6_MAE_upper_population` (Cauchy–Schwarz upper) both green at production MC. MAE matching lower bound left as open problem in §4. |
+| T8 soft-partition / Markov-kernel bracket | 0.90 | **0.95 (HIGH)** | Proved as T9 in `main.md §5`; `T9_kernel_bracket_population` over 200 trials, both Shannon and variance, envelope $\varepsilon^*_K$ within Hoeffding; boundary `T9_deterministic_reduces_to_T3` green to 1e-12. |
+| T9 Lemma 6′ exponential blow-up | 0.95 | **0.97 (HIGH)** | Aggregator-typed split done as L11 in `main.md §6`; `verify_b_t1.L11_aggregator_deltaL` green. |
+| C-Sh, C-Va, C-Pi Shannon/variance/Gini instances of T3 | n/a (new in Paper B) | **0.98 (HIGH)** | All three closed-form $c_\phi$ values certified symbolically (`CSh_reduces_to_paperA`, `CVa_bayes_variance_identity`, `CPi_pinsker_constant`) and MC at population (`CVa_variance_identity_population`); mutation `CVa_wrong_identity` (eta(1+eta)) caught. |
 
-**Material corrections to prior turns:**
+**Audit infrastructure** — promotions above are justified by the following
+machine-checked evidence (artefacts live in the workspace, not in the
+preprint tree):
+
+- `partition-brackets-framework/verify_b_t1.py`: 8/8 SymPy + Hypothesis
+  contracts on the critical path (T3, T6, T7, T9, P10, L11, C-Sh,
+  C-Va, C-Pi).
+- `partition-brackets-framework/verify_b_t2_mc.py`: 6/6 Monte-Carlo
+  contracts at population, including the cross-paper reconciliation
+  `T7_shannon_matches_paperA` (B.5 — imports
+  `partition-sandwich-preprint/verify_t1_float.hbin / hbin_inv`).
+- `partition-brackets-framework/audit/stress.py`: A.1 seed sweep
+  (15 seeds × 14 contracts at trials=500, samples=50 000 — 0 failures
+  over 210 invocations, wall 20m44s), A.1' mutation test (3 wrong
+  identities, all rejected), A.2 boundary tests (13 explicit
+  pathological-input checks, 0 failures). Manifest at
+  `partition-brackets-framework/audit/stress.json`.
+- Git tag `v0.1.0-paperB-G2` on commit `de852d5` certifies the Gate G2
+  close; audit landed on `74f127d`; B.5 reconciliation on `8cbf86a`.
+
+**Material corrections to prior turns (kept for the record):**
 
 - **T4**: the noise correction is exact at the population level. No
   proviso. The proviso I asserted earlier is a finite-sample
@@ -38,6 +59,19 @@ reviewer):
 - **T7**: reformulated. MSE case is an *identity*, not a bracket.
 - **T3**: hypothesis $\phi^{-1}$ on image needed for the Jensen-sharp
   lower side. Variance instance: $\phi^{-1}(v)=\tfrac12-\tfrac12\sqrt{1-4v}$.
+
+**Open items (post-G2, blocking the move to HIGH+ / publishable):**
+
+1. Matching MAE *lower* bound for Paper B's T6 (currently upper only).
+2. Paper A's claim numbers (Prop 7 etc.) should be grep-audited against
+   `partition-sandwich-preprint/main.tex` for any stale references in
+   Paper B prose (B.6).
+3. Phase 2d — LaTeX mirror of `main.md → main.tex`. The markdown is the
+   sole authoritative source today.
+4. Empirical anchoring (D) — at least one real-data witness per
+   instance, reusing the JSON in
+   `partition-sandwich-preprint/experiments/results/` (zero new
+   training).
 
 ---
 
