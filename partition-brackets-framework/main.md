@@ -34,9 +34,17 @@ to Phase 2d.
 > refinement. Manifest: `audit/anchor_real_data_full.json`
 > (zero failures, wall ≈ 10 s on a single CPU core; no GPU,
 > no new training). C-Pi is genuinely vacuous (raw lower < 0)
-> for deep-$L$ rows where $H$ falls below ≈ $0.279$; the
+> for deep-$L$ rows where $H$ falls below ≈ $0.279$[^bk-0279]; the
 > contract uses the 0-clipped envelope, which is the
 > publishable convention.
+
+[^bk-0279]: $0.279 = 1 - 1/(2 \ln 2)$ is the C-Pi vacuity
+  threshold derived in the adversarial check of Theorem C-Pi
+  (§3). Empirical clipping is observed in 8 of the 20 rows of
+  `audit/anchor_real_data_full.json` (cells
+  `rows[*].C_Pi.vacuous == true`), all at refinement depth
+  $L \geq 1$ on ogbn_arxiv / twitch_en and at $L \geq 2$ on
+  cora / citeseer / pubmed; see Table B.4.
 
 ---
 
@@ -168,7 +176,14 @@ i.e. the fraction of injected mutants caught by *at least
 one* property contract in the suite. A screen is
 **comprehensive** if it covers every load-bearing line of
 the reference implementation; *production discovery rate*
-is $\rho_{\mathcal{M}} = 1$ (no silent mutants).
+is $\rho_{\mathcal{M}} = 1$[^bk-rhoM] (no silent mutants).
+
+[^bk-rhoM]: $\rho_{\mathcal{M}_{\mathrm{B}}} = 1$ is the
+  observed discovery rate on the $K = 3$ mutants of
+  `audit/stress.py` (`T7_wrong_sign`, `T3_wrong_c_phi`,
+  `CVa_wrong_identity`), logged at JSON path
+  `audit/external_audit/T3_stress.json :: mutation_test.all_caught == true`.
+  Comprehensiveness is OP-mut, §7.
 
 > *Status (Phase 2b-md.G2).* The mutation screen
 > $\mathcal{M}_{\mathrm{B}}$ in `audit/stress.py` ships
@@ -266,8 +281,15 @@ $$
 $$
 where the second inequality uses $\sum_i c_i^2 \leq (b-a)^2/N$.
 For $\alpha = 0.05$ this is $\leq 2 \cdot (0.025)^{16}
-\approx 4.6 \times 10^{-26}$ per contract evaluation,
+\approx 4.6 \times 10^{-26}$[^bk-46e26] per contract evaluation,
 *independent of the range $[a, b]$* once $h$ absorbs $(b-a)$.
+
+[^bk-46e26]: $4.6 \times 10^{-26} = 2 \cdot (\alpha/2)^{16}$ at
+  $\alpha = 0.05$, the per-contract Type-I cap derived in the
+  proof of Proposition 0.4 (line above). Reproducible by
+  `python3 -c "print(2*(0.025)**16)"`. The $16$ exponent comes
+  from the $(4h)^2 / (\sum c_i^2) \geq 16 \ln(2/\alpha)$ step in
+  the McDiarmid invocation.
 
 > *Why McDiarmid, not Hoeffding alone.* The B-T2 verifiers in
 > `verify_b_t2_mc.py` compare *plug-in estimators*
@@ -1190,8 +1212,16 @@ theoretic statement of that previewed bracket.
   A's binary-entropy bracket (`thm:sandwich`, Paper A
   Theorem~1, evaluated under the affine relabelling (T7.affine))
   to 4 decimals on the same cohort. Worst gap on production
-  cohort: $|\Delta_{\mathrm{lower}}| = 7.8\times 10^{-16}$,
+  cohort: $|\Delta_{\mathrm{lower}}| = 7.8\times 10^{-16}$[^bk-78e16],
   $|\Delta_{\mathrm{upper}}| = 0$.
+
+[^bk-78e16]: $7.8 \times 10^{-16}$ = worst-case absolute gap
+  between Paper A's `verify_t1_float` Shannon bracket lower
+  endpoint and Paper B's `verify_b_t1` Shannon corollary at
+  the production cohort (200 trials × 3 noise levels
+  $\rho \in \{0.05, 0.10, 0.20\}$). Sourced from
+  `verify_b_t2.json :: results[?(name=="T7_shannon_matches_paperA")].message`
+  (Table B.2, row 13).
 
 ---
 
@@ -1370,7 +1400,18 @@ $\square$
 $\varepsilon$-robust MPNN–WL constancy lemma
 (`lem:mpnn-wl-robust`, the aggregator-typed cumulative
 Lipschitz constant in Paper A §6) symbol-for-symbol; the
-$r_T \in \{\Delta, 1, 1\}$ table is identical.
+$r_T \in \{\Delta, 1, 1\}$[^bk-rT] table is identical.
+
+[^bk-rT]: The aggregator-constant triple
+  $r_T = (\Delta, 1, 1)$ for $T \in \{\mathrm{sum},
+  \mathrm{mean}, \mathrm{sym\text{-}norm}\}$ is defined in
+  the L11 "aggregator constant" display equation above and
+  proven in Step 2 of the L11 proof. Verified empirically on
+  the linear MPNN cohort by
+  `verify_b_t1.py::check_L11_aggregator_deltaL` for each $T$;
+  see `verify_b_t1.json :: results[?(name=="L11_aggregator_deltaL")]`.
+  Symbol-for-symbol parity with Paper A's `lem:mpnn-wl-robust`
+  table is checked manually (no cross-paper verifier shipped).
 
 *Failure mode.* If $C_\ell$ is not $L^c_\ell$-Lipschitz in arg
 1 (e.g. uses a non-Lipschitz activation like the unconstrained
