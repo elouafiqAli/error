@@ -1,0 +1,23 @@
+[phase1] device=cuda  out_dir=/workspace/out
+[phase1] ogbn_arxiv  n=169343  |E|=2332486  d_in=128  pi=0.1613  k_WL=161943  eps_WL=0.0021  k_grid=[16, 64, 256, 1024, 4096]
+  [phase1] GCN   seed=0  Rhat=0.0488  loss=0.1290  train_wall=10.1s  cell_wall=12.3s  -> Z_GCN_0.npz (43.4 MB raw)
+  [phase1] GCN   seed=1  Rhat=0.0505  loss=0.1278  train_wall=9.7s  cell_wall=11.8s  -> Z_GCN_1.npz (43.4 MB raw)
+  [phase1] GCN   seed=2  Rhat=0.0488  loss=0.1260  train_wall=9.7s  cell_wall=11.9s  -> Z_GCN_2.npz (43.4 MB raw)
+  [phase1] GCN   seed=3  Rhat=0.0476  loss=0.1253  train_wall=9.7s  cell_wall=11.8s  -> Z_GCN_3.npz (43.4 MB raw)
+  [phase1] GCN   seed=4  Rhat=0.0563  loss=0.1322  train_wall=9.7s  cell_wall=11.8s  -> Z_GCN_4.npz (43.4 MB raw)
+  [phase1] GAT   seed=0  Rhat=0.0524  loss=0.1331  train_wall=15.6s  cell_wall=17.8s  -> Z_GAT_0.npz (43.4 MB raw)
+  [phase1] GAT   seed=1  Rhat=0.0530  loss=0.1344  train_wall=15.6s  cell_wall=17.8s  -> Z_GAT_1.npz (43.4 MB raw)
+  [phase1] GAT   seed=2  Rhat=0.0530  loss=0.1343  train_wall=15.6s  cell_wall=17.8s  -> Z_GAT_2.npz (43.4 MB raw)
+  [phase1] GAT   seed=3  Rhat=0.0534  loss=0.1351  train_wall=15.6s  cell_wall=17.8s  -> Z_GAT_3.npz (43.4 MB raw)
+  [phase1] GAT   seed=4  Rhat=0.0532  loss=0.1347  train_wall=15.6s  cell_wall=17.7s  -> Z_GAT_4.npz (43.4 MB raw)
+  [phase1] GIN   seed=0  Rhat=0.1333  loss=0.3760  train_wall=7.2s  cell_wall=9.3s  -> Z_GIN_0.npz (43.4 MB raw)
+  [phase1] GIN   seed=1  Rhat=0.1331  loss=0.3660  train_wall=7.2s  cell_wall=9.4s  -> Z_GIN_1.npz (43.4 MB raw)
+  [phase1] GIN   seed=2  Rhat=0.1620  loss=0.4260  train_wall=7.2s  cell_wall=7.9s  -> Z_GIN_2.npz (43.4 MB raw)
+  [phase1] GIN   seed=3  Rhat=0.1362  loss=0.5628  train_wall=7.2s  cell_wall=9.3s  -> Z_GIN_3.npz (43.4 MB raw)
+  [phase1] GIN   seed=4  Rhat=0.2181  loss=1.6022  train_wall=7.1s  cell_wall=9.1s  -> Z_GIN_4.npz (43.4 MB raw)
+  [phase1] SAGE  seed=0  Rhat=0.0526  loss=0.1322  train_wall=6.5s  cell_wall=8.5s  -> Z_SAGE_0.npz (43.4 MB raw)
+  [phase1] SAGE  seed=1  Rhat=0.0523  loss=0.1265  train_wall=6.5s  cell_wall=8.5s  -> Z_SAGE_1.npz (43.4 MB raw)
+  [phase1] SAGE  seed=2  Rhat=0.0498  loss=0.1256  train_wall=6.5s  cell_wall=8.5s  -> Z_SAGE_2.npz (43.4 MB raw)
+  [phase1] SAGE  seed=3  Rhat=0.0504  loss=0.1257  train_wall=6.5s  cell_wall=8.5s  -> Z_SAGE_3.npz (43.4 MB raw)
+  [phase1] SAGE  seed=4  Rhat=0.0547  loss=0.1720  train_wall=6.5s  cell_wall=8.4s  -> Z_SAGE_4.npz (43.4 MB raw)
+[phase1] wrote meta.json + 20 Z_*.npz to /workspace/out  total_wall=236s

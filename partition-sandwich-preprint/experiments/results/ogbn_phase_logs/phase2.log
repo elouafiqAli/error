@@ -1,0 +1,23 @@
+[phase2] dataset=ogbn_arxiv  n=169343  k_WL=161943  eps_WL=0.0021  k_grid=[16, 64, 256, 1024, 4096]
+[phase2] cells = 4 archs x 5 seeds = 20
+  [phase2] GCN   seed=0  Rhat=0.0488  eps_tr(k=4096)=0.0480  feat_gap=-0.0459  cell_wall=101.5s
+  [phase2] GCN   seed=1  Rhat=0.0505  eps_tr(k=4096)=0.0476  feat_gap=-0.0455  cell_wall=84.6s
+  [phase2] GCN   seed=2  Rhat=0.0488  eps_tr(k=4096)=0.0465  feat_gap=-0.0444  cell_wall=77.3s
+  [phase2] GCN   seed=3  Rhat=0.0476  eps_tr(k=4096)=0.0471  feat_gap=-0.0449  cell_wall=86.7s
+  [phase2] GCN   seed=4  Rhat=0.0563  eps_tr(k=4096)=0.0488  feat_gap=-0.0466  cell_wall=90.9s
+  [phase2] GAT   seed=0  Rhat=0.0524  eps_tr(k=4096)=0.0510  feat_gap=-0.0489  cell_wall=81.5s
+  [phase2] GAT   seed=1  Rhat=0.0530  eps_tr(k=4096)=0.0508  feat_gap=-0.0487  cell_wall=87.3s
+  [phase2] GAT   seed=2  Rhat=0.0530  eps_tr(k=4096)=0.0517  feat_gap=-0.0495  cell_wall=89.7s
+  [phase2] GAT   seed=3  Rhat=0.0534  eps_tr(k=4096)=0.0518  feat_gap=-0.0497  cell_wall=90.6s
+  [phase2] GAT   seed=4  Rhat=0.0532  eps_tr(k=4096)=0.0516  feat_gap=-0.0495  cell_wall=87.2s
+  [phase2] GIN   seed=0  Rhat=0.1333  eps_tr(k=4096)=0.1274  feat_gap=-0.1252  cell_wall=89.5s
+  [phase2] GIN   seed=1  Rhat=0.1331  eps_tr(k=4096)=0.1298  feat_gap=-0.1276  cell_wall=89.1s
+  [phase2] GIN   seed=2  Rhat=0.1620  eps_tr(k=4096)=0.1570  feat_gap=-0.1549  cell_wall=90.7s
+  [phase2] GIN   seed=3  Rhat=0.1362  eps_tr(k=4096)=0.1253  feat_gap=-0.1231  cell_wall=88.7s
+  [phase2] GIN   seed=4  Rhat=0.2181  eps_tr(k=4096)=0.1230  feat_gap=-0.1209  cell_wall=93.4s
+  [phase2] SAGE  seed=0  Rhat=0.0526  eps_tr(k=4096)=0.0515  feat_gap=-0.0493  cell_wall=94.1s
+  [phase2] SAGE  seed=1  Rhat=0.0523  eps_tr(k=4096)=0.0481  feat_gap=-0.0460  cell_wall=98.5s
+  [phase2] SAGE  seed=2  Rhat=0.0498  eps_tr(k=4096)=0.0486  feat_gap=-0.0465  cell_wall=89.7s
+  [phase2] SAGE  seed=3  Rhat=0.0504  eps_tr(k=4096)=0.0482  feat_gap=-0.0461  cell_wall=91.9s
+  [phase2] SAGE  seed=4  Rhat=0.0547  eps_tr(k=4096)=0.0515  feat_gap=-0.0493  cell_wall=91.3s
+[phase2] wrote /workspace/out/e3d_arch_full.ogbn_only.json  (20 runs, total wall 1794s)

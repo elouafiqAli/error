@@ -2025,6 +2025,12 @@ Twitch-EN ($k{=}4096{<}k_{\mathrm{WL}}{=}6648$)
  & GAT  & $0.416{\pm}0.001$ & $0.195{\pm}0.005$ & $\mathbf{-0.168{\pm}0.005}$ & $-0.221{\pm}0.005$ \\
  & GIN  & $0.408{\pm}0.015$ & $0.190{\pm}0.004$ & $\mathbf{-0.164{\pm}0.004}$ & $-0.218{\pm}0.014$ \\
  & SAGE & $0.376{\pm}0.009$ & $0.181{\pm}0.005$ & $\mathbf{-0.154{\pm}0.005}$ & $-0.195{\pm}0.012$ \\
+\midrule
+ogbn-arxiv ($k{=}4096{<}k_{\mathrm{WL}}{=}161\,943$)
+ & GCN   & $0.050{\pm}0.003$ & $0.048{\pm}0.001$ & $\mathbf{-0.045{\pm}0.001}$ & $-0.003{\pm}0.003$ \\
+ & GAT   & $0.053{\pm}0.000$ & $0.051{\pm}0.000$ & $\mathbf{-0.049{\pm}0.000}$ & $-0.002{\pm}0.000$ \\
+ & GIN   & $0.157{\pm}0.033$ & $0.132{\pm}0.012$ & $\mathbf{-0.130{\pm}0.012}$ & $-0.024{\pm}0.036$ \\
+ & SAGE  & $0.052{\pm}0.002$ & $0.050{\pm}0.002$ & $\mathbf{-0.047{\pm}0.002}$ & $-0.002{\pm}0.001$ \\
 \bottomrule
 \end{tabular}
 \caption{E3d-arch-full: 5-seed, 4-architecture, 4-dataset
@@ -2048,10 +2054,7 @@ their feat\_gap signs conflate features-vs-WL with $k$-budget
 mismatch; the Twitch-EN $\hat R \approx 0.41$ is itself close
 to the trivial constant baseline ($1 - \pi = 0.454$). Closing
 the $k$-mismatch is the natural next experiment.
-\textbf{Limitation:} ogbn-arxiv (fifth E3 dataset,
-$n = 169\,343$, $k_{\mathrm{WL}} = 161\,943$) is not in this
-sweep; documented as \texttt{merge\_provenance.missing\_dataset}
-in the raw output. Raw outputs:
+\textbf{Closing the loop on ogbn-arxiv:} the ogbn-arxiv block uses the same evaluation budget caveat ($k=4096<k_{\mathrm{WL}}=161\,943$); the 5/5 merge is at \texttt{experiments/results/e3d\_arch\_full.5of5.json}; two-phase split docs in \texttt{experiments/runpod/README.md}. Raw outputs:
 \texttt{experiments/results/e3d\_arch\_full.4of5.json}.}
 \label{tab:e3d-arch-full}
 \end{table}
@@ -2161,10 +2164,14 @@ and $36.8$ pp).}
 \includegraphics[width=0.48\linewidth]{experiments/figures/e6_nas_v2_kendall.pdf}
 \caption{E6-NAS: lower bracket endpoint vs.\ held-out test
 error (left) and Kendall-$\tau$ comparison vs.\ parameter
-count (right) on a heterogeneous ten-architecture menu over
-UCI Adult. The bracket attains $\tau = 0.48$
-($p = 5{\times}10^{-5}$) with held-out test error; parameter
-count \emph{anti}-ranks at $\tau = -0.38$.}
+count (right) on a heterogeneous $35$-architecture menu over
+UCI Adult ($n_{\mathrm{tr}} = 36{,}177$). The bracket attains
+$\tau = 0.48$ ($p = 5{\times}10^{-5}$) with held-out test error;
+parameter count \emph{anti}-ranks at $\tau = -0.38$. The
+companion digits-bin row ($n_{\mathrm{tr}} = 1{,}437$,
+$\tau = +0.11$, CI crosses zero) is plotted in the JSON-only
+v2 artefact; it is the predicted small-$n$ failure regime of
+\cref{prop:pop} and is reported in \cref{tab:e6nas}.}
 \label{fig:e6nas}
 \end{figure}
 

@@ -1,0 +1,199 @@
+{
+  "phase": "phase1_train_dump_Z",
+  "dataset": "ogbn_arxiv",
+  "n": 169343,
+  "edges": 2332486,
+  "in_dim": 128,
+  "pi": 0.1613352781042027,
+  "target_class": 16,
+  "eps_WL": 0.002125862893653709,
+  "k_WL": 161943,
+  "k_grid": [
+    16,
+    64,
+    256,
+    1024,
+    4096
+  ],
+  "archs": [
+    "GCN",
+    "GAT",
+    "GIN",
+    "SAGE"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "hidden": 128,
+  "depth_L": 3,
+  "epochs": 200,
+  "device": "cuda",
+  "z_dtype": "float16",
+  "total_wall_s": 235.9120051190257,
+  "per_cell_walls": [
+    {
+      "arch": "GCN",
+      "seed": 0,
+      "wall_train_s": 10.096400488168001,
+      "wall_cell_s": 12.288745891302824,
+      "Rhat": 0.04878855496644974,
+      "train_loss_final": 0.12903212010860443
+    },
+    {
+      "arch": "GCN",
+      "seed": 1,
+      "wall_train_s": 9.687991138547659,
+      "wall_cell_s": 11.820585582405329,
+      "Rhat": 0.05051876977086067,
+      "train_loss_final": 0.12775927782058716
+    },
+    {
+      "arch": "GCN",
+      "seed": 2,
+      "wall_train_s": 9.696518633514643,
+      "wall_cell_s": 11.853325698524714,
+      "Rhat": 0.04882989078760147,
+      "train_loss_final": 0.12599481642246246
+    },
+    {
+      "arch": "GCN",
+      "seed": 3,
+      "wall_train_s": 9.685721136629581,
+      "wall_cell_s": 11.807280838489532,
+      "Rhat": 0.04764294996857643,
+      "train_loss_final": 0.12527652084827423
+    },
+    {
+      "arch": "GCN",
+      "seed": 4,
+      "wall_train_s": 9.68592144548893,
+      "wall_cell_s": 11.783325847238302,
+      "Rhat": 0.05626450851559639,
+      "train_loss_final": 0.13216224312782288
+    },
+    {
+      "arch": "GAT",
+      "seed": 0,
+      "wall_train_s": 15.630899496376514,
+      "wall_cell_s": 17.8212450183928,
+      "Rhat": 0.05244976282119751,
+      "train_loss_final": 0.13306085765361786
+    },
+    {
+      "arch": "GAT",
+      "seed": 1,
+      "wall_train_s": 15.623392388224602,
+      "wall_cell_s": 17.778235226869583,
+      "Rhat": 0.05298713594675064,
+      "train_loss_final": 0.13438570499420166
+    },
+    {
+      "arch": "GAT",
+      "seed": 2,
+      "wall_train_s": 15.619837444275618,
+      "wall_cell_s": 17.77904485166073,
+      "Rhat": 0.05295760929584503,
+      "train_loss_final": 0.13431225717067719
+    },
+    {
+      "arch": "GAT",
+      "seed": 3,
+      "wall_train_s": 15.628611087799072,
+      "wall_cell_s": 17.780672270804644,
+      "Rhat": 0.053370971232652664,
+      "train_loss_final": 0.13506950438022614
+    },
+    {
+      "arch": "GAT",
+      "seed": 4,
+      "wall_train_s": 15.621824845671654,
+      "wall_cell_s": 17.71391337737441,
+      "Rhat": 0.053182005882263184,
+      "train_loss_final": 0.1346779316663742
+    },
+    {
+      "arch": "GIN",
+      "seed": 0,
+      "wall_train_s": 7.173005599528551,
+      "wall_cell_s": 9.338656287640333,
+      "Rhat": 0.13326798379421234,
+      "train_loss_final": 0.3760099709033966
+    },
+    {
+      "arch": "GIN",
+      "seed": 1,
+      "wall_train_s": 7.1684478633105755,
+      "wall_cell_s": 9.40577808022499,
+      "Rhat": 0.13311445713043213,
+      "train_loss_final": 0.3659748435020447
+    },
+    {
+      "arch": "GIN",
+      "seed": 2,
+      "wall_train_s": 7.166775207966566,
+      "wall_cell_s": 7.947642933577299,
+      "Rhat": 0.1619848608970642,
+      "train_loss_final": 0.42602768540382385
+    },
+    {
+      "arch": "GIN",
+      "seed": 3,
+      "wall_train_s": 7.168559055775404,
+      "wall_cell_s": 9.301894873380661,
+      "Rhat": 0.13616152107715607,
+      "train_loss_final": 0.5628407001495361
+    },
+    {
+      "arch": "GIN",
+      "seed": 4,
+      "wall_train_s": 7.1325266025960445,
+      "wall_cell_s": 9.099665984511375,
+      "Rhat": 0.21805448830127716,
+      "train_loss_final": 1.602156162261963
+    },
+    {
+      "arch": "SAGE",
+      "seed": 0,
+      "wall_train_s": 6.468085158616304,
+      "wall_cell_s": 8.517374224960804,
+      "Rhat": 0.052556056529283524,
+      "train_loss_final": 0.13218261301517487
+    },
+    {
+      "arch": "SAGE",
+      "seed": 1,
+      "wall_train_s": 6.4675150364637375,
+      "wall_cell_s": 8.468816585838795,
+      "Rhat": 0.05225489288568497,
+      "train_loss_final": 0.12648379802703857
+    },
+    {
+      "arch": "SAGE",
+      "seed": 2,
+      "wall_train_s": 6.465195640921593,
+      "wall_cell_s": 8.50381463766098,
+      "Rhat": 0.04982786625623703,
+      "train_loss_final": 0.12562178075313568
+    },
+    {
+      "arch": "SAGE",
+      "seed": 3,
+      "wall_train_s": 6.4618509113788605,
+      "wall_cell_s": 8.460182942450047,
+      "Rhat": 0.050436098128557205,
+      "train_loss_final": 0.12566237151622772
+    },
+    {
+      "arch": "SAGE",
+      "seed": 4,
+      "wall_train_s": 6.46361656114459,
+      "wall_cell_s": 8.440486669540405,
+      "Rhat": 0.05469963699579239,
+      "train_loss_final": 0.17203007638454437
+    }
+  ]
+}

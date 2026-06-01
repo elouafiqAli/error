@@ -119,7 +119,7 @@ def _patch_md(md_path: Path, summary: dict) -> bool:
     k_WL = s["k_WL"]
     eps_WL = s["eps_WL"]
     header = (
-        f"| ogbn-arxiv ({eps_WL:.4f}, k={K}<k_WL={k_WL}) "
+        f"| ogbn-arxiv ({eps_WL:.4f}, k={K}<k_WL={k_WL}) |"
     )
     md_rows_lines = [header + _fmt_md_row("GCN", s["rows"]["GCN"]).split("| |", 1)[1]]
     for arch in ["GAT", "GIN", "SAGE"]:
@@ -170,10 +170,10 @@ def _patch_tex(tex_path: Path, summary: dict) -> bool:
     K = s["K_eval"]
     k_WL = s["k_WL"]
     eps_WL = s["eps_WL"]
+    k_WL_tex = f"{k_WL:,}".replace(",", r"\,")
     header = (
         f"\\midrule\n"
-        f"ogbn-arxiv ($k{{=}}{K}{{<}}k_{{\\mathrm{{WL}}}}{{=}}{k_WL:,}$)\n"
-        .replace(",", "\\,")
+        f"ogbn-arxiv ($k{{=}}{K}{{<}}k_{{\\mathrm{{WL}}}}{{=}}{k_WL_tex}$)\n"
     )
     tex_rows = [_fmt_tex_row(a, s["rows"][a]) for a in ["GCN", "GAT", "GIN", "SAGE"]]
     tex_block = header + "\n".join(tex_rows) + "\n"
@@ -196,8 +196,8 @@ def _patch_tex(tex_path: Path, summary: dict) -> bool:
         end = src.index(".", end) + 1
         new_clause = (
             "\\textbf{Closing the loop on ogbn-arxiv:} the ogbn-arxiv "
-            f"block uses the same evaluation budget caveat ($k={K}<k_{{\\mathrm{{WL}}}}={k_WL:,}$"
-            ".replace(',', '\\\\,')); the 5/5 merge is at "
+            f"block uses the same evaluation budget caveat ($k={K}<k_{{\\mathrm{{WL}}}}={k_WL_tex}$); "
+            "the 5/5 merge is at "
             "\\texttt{experiments/results/e3d\\_arch\\_full.5of5.json}; "
             "two-phase split docs in \\texttt{experiments/runpod/README.md}."
         )

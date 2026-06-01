@@ -226,7 +226,11 @@ entropy-bounds-Bayes-error literature.
   fit (E6); as a heterogeneous-menu NAS pre-filter the bracket
   attains Kendall $\tau = 0.48$ ($p = 5{\times}10^{-5}$) with
   held-out test error on Adult while parameter count *anti*-ranks
-  the same menu ($\tau = -0.38$, E6-NAS); on feature-rich citation
+  the same menu ($\tau = -0.38$, E6-NAS) — though on the
+  small-$n$ digits-bin companion the bracket ranking collapses
+  to noise ($\tau = +0.11$, CI crosses zero), instantiating the
+  predicted finite-sample failure regime of Proposition 7 that
+  we report alongside the headline; on feature-rich citation
   / social graphs the depth-$3$ $1$-WL partition becomes
   near-discrete (95.6% singleton cells on ogbn-arxiv), exposing
   the bracket's partition-cardinality collapse regime which we
@@ -1186,6 +1190,10 @@ over seeds:
 | | GAT | 0.416 ± 0.001 | 0.195 ± 0.005 | **−0.168 ± 0.005** | −0.221 ± 0.005 |
 | | GIN | 0.408 ± 0.015 | 0.190 ± 0.004 | **−0.164 ± 0.004** | −0.218 ± 0.014 |
 | | SAGE | 0.376 ± 0.009 | 0.181 ± 0.005 | **−0.154 ± 0.005** | −0.195 ± 0.012 |
+| ogbn-arxiv (0.0021, k=4096<k_WL=161943) | GCN | 0.050 ± 0.003 | 0.048 ± 0.001 | **-0.045 ± 0.001** | -0.003 ± 0.003 |
+| | GAT | 0.053 ± 0.000 | 0.051 ± 0.000 | **-0.049 ± 0.000** | -0.002 ± 0.000 |
+| | GIN | 0.157 ± 0.033 | 0.132 ± 0.012 | **-0.130 ± 0.012** | -0.024 ± 0.036 |
+| | SAGE | 0.052 ± 0.002 | 0.050 ± 0.002 | **-0.047 ± 0.002** | -0.002 ± 0.001 |
 
 The extended sweep ($16$ arch-dataset cells × 5 seeds = 80 runs,
 total wall $\approx 53.7$ min) reproduces and sharpens the
@@ -1235,17 +1243,19 @@ the $k$-mismatch on PubMed / Twitch-EN is the natural next
 experiment (E3d-arch-full+: evaluate at $k = k_{\mathrm{WL}}$
 directly).
 
-**Limitation.** ogbn-arxiv (the fifth dataset of E3) is not
-included in this sweep: the 5-seed × 4-arch run at $n =
-169\,343$, $k_{\mathrm{WL}} = 161\,943$ requires GPU memory
-and wall budget that exceeded our current cap. We document
-this as `merge_provenance.missing_dataset = "ogbn_arxiv"` in
-the raw output (`experiments/results/e3d_arch_full.4of5.json`)
-and leave the ogbn-arxiv block to a follow-up audit. Raw
-outputs for the 4/5 sweep are at
-`experiments/results/e3d_arch_full.4of5.json` (merged from
-`e3d_arch_full.partial_3of5.json` on CUDA and
-`e3d_arch_full.twitch_only.json` on CPU; total wall $3224$ s).
+**Closing the loop on ogbn-arxiv.** The ogbn-arxiv row
+(eval $k = 4096 < k_{\mathrm{WL}} = 161943$, 5 seeds,
+CUDA + CPU two-phase split, see
+`experiments/runpod/README.md`) inherits the same
+$k$-budget caveat as PubMed and Twitch-EN: $\varepsilon^*
+_{\Pi^{\mathrm{tr}}_k}$ is evaluated on a coarser
+partition than $\varepsilon_{\mathrm{WL}}$, so a negative
+feat\_gap conflates features-vs-WL with $k$-mismatch. The
+raw 5/5 merge is at
+`experiments/results/e3d_arch_full.5of5.json`
+(merge provenance recorded inline; CUDA L4 Phase 1 + CPU
+Phase 2 walls separately stamped).
+
 
 #### E3f — Richer-than-1-WL initialisation on CiteSeer / PubMed
 
@@ -1379,9 +1389,13 @@ gives the bracket its bite on Adult. Figure:
 
 *Figure E6-NAS.* Lower bracket endpoint vs. held-out test error
 (top) and Kendall-$\tau$ comparison vs. parameter count (bottom)
-on a heterogeneous ten-architecture menu over UCI Adult. Bracket
+on a heterogeneous $35$-architecture menu over UCI Adult
+($n_{\mathrm{tr}} = 36{,}177$). Bracket
 $\tau = 0.48$ ($p = 5\!\times\!10^{-5}$); parameter count
-*anti*-ranks at $\tau = -0.38$.
+*anti*-ranks at $\tau = -0.38$. The companion digits-bin row
+($n_{\mathrm{tr}} = 1{,}437$, $\tau = +0.11$, CI crosses zero)
+is the predicted small-$n$ failure regime of Proposition 7 and
+is tabulated above rather than plotted here.
 
 #### E6 — Cost comparison vs one training epoch
 
