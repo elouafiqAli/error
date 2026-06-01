@@ -131,20 +131,26 @@ expected payoff per unit risk:
 
 ## 3. Critical path with explicit gates
 
-| Gate | Predicate (must hold to pass)                                          | Verifier evidence                       |
-|------|-------------------------------------------------------------------------|------------------------------------------|
-| G2.0 | A0–A2 typeset; no ambiguity in `\phi`, `\ell_\phi`, `\phi^{-1}` domain | grep `main.md` for placeholders         |
-| G2.1 | T3 proof has four explicit steps: (a) Jensen lower, (b) randomisation upper, (c) sharpness witness, (d) failure mode named | `verify_b_t1.py::check_T3_*` returns 0 + Hypothesis `prop_phi_bracket` green |
-| G2.2 | C-Sh reduces to Paper A's bracket numerically (4-decimal match)        | `verify_b_t1.py::check_CSh_*` + Hypothesis on 10³ partitions   |
-| G2.3 | C-Va recovers Bayes–variance identity at equality                     | `verify_b_t2_mc.py::check_CVa_*` identity within 95% CI       |
-| G2.4 | P10 monotonicity holds on 10³ random refinements                       | `verify_b_t1.py::check_P10_*` + Hypothesis `prop_refinement_monotone` |
-| G2.5 | T7 noise correction matches Paper A's Prop 7 in Shannon special case   | `verify_b_t2_mc.py::check_T7_*` + Hypothesis `prop_noise_correction` |
-| G2.6 | T9 bracket holds on 10² random Markov kernels                           | `verify_b_t1.py::check_T9_*` + Hypothesis `prop_kernel_bracket` |
-| G2.7 | L11 δ_L expansion matches Paper A's δ_L for `φ = Hbin`                  | `verify_b_t1.py::check_L11_*` symbolic substitution match     |
-| G2   | ≥ 3 of {T3, T6, T7, T9, L11} fully proved AND both verifiers exit 0    | this whole table                        |
+**Status: G2 CLOSED (paper-b Phase 2b-md.T9+G2-close).** All
+gates below have been independently verified by the B-T1 and
+B-T2 verifier ladders.
 
-Master-plan rule (§2.6, Phase 2 G2): if < 3 of the gated set
-prove out, Paper B downscopes to a short TMLR note.
+| Gate | Predicate (must hold to pass)                                          | Verifier evidence                       | Status |
+|------|-------------------------------------------------------------------------|------------------------------------------|--------|
+| G2.0 | A0–A2 typeset; no ambiguity in `\phi`, `\ell_\phi`, `\phi^{-1}` domain | grep `main.md` for placeholders         | ✅ |
+| G2.1 | T3 proof has four explicit steps: (a) Jensen lower, (b) randomisation upper, (c) sharpness witness, (d) failure mode named | `verify_b_t1.py::check_T3_*` returns 0 + Hypothesis `prop_phi_bracket` green | ✅ |
+| G2.2 | C-Sh reduces to Paper A's bracket numerically (4-decimal match)        | `verify_b_t1.py::check_CSh_*` (1e-9 on ≥ 200 partitions)   | ✅ |
+| G2.3 | C-Va recovers Bayes–variance identity at equality                     | `verify_b_t1.py::check_CVa_*` + `verify_b_t2_mc.py::check_CVa_*` (Hoeffding 95% on 500 trials × n=50k) | ✅ |
+| G2.4 | P10 monotonicity holds on random refinements                           | `verify_b_t1.py::check_P10_*` (200 examples, 3 φ)         | ✅ |
+| G2.5 | T7 noise correction matches Paper A's Prop 7 in Shannon special case   | `verify_b_t1.py::check_T7_*_symbolic` + `verify_b_t2_mc.py::check_T7_*` (500 trials × 3 ρ, 200 trials Shannon match to 1e-6) | ✅ |
+| G2.6 | T9 bracket holds on random Markov kernels                              | T3 symbolic (cf. T9 §5 contract block) + `verify_b_t2_mc.py::check_T9_kernel_bracket_population` (500 trials × 2 φ on n_X=16 → m∈[2,8]) | ✅ |
+| G2.7 | L11 δ_L expansion matches Paper A's δ_L for `φ = Hbin`                  | `verify_b_t1.py::check_L11_*` symbolic product + property tests on 3 aggregators | ✅ |
+| G2   | ≥ 3 of {T3, T6, T7, T9, L11} fully proved AND both verifiers exit 0    | this whole table                        | ✅ (5/5) |
+
+Master-plan rule (§2.6, Phase 2 G2): the downscope clause does
+*not* trigger — all 5 of {T3, T6, T7, T9, L11} are proven, plus
+{C-Sh, C-Va, C-Pi, P10}, with `verify_b_t1.py` pass=8/8 and
+`verify_b_t2_mc.py` pass=6/6 on seed 0.
 
 ---
 

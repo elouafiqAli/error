@@ -404,6 +404,100 @@ def check_T7_shannon_matches_paperA(args) -> ContractResult:
     )
 
 
+@contract
+def check_T9_kernel_bracket_population(args) -> ContractResult:
+    """T9 population: kernel-restricted Bayes risk inside the T3 bracket.
+
+    Draws a random row-stochastic K: [n_X] -> Delta([m]); samples
+    n IID (X, Z) pairs via Z|X ~ K(.|X); computes empirical
+    kernel-restricted Bayes risk and the empirical T9 bracket
+    for phi in {H_bin, eta(1-eta)}; asserts bracket envelopes
+    the risk within 4 * Hoeffding 95% halfwidth.
+    """
+    try:
+        import numpy as np
+    except ImportError as e:
+        return ContractResult("T9_kernel_bracket_population", "fail", f"missing dep: {e}")
+
+    def h_bin(eta):
+        e = np.clip(eta, 1e-12, 1 - 1e-12)
+        return -e * np.log2(e) - (1 - e) * np.log2(1 - e)
+
+    def h_bin_inv(h):
+        if h <= 0.0:
+            return 0.0
+        if h >= 1.0:
+            return 0.5
+        lo, hi = 0.0, 0.5
+        for _ in range(80):
+            mid = 0.5 * (lo + hi)
+            v = h_bin(np.array([mid]))[0]
+            if v < h:
+                lo = mid
+            else:
+                hi = mid
+        return 0.5 * (lo + hi)
+
+    rng_master = np.random.default_rng(args.seed)
+    n = args.samples
+    halfwidth = 4.0 * _hoeffding_halfwidth(n)
+    n_violations = 0
+    worst = 0.0
+    n_X = 16
+    for _ in range(args.trials):
+        rng = np.random.default_rng(rng_master.integers(2**31) ^ 0x7917)
+        m = int(rng.integers(2, 9))
+        # Random base distribution over X
+        px = rng.dirichlet([1.0] * n_X)
+        # Random row-stochastic kernel K: n_X -> Delta(m)
+        K = rng.dirichlet([1.0] * m, size=n_X)
+        # Per-X positive rates
+        eta_x = rng.random(n_X)
+        # Sample X
+        xs = rng.choice(n_X, size=n, p=px)
+        # Sample Z | X vectorised: inverse-CDF on per-x cumulative
+        cdf = np.cumsum(K, axis=1)  # shape (n_X, m)
+        u = rng.random(n)
+        zs = (u[:, None] < cdf[xs]).argmax(axis=1)
+        # Sample labels
+        labels = (rng.random(n) < eta_x[xs]).astype(int)
+        # Empirical eps*_K via cell-z plug-in
+        eps_K = 0.0
+        eta_z_hat = np.zeros(m)
+        p_z_hat = np.zeros(m)
+        for z in range(m):
+            mask = zs == z
+            c = mask.sum()
+            if c == 0:
+                continue
+            p_z_hat[z] = c / n
+            eta_z_hat[z] = labels[mask].mean()
+            eps_K += p_z_hat[z] * min(eta_z_hat[z], 1 - eta_z_hat[z])
+        # T9 bracket for Shannon
+        phi_sh = float(np.dot(p_z_hat, h_bin(eta_z_hat)))
+        lo_sh = h_bin_inv(phi_sh)
+        up_sh = 0.5 * phi_sh
+        # T9 bracket for variance
+        phi_va = float(np.dot(p_z_hat, eta_z_hat * (1 - eta_z_hat)))
+        lo_va = 0.5 * (1.0 - np.sqrt(max(0.0, 1.0 - 4.0 * phi_va)))
+        up_va = 2.0 * phi_va
+        # Both brackets must envelope eps_K within halfwidth
+        for (lo, up, name) in [(lo_sh, up_sh, "shannon"), (lo_va, up_va, "variance")]:
+            if eps_K < lo - halfwidth or eps_K > up + halfwidth:
+                slack = max(lo - halfwidth - eps_K, eps_K - up - halfwidth)
+                worst = max(worst, slack)
+                n_violations += 1
+    if n_violations > 0:
+        return ContractResult(
+            "T9_kernel_bracket_population", "fail",
+            f"{n_violations}/{2 * args.trials} bracket envelopes violated; worst slack = {worst:.4f}",
+        )
+    return ContractResult(
+        "T9_kernel_bracket_population", "pass",
+        f"T9 brackets (Shannon, variance) envelope eps*_K within {halfwidth:.4f} on {args.trials} trials",
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--seed", type=int, default=0)
