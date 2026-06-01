@@ -540,3 +540,22 @@ measured spread) is the Phase 4b experiment; not yet run.
 Audit row A5 moves from MEDIUM target HIGH to MEDIUM with
 the theory line committed; A5b (airtight C3) stays LOW
 pending Phase 4b.
+
+### r8 / 2026-06 — Phase 5: related-work GNN-stability paragraph (PATCH E)
+
+Phase 5 of `future-work/08-p1-patch-plan.md` appends the
+"Stability vs robust constancy" paragraph to §9 (Related work,
+`sec:related`) under the MPNN expressivity sub-heading, mirrored
+in §9 of `main.md`. The paragraph differentiates Lemma 6′/6″ from
+the GNN-stability literature on three axes (perturbed object,
+bounded quantity, inferential direction) and ties the aggregator
+dichotomy of Lemma 6″ to the oversquashing literature as the
+constancy-side analogue of degree-driven output sensitivity.
+
+Six new BibTeX entries added (`gama2020stability`,
+`kenlay2021stability`, `alon2021bottleneck`,
+`topping2022oversquashing`, `digiovanni2023oversquashing`,
+`sato2021random`). Titles, authors, venues, and years were
+asserted from common knowledge; a formal literature sweep
+(checking that no prior bound is a relabelling of 6′ in any of
+these references) is the Phase 5 audit gate that remains open.

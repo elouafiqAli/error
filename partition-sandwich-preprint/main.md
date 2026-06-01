@@ -1991,6 +1991,25 @@ variants (Morris et al., 2020). Corollary 7 recasts the WL ceiling as
 one half of an information-theoretic bracket, giving the matching
 upper bound on equal footing.
 
+**Stability vs robust constancy.** A substantial literature bounds
+how GNN *outputs* change under *graph* perturbation —
+graphon-sampling and edge-rewiring stability (Gama–Bruna–Ribeiro,
+2020), spectral-filter robustness certificates (Kenlay–Thanou–Dong,
+2021), and the oversquashing analyses that trace sensitivity decay
+to degree and spectral-gap quantities (Alon–Yahav, 2021;
+Topping et al., 2022; Di Giovanni et al., 2023). Lemma 6′/6″ are
+orthogonal in object and direction. The perturbation is to the
+*initial features* $h^{(0)}$ (positional encodings, random features
+(Sato et al., 2021), ID signals), not to the graph; the bounded
+quantity is the *within-WL-cell embedding diameter*, not output
+drift; and the use is to certify an $\varepsilon$-robust version of
+the MPNN–WL *constancy* lemma feeding a Bayes-error *lower* bound,
+rather than a Lipschitz output-stability guarantee. The aggregator
+dichotomy of Lemma 6″ — sum amplification governed by the adjacency
+Perron root $\lambda_{\max}(A)$, mean/sym-norm degree-independent —
+is the constancy-side analogue of the degree-driven sensitivity
+that the oversquashing literature studies on the output side.
+
 ---
 
 ## 10. Discussion and limitations

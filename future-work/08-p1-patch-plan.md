@@ -132,7 +132,7 @@ concurrently with P0.1–P0.5.
 | A5b | C3 airtight: direct $D(L)$ measurement matches $\lambda_{\max}(A)$ envelope             | LOW (r2: $\sigma_{\hat R}$ is indirect proxy) | HIGH | Phase 4b $D(L)$ measurement                      |
 | A5c | C3 indirect: GIN $\sigma_{\hat R}$ vs others scales with $\Delta_{\max}$                | HIGH (10.7× on ogbn-arxiv)   | HIGH         | 5/5 sweep, already observed                          |
 | A6  | NAS pre-filter regime characterised by $n_{\mathrm{tr}}$ and non-memorising family      | MEDIUM               | HIGH              | Gated on Prop 7 (P0-B1)                              |
-| A7  | Lemma 6′/6″ orthogonal to GNN-stability literature                                      | MEDIUM               | HIGH              | Literature sweep, Phase 5                            |
+| A7  | Lemma 6′/6″ orthogonal to GNN-stability literature                                      | MEDIUM               | HIGH              | Literature sweep, Phase 5 (paragraph + 6 bib entries committed; formal sweep audit-gate open) |
 | A8  | E1/E2 are identities, not evidence                                                      | HIGH                 | HIGH              | Definitional; PATCH G                                |
 | A9  | Lean 4 mechanisation of Thm 1 + Cor 2                                                   | UNVERIFIED           | HIGH (committed)  | Lean kernel accepts file                             |
 | A10 | ogbn-arxiv bracket tightness is due to Prop 4.5 cardinality collapse, NOT $w^{*}=0$     | HIGH (r2: $0.0008$ realised slack refutes $w^{*}=0$) | HIGH | Phase 0 attribution fix                |
