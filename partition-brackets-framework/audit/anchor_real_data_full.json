@@ -1,0 +1,533 @@
+{
+  "experiment": "D.10 real-data cell-level anchor (Paper B C-Sh + C-Va + C-Pi)",
+  "datasets_requested": [
+    "cora",
+    "citeseer",
+    "pubmed",
+    "twitch_en",
+    "ogbn_arxiv"
+  ],
+  "datasets_seen": [
+    "citeseer",
+    "cora",
+    "ogbn_arxiv",
+    "pubmed",
+    "twitch_en"
+  ],
+  "skipped": [],
+  "depths": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "wall_s": 10.343807935714722,
+  "n_rows": 20,
+  "n_failures": 0,
+  "all_pass": true,
+  "tolerances": {
+    "TOL_BRACKET": 1e-09
+  },
+  "rows": [
+    {
+      "dataset": "cora",
+      "L": 0,
+      "n_cells": 37,
+      "H": 0.8635791855413593,
+      "eps_star": 0.3002215657311669,
+      "C_Sh": {
+        "lower": 0.2860615384060595,
+        "upper": 0.43178959277067963,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.20585029634345908,
+        "lower": 0.28988169128669217,
+        "upper": 0.41170059268691817,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": 0.2825606947770272,
+        "clipped_lower": 0.2825606947770272,
+        "vacuous": false,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "cora",
+      "L": 1,
+      "n_cells": 1589,
+      "H": 0.3266701226819082,
+      "eps_star": 0.12887740029542097,
+      "C_Sh": {
+        "lower": 0.05980494150235777,
+        "upper": 0.1633350613409541,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.07894548946495003,
+        "lower": 0.08641263252481951,
+        "upper": 0.15789097892990006,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": 0.01692821131336536,
+        "clipped_lower": 0.01692821131336536,
+        "vacuous": false,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "cora",
+      "L": 2,
+      "n_cells": 2301,
+      "H": 0.08885725025905067,
+      "eps_star": 0.039143279172821274,
+      "C_Sh": {
+        "lower": 0.011232480347747542,
+        "upper": 0.044428625129525334,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.02181459927514503,
+        "lower": 0.02231244445259517,
+        "upper": 0.04362919855029006,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.06194129055915387,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "cora",
+      "L": 3,
+      "n_cells": 2363,
+      "H": 0.0646420705801003,
+      "eps_star": 0.029172821270310196,
+      "C_Sh": {
+        "lower": 0.00763088522182865,
+        "upper": 0.03232103529005015,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.015919368213739668,
+        "lower": 0.01618119942869073,
+        "upper": 0.031838736427479336,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.06935960147862252,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "citeseer",
+      "L": 0,
+      "n_cells": 32,
+      "H": 0.7338515025857631,
+      "eps_star": 0.21070033062819357,
+      "C_Sh": {
+        "lower": 0.20604342234849388,
+        "upper": 0.3669257512928816,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.16459340797805896,
+        "lower": 0.20775593757624256,
+        "upper": 0.32918681595611793,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": 0.19628954529606313,
+        "clipped_lower": 0.19628954529606313,
+        "vacuous": false,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "citeseer",
+      "L": 1,
+      "n_cells": 983,
+      "H": 0.5226480977775012,
+      "eps_star": 0.16321009918845805,
+      "C_Sh": {
+        "lower": 0.11767758274990112,
+        "upper": 0.2613240488887506,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.11938455473693618,
+        "lower": 0.13859241117117665,
+        "upper": 0.23876910947387237,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": 0.09325983407066146,
+        "clipped_lower": 0.09325983407066146,
+        "vacuous": false,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "citeseer",
+      "L": 2,
+      "n_cells": 1835,
+      "H": 0.30173345411487384,
+      "eps_star": 0.09858731590021039,
+      "C_Sh": {
+        "lower": 0.05365709559614407,
+        "upper": 0.15086672705743692,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.06968914967199794,
+        "lower": 0.07536974868951923,
+        "upper": 0.13937829934399587,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": 0.00806428897689948,
+        "clipped_lower": 0.00806428897689948,
+        "vacuous": false,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "citeseer",
+      "L": 3,
+      "n_cells": 2044,
+      "H": 0.24243798846557835,
+      "eps_star": 0.0775473399458972,
+      "C_Sh": {
+        "lower": 0.04003180361428717,
+        "upper": 0.12121899423278917,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.055746191985373006,
+        "lower": 0.059257662557104684,
+        "upper": 0.11149238397074601,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.012397293315648317,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "pubmed",
+      "L": 0,
+      "n_cells": 82,
+      "H": 0.9648821538652386,
+      "eps_star": 0.3949890957042146,
+      "C_Sh": {
+        "lower": 0.39012808089515827,
+        "upper": 0.4824410769326193,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.23810783059847332,
+        "lower": 0.39094877624929336,
+        "upper": 0.47621566119694664,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": 0.3896781163239862,
+        "clipped_lower": 0.3896781163239862,
+        "vacuous": false,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "pubmed",
+      "L": 1,
+      "n_cells": 8060,
+      "H": 0.540375356826649,
+      "eps_star": 0.21128974996196176,
+      "C_Sh": {
+        "lower": 0.12386704781022137,
+        "upper": 0.2701876784133245,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.13123723622394856,
+        "lower": 0.15538026206258665,
+        "upper": 0.2624744724478971,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": 0.1008837728609126,
+        "clipped_lower": 0.1008837728609126,
+        "vacuous": false,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "pubmed",
+      "L": 2,
+      "n_cells": 12814,
+      "H": 0.15627959435351005,
+      "eps_star": 0.05563726733275853,
+      "C_Sh": {
+        "lower": 0.02268831052550674,
+        "upper": 0.07813979717675502,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.03638160270628362,
+        "lower": 0.03781129687787005,
+        "upper": 0.07276320541256724,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.040750598869181975,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "pubmed",
+      "L": 3,
+      "n_cells": 12990,
+      "H": 0.14437742381781843,
+      "eps_star": 0.05107267839935081,
+      "C_Sh": {
+        "lower": 0.020524859543007402,
+        "upper": 0.07218871190890921,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.03354739086461628,
+        "lower": 0.03475532336695808,
+        "upper": 0.06709478172923256,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.044551364108160296,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "twitch_en",
+      "L": 0,
+      "n_cells": 130,
+      "H": 0.9617174906625134,
+      "eps_star": 0.41636261577322475,
+      "C_Sh": {
+        "lower": 0.3853268553215695,
+        "upper": 0.4808587453312567,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.23810745781196815,
+        "lower": 0.39094706703608634,
+        "upper": 0.4762149156239363,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": 0.3848144683303528,
+        "clipped_lower": 0.3848144683303528,
+        "vacuous": false,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "twitch_en",
+      "L": 1,
+      "n_cells": 5810,
+      "H": 0.18775028555360954,
+      "eps_star": 0.07900645523435307,
+      "C_Sh": {
+        "lower": 0.028684325615406625,
+        "upper": 0.09387514277680477,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.04606638596920416,
+        "lower": 0.048409904857518116,
+        "upper": 0.09213277193840833,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.03056978781265729,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "twitch_en",
+      "L": 2,
+      "n_cells": 6633,
+      "H": 0.06498221657696275,
+      "eps_star": 0.027785573954532697,
+      "C_Sh": {
+        "lower": 0.007679350972920329,
+        "upper": 0.032491108288481375,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.015936004078127848,
+        "lower": 0.016198391980894566,
+        "upper": 0.031872008156255696,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.06925606731640888,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "twitch_en",
+      "L": 3,
+      "n_cells": 6648,
+      "H": 0.062442241068948454,
+      "eps_star": 0.026662924501824305,
+      "C_Sh": {
+        "lower": 0.007318985535675298,
+        "upper": 0.031221120534474227,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.015311530320058806,
+        "lower": 0.015553439809981529,
+        "upper": 0.030623060640117612,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.07002873489639072,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "ogbn_arxiv",
+      "L": 0,
+      "n_cells": 547,
+      "H": 0.5788823741088017,
+      "eps_star": 0.15994165687391862,
+      "C_Sh": {
+        "lower": 0.13796422696891558,
+        "upper": 0.28944118705440086,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.1227751857566454,
+        "lower": 0.1433141238521567,
+        "upper": 0.2455503715132908,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": 0.11796826370667718,
+        "clipped_lower": 0.11796826370667718,
+        "vacuous": false,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "ogbn_arxiv",
+      "L": 1,
+      "n_cells": 123755,
+      "H": 0.07652147361310745,
+      "eps_star": 0.016888799655137798,
+      "C_Sh": {
+        "lower": 0.009360241170091335,
+        "upper": 0.03826073680655372,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.014240763245268531,
+        "lower": 0.014449552822025036,
+        "upper": 0.028481526490537062,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.0657325060807128,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "ogbn_arxiv",
+      "L": 2,
+      "n_cells": 157563,
+      "H": 0.012148380348019688,
+      "eps_star": 0.0034899582504148386,
+      "C_Sh": {
+        "lower": 0.0010747222019649879,
+        "upper": 0.006074190174009844,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.0025048032998656166,
+        "lower": 0.0025111089681153498,
+        "upper": 0.005009606599731233,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.08511817822271839,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    },
+    {
+      "dataset": "ogbn_arxiv",
+      "L": 3,
+      "n_cells": 161943,
+      "H": 0.0058619001724352325,
+      "eps_star": 0.002125862893653709,
+      "C_Sh": {
+        "lower": 0.0004689253471234625,
+        "upper": 0.0029309500862176163,
+        "ok": true
+      },
+      "C_Va": {
+        "phi_V": 0.0013439359361970288,
+        "lower": 0.0013457469711072867,
+        "upper": 0.0026878718723940577,
+        "ok": true
+      },
+      "C_Pi": {
+        "raw_lower": -0.08697701018979354,
+        "clipped_lower": 0.0,
+        "vacuous": true,
+        "ok": true
+      },
+      "status": "pass"
+    }
+  ]
+}
