@@ -20,6 +20,9 @@ verify_b_t1.json
 verify_b_t2.json
 verify_b_optional.json
 
+# External audit driver outputs (regenerable; not source)
+audit/external_audit/
+
 # Editor / OS noise
 .DS_Store
 *.swp
