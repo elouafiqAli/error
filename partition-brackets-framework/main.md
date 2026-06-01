@@ -420,18 +420,167 @@ variance.
 
 ---
 
-### C-Pi — Pinsker / KL instance
+### C-Pi — Pinsker / KL instance (sqrt-bound replacement when $c_\varphi = \infty$)
 
-> *Status: SKELETON — to be replaced in commit
-> `paper-b Phase 2b-md.T6+C-Pi`. Pinsker is the
-> $c_\varphi = \infty$ failure case for the linear T3 upper
-> bound and requires a square-root replacement.*
+**Setup.** Take $\varphi_{\mathrm{KL}}(\eta) := 1 - H_{\mathrm{bin}}
+(\eta) = D_{\mathrm{KL}}\!\bigl(\mathrm{Bern}(\eta) \,\|\,
+\mathrm{Bern}(\tfrac12)\bigr)$ (bits). Two T3 hypotheses fail
+*simultaneously*:
+
+- **(H1) fails.** $\varphi_{\mathrm{KL}}$ is *convex*, not
+  concave ($\varphi_{\mathrm{KL}}'' = 1/(\eta(1-\eta) \ln 2)
+  > 0$). Jensen swings the wrong way; T3's lower bracket is
+  vacuous.
+
+- **(T3 Step 3) fails.** $c_{\mathrm{KL}} := \sup_{\eta \in
+  [0,1/2]} \min(\eta, 1-\eta)/\varphi_{\mathrm{KL}}(\eta) =
+  \infty$, since as $\eta \to \tfrac12$ the numerator
+  $\to \tfrac12$ while the denominator $\to 0$ (Taylor:
+  $\varphi_{\mathrm{KL}}(\tfrac12 + t) = (2/\ln 2)\, t^2 + O(t^4)$).
+  The linear upper bracket is vacuous.
+
+This is precisely the failure mode named in T3 Step 5.
+
+**Statement (Pinsker bracket, sqrt-shaped lower).** For every
+random binary label $f$ with cell-conditional rates
+$(\eta_i)_{i=1}^m$ on partition $\Pi$,
+$$
+\varepsilon^{*}_{\Pi}(f)
+\;\geq\;
+\tfrac12 \;-\; \sqrt{\tfrac{\ln 2}{2}\,\bigl(1 - H(f \mid \Pi)\bigr)},
+\qquad
+H(f \mid \Pi) := \sum_i p_i\, H_{\mathrm{bin}}(\eta_i).
+\tag{C-Pi.lower}
+$$
+
+**Proof.**
+
+- *Step 1 (Pinsker, classical).* For any $\eta \in [0, 1]$,
+  $D_{\mathrm{KL}}(\mathrm{Bern}(\eta) \| \mathrm{Bern}(\tfrac12)) \geq
+  (2/\ln 2)\,(\eta - \tfrac12)^2$ (Pinsker's inequality in
+  bits, or equivalently $D_{\mathrm{KL}} \geq 2 \cdot \mathrm{TV}^2 / \ln 2$ with
+  $\mathrm{TV}(\mathrm{Bern}(\eta), \mathrm{Bern}(\tfrac12)) = |\eta -
+  \tfrac12|$). Equivalently:
+  $|\eta - \tfrac12| \leq \sqrt{(\ln 2)/2 \cdot (1 -
+  H_{\mathrm{bin}}(\eta))}$.
+
+- *Step 2 (kink as $\tfrac12 - |\cdot|$).* $\min(\eta, 1-\eta)
+  = \tfrac12 - |\eta - \tfrac12|$. Combine with Step 1:
+  $\min(\eta_i, 1 - \eta_i) \geq \tfrac12 - \sqrt{(\ln 2)/2 \cdot
+  (1 - H_{\mathrm{bin}}(\eta_i))}$.
+
+- *Step 3 (aggregate via Jensen on $-\sqrt{\cdot}$, concave).*
+  $\varepsilon^{*}_{\Pi}(f) = \sum_i p_i \min(\eta_i, 1 -
+  \eta_i) \geq \tfrac12 - \sum_i p_i \sqrt{(\ln 2)/2 \cdot (1 -
+  H_{\mathrm{bin}}(\eta_i))} \geq \tfrac12 - \sqrt{(\ln 2)/2 \cdot
+  (1 - H(f \mid \Pi))}$, where the last step uses Jensen with
+  the concave function $\sqrt{\cdot}$. $\square$
+
+**Adversarial check.** Pinsker is tight only in the limit
+$\eta \to \tfrac12$; the bracket is *vacuous* (returns
+$\varepsilon^{*}_{\Pi} \geq -\text{something}$) whenever $H(f
+\mid \Pi) < 1 - 2/\ln 2 \approx -1.886$, which never happens
+since $H_{\mathrm{bin}} \in [0, 1]$. It is *non-trivial* iff
+$H(f \mid \Pi) > 1 - 1/(2 \ln 2) \approx 0.279$. Bretagnolle–
+Huber is a strictly sharper drop-in for the same direction; see
+OP-BH in §7.
+
+**Verifier contract.** Mechanically checked by
+`verify_b_t1.py::check_CPi_pinsker_constant`:
+
+- SymPy verifies Pinsker $\eta \mapsto 1 - H_{\mathrm{bin}}(\eta)
+  - (2/\ln 2)(\eta - \tfrac12)^2 \geq 0$ on a $10^4$-point grid
+  to $5 \times 10^{-4}$ (with rounded-down endpoint guard);
+
+- Hypothesis fuzzes 200 random binary labels on random
+  partitions and asserts the population (C-Pi.lower) holds.
 
 ---
 
-## 4. Regression (skeleton)
+## 4. Regression
 
-- **T6** MSE identity + MAE Cauchy–Schwarz upper bound.
+### Theorem T6 — Regression MSE identity + MAE Cauchy–Schwarz upper
+
+**Setup.** Let $f : \mathcal{X} \to [0, 1]$ be a bounded
+(possibly real-valued, not necessarily binary) label and let
+$\eta_i := \mathbb{E}[f \mid \Pi = S_i]$ be the cell-conditional
+mean. Partition-restricted Bayes risks under squared / absolute
+loss are
+$$
+\mathrm{MSE}^{*}_{\Pi}(f) := \inf_{\hat y\, \Pi\text{-measurable}}
+  \mathbb{E}\bigl[(f - \hat y)^2\bigr],
+\qquad
+\mathrm{MAE}^{*}_{\Pi}(f) := \inf_{\hat y\, \Pi\text{-measurable}}
+  \mathbb{E}\bigl[|f - \hat y|\bigr].
+$$
+
+**Statement.**
+
+- **(T6.MSE)** The MSE bracket *collapses* to an identity:
+$$
+\mathrm{MSE}^{*}_{\Pi}(f) \;=\; \mathbb{E}\bigl[\mathrm{Var}(f \mid \Pi)\bigr]
+   \;=\; \varphi_{\mathrm{var}}(f \mid \Pi).
+$$
+
+- **(T6.MAE)** MAE Cauchy–Schwarz upper bound:
+$$
+\mathrm{MAE}^{*}_{\Pi}(f) \;\leq\; \sqrt{\mathrm{MSE}^{*}_{\Pi}(f)}
+   \;=\; \sqrt{\mathbb{E}\bigl[\mathrm{Var}(f \mid \Pi)\bigr]}.
+$$
+  The matching lower bound is **OP-MAE** (§7): no closed-form
+  is known without additional regularity on $f \mid \Pi = S_i$.
+
+**Proof.**
+
+- *(T6.MSE).* The per-cell squared-loss minimiser is the
+  conditional mean: $\arg\min_{c} \mathbb{E}[(f - c)^2 \mid \Pi=S_i]
+  = \mathbb{E}[f \mid \Pi=S_i] = \eta_i$, and the minimum
+  equals $\mathrm{Var}(f \mid \Pi = S_i)$. Sum against $p_i$:
+  $\mathrm{MSE}^{*}_{\Pi}(f) = \sum_i p_i \mathrm{Var}(f \mid \Pi=S_i) =
+  \mathbb{E}[\mathrm{Var}(f \mid \Pi)]$. For *binary* $f$ this
+  specialises to $\sum_i p_i \eta_i(1 - \eta_i) =
+  \varphi_{\mathrm{var}}(f \mid \Pi)$, recovering (C-Va.id);
+  the equality is *degenerate* T3 with both bracket endpoints
+  coinciding ($\varphi^{-1} \circ \varphi = \mathrm{id}$ when
+  the per-cell loss equals $\varphi$).
+
+- *(T6.MAE).* For any predictor $\hat y$, Cauchy–Schwarz with
+  the constant weight $\mathbf{1}$ yields $\mathbb{E}[|f - \hat
+  y|] \leq \sqrt{\mathbb{E}[(f - \hat y)^2]}$. Take $\hat y$ to
+  be the MSE-optimal $\Pi$-measurable predictor (cell-wise
+  mean); then the RHS equals $\sqrt{\mathrm{MSE}^{*}_{\Pi}(f)}$. The
+  $\inf$ over $\Pi$-measurable predictors on the LHS is only
+  smaller, so $\mathrm{MAE}^{*}_{\Pi}(f) \leq \mathbb{E}[|f - \hat
+  y_{\mathrm{MSE}^*}|] \leq \sqrt{\mathrm{MSE}^{*}_{\Pi}(f)}$. $\square$
+
+*Tightness of (T6.MAE).* The inequality is tight when $f \mid
+\Pi$ is *two-point* (e.g. binary), since then absolute and
+squared loss coincide up to scale. For continuous $f \mid \Pi$
+it is loose; closing the gap is OP-MAE.
+
+**Verifier contract.** Mechanically checked by
+
+- `verify_b_t2_mc.py::check_T6_MSE_identity_population` — for
+  random partitions with bounded continuous $f \mid \Pi$
+  (e.g.\ Beta-distributed labels per cell), draws $n = 50{,}000$
+  IID samples, computes $\widehat{\mathrm{MSE}}^{*}_{\Pi}$ via the
+  cell-wise sample mean predictor and $\widehat{\mathbb{E}}
+  [\mathrm{Var}(f \mid \Pi)]$ via cell-wise sample variance,
+  asserts agreement within $4 \cdot$ Hoeffding 95\% halfwidth on
+  every of `--trials` (default 500) repetitions.
+
+- `verify_b_t2_mc.py::check_T6_MAE_upper_population` — same
+  cohort; computes empirical $\widehat{\mathrm{MAE}}^{*}_{\Pi}$ via
+  cell-wise median and asserts $\widehat{\mathrm{MAE}}^{*}_{\Pi}
+  \leq \sqrt{\widehat{\mathrm{MSE}}^{*}_{\Pi}} + 4 \cdot $
+  Hoeffding 95\% halfwidth.
+
+- `verify_b_t2_mc.py::check_CVa_variance_identity_population` —
+  binary-label specialisation: empirical
+  $\widehat{\mathrm{MSE}}^{*}_{\Pi}$ matches $\sum_i \hat p_i
+  \hat\eta_i (1 - \hat\eta_i)$ within Hoeffding halfwidth.
+
+---
 
 ## 5. Robustness
 

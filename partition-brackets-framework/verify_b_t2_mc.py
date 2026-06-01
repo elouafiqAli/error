@@ -122,28 +122,157 @@ def _empirical_bayes_risk(cells, labels, m: int) -> float:
 
 @contract
 def check_CVa_variance_identity_population(args) -> ContractResult:
+    """C-Va population: empirical MSE* = sum p_i eta_i(1-eta_i).
+
+    Draws IID binary labels from a random partition; computes
+    empirical MSE* via cell-wise sample mean predictor and the
+    plug-in sum p_i hat_eta_i (1 - hat_eta_i); asserts agreement
+    within 4 * Hoeffding 95% halfwidth.
+    """
+    try:
+        import numpy as np
+    except ImportError as e:
+        return ContractResult("CVa_variance_identity_population", "fail", f"missing dep: {e}")
+
+    rng_master = np.random.default_rng(args.seed)
+    n = args.samples
+    halfwidth = 4.0 * _hoeffding_halfwidth(n)
+    n_violations = 0
+    worst = 0.0
+    for _ in range(args.trials):
+        rng = np.random.default_rng(rng_master.integers(2**31))
+        m = int(rng.integers(2, 9))
+        p, etas = _draw_partition(rng, m)
+        cells, labels = _draw_iid_labelled(rng, p, etas, n)
+        # MSE* via cell-mean predictor
+        mse = 0.0
+        var_plugin = 0.0
+        for i in range(m):
+            mask = cells == i
+            c = mask.sum()
+            if c == 0:
+                continue
+            p_hat = c / n
+            yhat = labels[mask].mean()
+            mse += p_hat * ((labels[mask] - yhat) ** 2).mean()
+            var_plugin += p_hat * yhat * (1 - yhat)
+        resid = abs(mse - var_plugin)
+        worst = max(worst, resid)
+        if resid > halfwidth:
+            n_violations += 1
+    if n_violations > 0:
+        return ContractResult(
+            "CVa_variance_identity_population", "fail",
+            f"{n_violations}/{args.trials} trials exceeded {halfwidth:.4f}; worst = {worst:.4f}",
+        )
     return ContractResult(
-        "CVa_variance_identity_population",
-        "skipped",
-        "STUB — lands in commit paper-b Phase 2b-md.T6+C-Pi",
+        "CVa_variance_identity_population", "pass",
+        f"MSE* = sum p_i eta_i(1-eta_i) within {halfwidth:.4f} on {args.trials} trials (worst {worst:.4f})",
     )
 
 
 @contract
 def check_T6_MSE_identity_population(args) -> ContractResult:
+    """T6.MSE population: empirical MSE* = E[Var(f|Pi)] for [0,1]-valued f.
+
+    Per-cell labels are Beta(a_i, b_i) distributed with random
+    a_i, b_i ~ Uniform[0.5, 3]; the predictor is the cell-wise
+    sample mean; assert MSE* (sample) ~= sample E[Var(f|Pi)]
+    within 4 * Hoeffding 95% halfwidth.
+    """
+    try:
+        import numpy as np
+    except ImportError as e:
+        return ContractResult("T6_MSE_identity_population", "fail", f"missing dep: {e}")
+
+    rng_master = np.random.default_rng(args.seed)
+    n = args.samples
+    halfwidth = 4.0 * _hoeffding_halfwidth(n)
+    n_violations = 0
+    worst = 0.0
+    for _ in range(args.trials):
+        rng = np.random.default_rng(rng_master.integers(2**31) ^ 0x6005)
+        m = int(rng.integers(2, 9))
+        p = rng.dirichlet([1.0] * m)
+        a = 0.5 + 2.5 * rng.random(m)
+        b = 0.5 + 2.5 * rng.random(m)
+        cells = rng.choice(m, size=n, p=p)
+        labels = rng.beta(a[cells], b[cells])
+        mse = 0.0
+        var_cond = 0.0
+        for i in range(m):
+            mask = cells == i
+            c = mask.sum()
+            if c == 0:
+                continue
+            p_hat = c / n
+            yhat = labels[mask].mean()
+            mse += p_hat * ((labels[mask] - yhat) ** 2).mean()
+            var_cond += p_hat * labels[mask].var()
+        resid = abs(mse - var_cond)
+        worst = max(worst, resid)
+        if resid > halfwidth:
+            n_violations += 1
+    if n_violations > 0:
+        return ContractResult(
+            "T6_MSE_identity_population", "fail",
+            f"{n_violations}/{args.trials} trials exceeded {halfwidth:.4f}; worst = {worst:.4f}",
+        )
     return ContractResult(
-        "T6_MSE_identity_population",
-        "skipped",
-        "STUB — lands in commit paper-b Phase 2b-md.T6+C-Pi",
+        "T6_MSE_identity_population", "pass",
+        f"MSE* = E[Var(f|Pi)] within {halfwidth:.4f} on {args.trials} trials (worst {worst:.4f})",
     )
 
 
 @contract
 def check_T6_MAE_upper_population(args) -> ContractResult:
+    """T6.MAE Cauchy-Schwarz population: empirical MAE* <= sqrt(MSE*) + slack.
+
+    Per-cell median predictor for MAE; cell-mean predictor for MSE.
+    Asserts MAE* (sample) <= sqrt(MSE* sample) + 4 * Hoeffding halfwidth.
+    """
+    try:
+        import numpy as np
+    except ImportError as e:
+        return ContractResult("T6_MAE_upper_population", "fail", f"missing dep: {e}")
+
+    rng_master = np.random.default_rng(args.seed)
+    n = args.samples
+    halfwidth = 4.0 * _hoeffding_halfwidth(n)
+    n_violations = 0
+    worst = 0.0
+    for _ in range(args.trials):
+        rng = np.random.default_rng(rng_master.integers(2**31) ^ 0x6A6E)
+        m = int(rng.integers(2, 9))
+        p = rng.dirichlet([1.0] * m)
+        a = 0.5 + 2.5 * rng.random(m)
+        b = 0.5 + 2.5 * rng.random(m)
+        cells = rng.choice(m, size=n, p=p)
+        labels = rng.beta(a[cells], b[cells])
+        mae = 0.0
+        mse = 0.0
+        for i in range(m):
+            mask = cells == i
+            c = mask.sum()
+            if c == 0:
+                continue
+            p_hat = c / n
+            ymed = np.median(labels[mask])
+            ymean = labels[mask].mean()
+            mae += p_hat * np.abs(labels[mask] - ymed).mean()
+            mse += p_hat * ((labels[mask] - ymean) ** 2).mean()
+        residual = mae - (np.sqrt(mse) + halfwidth)
+        worst = max(worst, residual)
+        if residual > 0.0:
+            n_violations += 1
+    if n_violations > 0:
+        return ContractResult(
+            "T6_MAE_upper_population", "fail",
+            f"{n_violations}/{args.trials} trials violated MAE* <= sqrt(MSE*) + slack; worst residual = {worst:.4f}",
+        )
     return ContractResult(
-        "T6_MAE_upper_population",
-        "skipped",
-        "STUB — lands in commit paper-b Phase 2b-md.T6+C-Pi",
+        "T6_MAE_upper_population", "pass",
+        f"MAE* <= sqrt(MSE*) + {halfwidth:.4f} on {args.trials} trials (worst residual {worst:.4f})",
     )
 
 

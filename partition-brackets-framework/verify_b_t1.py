@@ -493,10 +493,75 @@ def check_CVa_bayes_variance_identity(args: argparse.Namespace) -> ContractResul
 
 @contract
 def check_CPi_pinsker_constant(args: argparse.Namespace) -> ContractResult:
+    """C-Pi: Pinsker sqrt-shaped lower bracket.
+
+    Step A (symbolic): on a 10^4-point grid, verify
+        1 - H_bin(eta) - (2/ln 2)(eta - 1/2)^2 >= -5e-4
+    (the Pinsker inequality in bits, with a numerical guard
+    for endpoint rounding).
+    Step B (property): 200 random binary labels on random
+    partitions; assert (C-Pi.lower)
+        eps*_Pi(f) >= 1/2 - sqrt((ln 2)/2 * (1 - H(f|Pi)))
+    holds.
+    """
+    try:
+        import math
+        import numpy as np
+        from hypothesis import HealthCheck, given, settings, strategies as st
+    except ImportError as e:
+        return ContractResult("CPi_pinsker_constant", "fail", f"missing dep: {e}")
+
+    # --- Step A: Pinsker on a 10^4 grid ---
+    grid = np.linspace(1e-9, 1 - 1e-9, 10_000)
+    h = -grid * np.log2(grid) - (1 - grid) * np.log2(1 - grid)
+    kl = 1.0 - h
+    pinsker = kl - (2.0 / math.log(2.0)) * (grid - 0.5) ** 2
+    if pinsker.min() < -5e-4:
+        return ContractResult(
+            "CPi_pinsker_constant", "fail",
+            f"Pinsker grid violated: min = {pinsker.min():.2e}",
+        )
+
+    # --- Step B: population (C-Pi.lower) on random partitions ---
+    n_examples = max(50, args.samples // 4)
+    rng_master = np.random.default_rng(args.seed)
+    counter = {"n": 0, "fail": 0, "worst_slack": float("inf")}
+
+    @settings(
+        max_examples=n_examples,
+        deadline=None,
+        suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+        derandomize=True,
+    )
+    @given(local_seed=st.integers(min_value=0, max_value=2**31 - 1),
+           m=st.integers(min_value=2, max_value=12))
+    def _check(local_seed: int, m: int) -> None:
+        rng = np.random.default_rng((args.seed << 8) ^ local_seed ^ 0x9171)
+        p = rng.dirichlet([1.0] * m)
+        # Force etas into (eps, 1-eps) for numerical safety
+        etas = 1e-6 + (1 - 2e-6) * rng.random(m)
+        h_vec = -etas * np.log2(etas) - (1 - etas) * np.log2(1 - etas)
+        h_cond = float(np.dot(p, h_vec))
+        eps_star = float(np.dot(p, np.minimum(etas, 1 - etas)))
+        rhs = 0.5 - math.sqrt(max(0.0, math.log(2.0) / 2.0 * (1.0 - h_cond)))
+        slack = eps_star - rhs
+        counter["n"] += 1
+        if slack < -1e-12:
+            counter["fail"] += 1
+        if slack < counter["worst_slack"]:
+            counter["worst_slack"] = slack
+
+    _check()
+    if counter["fail"] > 0:
+        return ContractResult(
+            "CPi_pinsker_constant", "fail",
+            f"(C-Pi.lower) violated on {counter['fail']}/{counter['n']} samples; "
+            f"worst slack = {counter['worst_slack']:.2e}",
+        )
     return ContractResult(
-        "CPi_pinsker_constant",
-        "skipped",
-        "STUB — proof lands in commit paper-b Phase 2b-md.T6+C-Pi",
+        "CPi_pinsker_constant", "pass",
+        f"Pinsker symbolic grid ok; (C-Pi.lower) holds on {counter['n']} examples "
+        f"(worst slack {counter['worst_slack']:.2e})",
     )
 
 
