@@ -1836,18 +1836,26 @@ dominates. The Adult row, with $n_{\rm tr} = 36\,177$, sits
 firmly in the regime where that gap is negligible and the
 bracket transfers cleanly to test error.
 
-**Takeaway for practitioners.** The bracket is not a universal
-NAS surrogate. As a pre-filter it strictly dominates parameter
-count on every metric on every dataset tested, and on
-sufficiently large data it provides a statistically
-significant rank signal that recovers most of the
-top-$k$ frontier in seconds without any supervised training.
-On small data with overfitting-prone partition families
-(deep CART, large $k$ in $k$-means), the practitioner must
-either ignore the zero-\texttt{lower} architectures or pair
-the bracket with a held-out split — a limitation that follows
-from the same finite-sample theorem (Proposition 7) that
-gives the bracket its bite on Adult. Figure:
+**Takeaway.** The bracket is not a universal NAS surrogate; it
+is a training-free pre-filter with a sharply characterised
+success regime. On UCI Adult ($n_{\rm tr} = 36\,177$) it
+recovers $7/10$ of the truly best architectures with $\tau =
+0.48$ and a CI strictly above zero, while parameter count —
+the standard NAS prior — *anti*-ranks the same menu ($\tau =
+-0.38$); on every metric on every dataset tested, the bracket
+dominates parameter count. The regime in which this holds is
+*large $n$ with a partition family that does not memorise*:
+on digits-bin ($n_{\rm tr} = 1\,437$) the ranking collapses to
+noise because deep-CART and large-$k$ partitions reach
+`lower = 0` by fitting the training rows, exactly the
+$O(1/\sqrt{n})$ finite-sample face of Proposition 7. The
+practitioner rule is correspondingly precise: on sufficiently
+large data, rank by the bracket lower endpoint and ignore
+parameter count; on small data with overfitting-prone families,
+either discard the zero-`lower` architectures or pair the
+bracket with a held-out split — the same theorem (Proposition 7)
+that bounds the transfer error on Adult predicts its failure on
+digits-bin. Figure:
 `experiments/figures/e6_nas_scatter.pdf` (v1; v2 is JSON-only).
 
 ![E6-NAS bracket-vs-test scatter](experiments/figures/e6_nas_v2_scatter.pdf)

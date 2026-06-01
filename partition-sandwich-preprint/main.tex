@@ -2668,15 +2668,29 @@ low-noise regime where the $O(1/\sqrt{n})$ generalisation gap
 of \cref{prop:pop} dominates. The Adult row, with
 $n_{\mathrm{tr}} = 36{,}177$, sits firmly in the regime where
 that gap is negligible and the bracket transfers cleanly to
-test error. Practical takeaway: the bracket is not a universal
-NAS surrogate, but as a pre-filter it strictly dominates
-parameter count on every metric on every dataset tested; on
-sufficiently large data it provides a statistically significant
-rank signal that recovers most of the top-$k$ frontier in
-seconds without any supervised training; on small data with
-overfitting-prone partition families the practitioner must
-either ignore the zero-\texttt{lower} architectures or pair the
-bracket with a held-out split.
+test error.
+
+\paragraph{Takeaway.} The bracket is not a universal NAS
+surrogate; it is a training-free pre-filter with a sharply
+characterised success regime. On UCI Adult
+($n_{\mathrm{tr}} = 36{,}177$) it recovers $7/10$ of the truly
+best architectures with $\tau = 0.48$ and a CI strictly above
+zero, while parameter count --- the standard NAS prior ---
+\emph{anti}-ranks the same menu ($\tau = -0.38$); on every
+metric on every dataset tested, the bracket dominates parameter
+count. The regime in which this holds is \emph{large $n$ with a
+partition family that does not memorise}: on digits-bin
+($n_{\mathrm{tr}} = 1{,}437$) the ranking collapses to noise
+because deep-CART and large-$k$ partitions reach
+$\texttt{lower} = 0$ by fitting the training rows, exactly the
+$O(1/\sqrt{n})$ finite-sample face of \cref{prop:pop}. The
+practitioner rule is correspondingly precise: on sufficiently
+large data, rank by the bracket lower endpoint and ignore
+parameter count; on small data with overfitting-prone families,
+either discard the zero-$\texttt{lower}$ architectures or pair
+the bracket with a held-out split --- the same theorem
+(\cref{prop:pop}) that bounds the transfer error on Adult
+predicts its failure on digits-bin.
 
 \paragraph{E6 --- Cost comparison vs one training epoch.}
 Quantifies the $O(|V|)$ remark of \cref{sec:intro}: on four
