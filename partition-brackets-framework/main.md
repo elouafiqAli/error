@@ -360,12 +360,20 @@ to $\varphi(\tfrac12)$).
 
 #### Named instances
 
+T3-compatible (satisfy (H1)–(H5)):
+
 | Name           | $\varphi(\eta)$                     | $\varphi(\tfrac12)$ | Matched loss (Def. 2) |
 |----------------|-------------------------------------|---------------------|------------------------|
 | **Shannon**    | $H_{\mathrm{bin}}(\eta)$            | $1$                 | log-loss (binarised → 0-1) |
 | **Variance**   | $\eta(1-\eta)$                      | $1/4$               | squared loss                |
-| **Pinsker/KL** | $\mathrm{KL}(\eta \,\|\, \tfrac12)$ | $1$                 | log-loss (KL form)          |
 | **Gini**       | $2\eta(1-\eta)$                     | $1/2$               | squared loss (×2)           |
+
+Failure-mode instance (treated separately in §3 C-Pi via a
+sqrt-bound, not the linear T3 bracket):
+
+| Name           | $\varphi(\eta)$                     | $\varphi(\tfrac12)$ | Failed hypotheses | Replacement |
+|----------------|-------------------------------------|---------------------|-------------------|-------------|
+| **Pinsker/KL** | $\mathrm{KL}(\mathrm{Bern}(\eta) \,\|\, \mathrm{Bern}(\tfrac12)) = 1 - H_{\mathrm{bin}}(\eta)$ | $0$ | (H1) convex; (H2) $\varphi(0)=\varphi(1)=1$; $c_\varphi = \infty$ | sqrt-bound (C-Pi) |
 
 ### Definition 2 (Matched pointwise loss)
 
@@ -751,13 +759,17 @@ $$
   the concave function $\sqrt{\cdot}$. $\square$
 
 **Adversarial check.** Pinsker is tight only in the limit
-$\eta \to \tfrac12$; the bracket is *vacuous* (returns
-$\varepsilon^{*}_{\Pi} \geq -\text{something}$) whenever $H(f
-\mid \Pi) < 1 - 2/\ln 2 \approx -1.886$, which never happens
-since $H_{\mathrm{bin}} \in [0, 1]$. It is *non-trivial* iff
-$H(f \mid \Pi) > 1 - 1/(2 \ln 2) \approx 0.279$. Bretagnolle–
-Huber is a strictly sharper drop-in for the same direction; see
-OP-BH in §7.
+$\eta \to \tfrac12$. The bracket (C-Pi.lower) is **vacuous**
+(its RHS drops below $0$, so it is weaker than the trivial
+floor $\varepsilon^{*}_{\Pi} \geq 0$) iff
+$H(f \mid \Pi) < 1 - \tfrac{1}{2\ln 2} \approx 0.279$.
+Equivalently, it is *non-trivial* iff $H(f \mid \Pi) > 1 -
+\tfrac{1}{2\ln 2}$. (The RHS would only drop below the trivial
+*signed* floor $-\tfrac12$ when $H < 1 - 2/\ln 2 \approx -1.886$,
+which is unreachable since $H_{\mathrm{bin}} \in [0, 1]$, so the
+0-clipped envelope used in the D.10 anchor is the publishable
+convention.) Bretagnolle–Huber is a strictly sharper drop-in
+for the same direction; see OP-BH in §7.
 
 **Verifier contract.** Mechanically checked by
 `verify_b_t1.py::check_CPi_pinsker_constant`:
@@ -1354,10 +1366,17 @@ The verifier files live alongside this document:
   with Paper A's `verify.jl`; not required to close Gate G2.
   Rationale in [`FORMALISATION.md`](FORMALISATION.md) §4.
 
-They are currently stubs (Phase 2b-md.A013); their docstrings
-declare the contracts that each subsequent commit must satisfy
-before the corresponding claim is promoted from SKELETON to
-PROVEN.
+As of Phase 2b-md.G2 (CLOSED), the two critical-path
+verifiers are fully implemented and green: `verify_b_t1.py`
+ships eight `check_*` contracts (T3-lower, T3-upper, C-Sh,
+C-Va, C-Pi, T7-symbolic, P10, L11) and `verify_b_t2_mc.py`
+ships six (T6-MSE, T6-MAE, C-Va population, T7 population,
+T7 Shannon vs. Paper A, T9 kernel) — counts match the
+`8/8 + 6/6` ladder cited in the status box at the top of
+this document. The earlier (Phase 2b-md.A013) docstring-only
+skeletons have been superseded; per-contract pass logs are
+manifested in `audit/` and surfaced through
+[`FORMALISATION.md`](FORMALISATION.md) §3 (G2 gate-table).
 
 ---
 
