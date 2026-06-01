@@ -1,0 +1,16 @@
+# Local secrets — NEVER commit
+.huggingface_token
+*.token
+.env
+
+# Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+
+# Editor / OS
+.DS_Store
+*.swp
+
+# Large local-only experiment caches
+partition-sandwich-preprint/experiments/data/
