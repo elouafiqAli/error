@@ -671,6 +671,252 @@ so Prop 7 holds with substantial slack on real data.
 
 ---
 
+## E3a — Structural-vs-memorisation decomposition (Angles A, B, C)
+
+Script: `e3a_decomposition.py` · json: `results/e3a.json` · figures:
+`figures/e3a_purity_<dataset>_L2.pdf` (5 graphs)
+
+**Why this exists.** On ogbn-arxiv the depth-3 1-WL partition is
+near-discrete (`m_3 / |V| = 0.956`), so the bracket's pinch is plausibly
+*structural overfitting* rather than a victory of the bound. E3a
+*quantifies* the regime via three statistics that the WL / MPNN literature
+does not currently report.
+
+**(A) Saturation–memorisation index `σ(τ, ρ)`.** Define
+
+$$
+L^\star(\tau) := \min\{L : \varepsilon^\*(\Pi_L) \le \tau\},
+\qquad
+L_{\mathrm{mem}}(\rho) := \min\{L : m_L / |V| \ge \rho\}.
+$$
+
+Then $\sigma(\tau, \rho) := (L_{\mathrm{mem}}(\rho) - L^\star(\tau)) / L_{\mathrm{mem}}(\rho) \in [-1, 1]$.
+
+| dataset    | $L^\star(0.05)$ | $L_{\rm mem}(0.9)$ | $\sigma(0.05, 0.9)$ |
+|------------|----------------:|-------------------:|--------------------:|
+| twitch_en  | 2 | 2 | 0.0 |
+| cora       | (see e3a.json `native.sigma`) | | |
+
+(Full numbers in `e3a.json`; `null` denotes "threshold never reached
+within $L_{\max}$".) $\sigma \to 1$: 1-WL refines the bracket to $\tau$
+well before partitioning into individual orbits ("structural"). $\sigma \le 0$:
+the bracket gains and the partition cardinality grow together
+("memorisation").
+
+**(B) Cell-size × purity scatter.** At depth $L = 2$ we emit
+`(|C|, min(p_C, 1-p_C))` for every cell. Singletons collapse to the
+$(1, 0)$ point and become visually separable from large pure cells.
+The summary fields `n_singletons`, `n_large_pure_ge16_imp_le0.05`,
+`n_large_mix_ge16_imp_gt0.05` are stored per dataset.
+
+**(C) Coarsened-initial-colour rerun ("E3c").** Replace raw-integer
+degree init by $h^{(0)}_v = \mathrm{clip}(\lfloor\log_2(\deg_v + 1)\rfloor, 0, K-1)$
+for $K \in \{4, 8, 16\}$. Raw-degree init is near-injective on the
+degree-skewed citation graphs; the coarsened init bounds the partition
+cardinality so the bracket measures *structural informativeness* of
+1-WL on the benchmark, not the degree fingerprint.
+
+**Replicate.** CPU-only, reuses `e3_wl_bracket.wl_funnel`:
+```
+cd partition-sandwich-preprint/experiments
+python3 e3a_decomposition.py     # writes e3a.json + 5 PDF scatters
+```
+
+---
+
+## E3b — Structural-only stress on featureless benchmarks
+
+Script: `e3b_wl_structural.py` · json: `results/e3b.json`
+
+**Sanity-check the bracket on graphs where 1-WL is provably degenerate**
+(constant per cell). If the bracket tightens on these, the implementation
+is buggy; if it stays pinned at the marginal-entropy ceiling, the
+WL-as-MPNN-bottleneck story has its expected empirical face.
+
+| benchmark | $n$ | 1-WL behaviour | expected bracket |
+|---|---:|---|---|
+| `CSL_union(C_41(1,2) ⊔ C_41(1,5))` | 82 | one colour per graph (label aligned) | $\varepsilon^\* = 0,\ H = 0$ |
+| `CSL_orbit(C_60(1,5), y = v \bmod 2)` | 60 | vertex-transitive Cayley → one colour for all $L$ | bracket pins at marginal ceiling |
+| `Paley(13), y = \text{QR-indicator}` | 13 | single-colour SRG → one colour for all $L$ | bracket pins at marginal ceiling |
+| `Paley(29), y = \text{QR-indicator}` | 29 | as above | as above |
+
+Wall time: **5 ms** end-to-end. Constant initial features
+($h^{(0)}_v \equiv 0$) throughout, so the only thing 1-WL can use is
+graph structure.
+
+**Replicate.** CPU-only, no PyG, no training:
+```
+python3 e3b_wl_structural.py
+```
+
+---
+
+## E3d-audit (D-Lite) — post-hoc architecture-vs-WL audit
+
+Script: `e3d_arch_audit.py` · json: `results/e3d_arch.json` ·
+device: MPS / CPU
+
+For each (dataset, arch, seed): train a 3-layer GNN ($d_h = 64$,
+Adam $\eta = 10^{-2}$, $\lambda_2 = 5\cdot 10^{-4}$, 200 epochs,
+transductive, no train/test split — this is a *fitting-power* audit),
+extract penultimate embeddings $Z \in \mathbb R^{n \times 64}$, cluster
+$Z$ with MiniBatchKMeans at $k \in \{16, 64, 256, m_L^{\rm WL}\}$, and
+report two diagnostics:
+
+* `feature_gap_at_kWL := eps_WL - eps_trained(k_WL)`. Positive ⇒ the
+  trained embedding at the *same* cell budget as WL is more
+  label-informative than the WL partition (the architecture used node
+  features beyond pure WL structure).
+* `head_signal_at_kWL := eps_trained(k_WL) - Rhat`. Positive ⇒ the
+  trained linear head exploits embedding geometry beyond what
+  $k$-means recovers.
+
+Invariants (gates, all must PASS): $\varepsilon_{\rm trained}(k)$
+monotone non-increasing in $k$ (modulo a $10^{-3}$ MiniBatchKMeans
+slack); $\hat R \in [0, 1]$; $Z$ contains no NaN/inf;
+`k_used >= 0.9 · min(k_requested, n)`.
+
+**Replicate.** Local MPS / CPU smoke (3 datasets, 4 archs, 5 seeds):
+```
+python3 e3d_arch_audit.py
+```
+
+---
+
+## E3d-full (D-Full) — CUDA architecture-vs-WL sweep
+
+Scripts: `e3d_data_full.py` (loaders), `e3d_arch_full.py` (sweep) ·
+orchestrator: `runpod_dfull.py` (root) · json:
+`results/e3d_arch_full.json` (live) and `e3d_arch_full.recovered.json`
+
+Extends D-Lite to 5 datasets (adds twitch_en + ogbn_arxiv), 4
+architectures (adds GraphSAGE), 5 seeds, $d_h = 128$, 200 epochs,
+extended $k$-grid $\{16, 64, 256, 1024, \min(k_{\rm WL}, 4096)\}$,
+full-batch transductive, fp32, single GPU, TF32 enabled on
+Ampere+. Designed for H200 / A100; falls back to MPS / CPU.
+
+**Current snapshot (`e3d_arch_full.json`, single-seed cora-only smoke):**
+`device=cuda, depth_L=3, hidden=128, epochs=50, wall=76.9 s`. Sample
+GCN/GAT/GIN/SAGE training errors on cora binarised (largest-class):
+$\hat R = 0.024, 0.022, 0.040, 0.000$. The full 5-seed multi-dataset
+manifest lives in `e3d_arch_full.recovered.json` (2 datasets currently:
+cora + citeseer).
+
+**Replicate.**
+- Local smoke (MPS / CPU, 1 seed): `python3 e3d_arch_full.py --quick`
+- Full remote sweep: from repo root,
+  `RUNPOD_API_KEY=… python3 runpod_dfull.py --epochs 200 --seeds 5
+   --datasets cora citeseer pubmed twitch_en ogbn_arxiv`.
+  The orchestrator creates a single-GPU pod, rsyncs the experiments
+  tree, SSH-execs the sweep, SCPs the JSON back, and terminates the
+  pod (always, in `finally`).
+
+---
+
+## E3e — In-vivo audit of Lemma 6′ (ε-robust MPNN-WL constancy)
+
+Script: `e3e_robust_lemma.py` · json: `results/e3e.json` · CPU-only
+
+Setup. Fix a graph $G$ with its 1-WL partition $\Pi_L$ (degree init).
+Fix a randomly-initialised $L$-layer GIN with PyG `GINConv` and a
+per-round MLP. Inject Gaussian perturbations
+$h^{(0)}_v \leftarrow h^{(0)}_v + \xi_v$, $\xi_v \stackrel{\rm iid}{\sim}\mathcal N(0, \delta_0^2 I_d)$.
+Forward-propagate. Measure at each round $\ell = 0, \ldots, L$:
+
+$$
+D(\ell) := \max_{v \sim_{\rm WL} w} \|h^{(\ell)}(v) - h^{(\ell)}(w)\|_2.
+$$
+
+Compare against Lemma 6′'s bound
+$\delta_\ell := \delta_0 \prod_{k=1}^{\ell} L_k (1 + \Delta_{\max})$
+(reported using the aggregator-typed
+$L^c_\ell + r_T L^m_\ell$ refinement of `main.tex` after this checkpoint).
+
+Cora snapshot ($n = 2708$, $\Delta_{\max} = 168$, $L = 3$,
+$d_h = 32$, $L_k^{\rm op} \approx 1.79, 1.86, 1.93$):
+
+| $\delta_0$ | $D(L)$ | $\delta_L$ bound | looseness $\delta_L / D(L)$ |
+|-----------:|-------:|-----------------:|----------------------------:|
+| 0          | 1.0e-14| 0                | n/a (strict equality at machine precision) |
+| 1e-3       | 0.109  | 3.67e+5          | 3.4e+6 |
+| 1e-2       | 1.03   | 3.63e+6          | 3.5e+6 |
+| 1e-1       | 4.03   | 3.71e+7          | 9.2e+6 |
+
+The lemma holds at every sweep point; the bound is loose by
+6–7 orders of magnitude on real sparse graphs because
+$1 + \Delta_{\max}$ is the worst-case fan-in. Empirical per-round
+amplification $\gamma_{\rm eff}^{(L)} := (D(L)/D(0))^{1/L} \approx 2.1$
+on Cora — close to a $\times 2$ per round, suggesting that an
+average-degree refinement of the lemma would tighten the bound by
+roughly $((L^c + \Delta_{\max} L^m) / \gamma_{\rm eff})^L$, a
+$\approx 10^6\times$ improvement on Cora at $L = 3$.
+
+**Replicate.** CPU-only:
+```
+python3 e3e_robust_lemma.py     # cora + citeseer; ~10 s wall
+```
+
+---
+
+## E3f — Richer initial colour (neighbourhood-degree fingerprint)
+
+Script: `e3f_richer_init.py` · json: `results/e3f.json`
+
+Push CiteSeer and PubMed past raw 1-WL with a cheap refinement of the
+initial colour that is provably between 1-WL and 2-WL on sparse graphs
+(Maron et al. 2019; Geerts 2020):
+
+$$
+h^{(0)}(v) := \mathrm{canonical}\bigl(\deg(v),\
+\mathrm{sorted}\{\deg(u) : u \in N(v)\}\bigr).
+$$
+
+Cost $O(|E| \log d)$; strictly stronger than degree-init 1-WL, strictly
+weaker than 2-FWL.
+
+Comparison on CiteSeer / PubMed:
+
+| init  | description                                       | provable strength |
+|-------|---------------------------------------------------|-------------------|
+| `const` | $h^{(0)} \equiv 0$                              | structural-WL baseline |
+| `deg`   | $h^{(0)} = \deg(v)$                             | original E3 setup |
+| `logdeg`| $K{=}8$ log-degree bin                          | matches E3c $K{=}8$ |
+| `nbrdeg`| degree + sorted neighbour-degree multiset       | between 1-WL and 2-FWL |
+
+Each `(graph, init, L)` row records the full bracket plus the
+$\sigma(0.05, 0.5)$ saturation–memorisation index from E3a.
+
+**Replicate.**
+```
+python3 e3f_richer_init.py      # ~30 s on CiteSeer + PubMed
+```
+
+---
+
+## E-K — Kochenderfer falsification protocol (post-processing)
+
+Script: `eK_falsification_protocol.py` · json: `results/eK.json`
+
+Pure post-processing of existing E1 / E2 / E3 / E6 result rows. For each
+nominal Bayes-error threshold $\tau \in \{0.10, 0.15, 0.20, 0.25\}$ and
+each row carrying a bracket $[L, U]$ we classify the claim
+"$\varepsilon^\* \le \tau$" as:
+
+* **FALSIFIED** if $\tau < L$ (bracket forbids it);
+* **VERIFIED** if $\tau \ge U$ (bracket guarantees it);
+* **INCONCLUSIVE** otherwise.
+
+Aggregated counts (falsified / verified / inconclusive) per source and
+per threshold are written to `eK.json`. Zero new training; touching a
+GPU is not required.
+
+**Replicate.**
+```
+python3 eK_falsification_protocol.py    # < 1 s
+```
+
+---
+
 ## Pipeline summary
 
 | Experiment | Status | Figure | json | Gates |
@@ -679,12 +925,19 @@ so Prop 7 holds with substantial slack on real data.
 | E2 — VQ zero-shot       | ✓ | e2_vq_zeroshot.pdf       | e2.json | PASS |
 | E2b — Marginal-aware    | ✓ | e2b_marginal_slack.pdf   | e2b.json | PASS |
 | E3 — WL on real graphs  | ✓ | e3_*_funnel.pdf (5)      | e3.json | PASS |
+| E3a — Decomposition     | ✓ | e3a_purity_*_L2.pdf (5)  | e3a.json | PASS |
+| E3b — Structural-only   | ✓ | —                        | e3b.json | PASS |
+| E3d-Lite — Arch audit   | ✓ | —                        | e3d_arch.json | PASS |
+| E3d-Full — CUDA sweep   | ◐ | —                        | e3d_arch_full.{,recovered.}json | partial (cora + citeseer landed; full 5-dataset sweep blocked on GPU availability) |
+| E3e — Lemma 6′ in vivo  | ✓ | —                        | e3e.json | PASS (bound holds; 6–7 orders loose) |
+| E3f — Richer init       | ✓ | —                        | e3f.json | PASS |
 | E4 — Duel table         | ✓ | e4_duel_table.pdf        | e4.json | PASS |
 | E5 — Achievable region  | ✓ | e5_achievable_region_scatter.pdf | e5.json | PASS |
 | E6 NAS                  | ✓ | e6_nas_scatter.pdf       | e6.json | PASS |
-| E6 NAS v2 (6-family)    | ✓ | —                        | e6_v2.json | 3/5 PASS (τ=+0.48 on Adult, n-limited on digits) |
+| E6 NAS v2 (6-family)    | ✓ | e6_nas_v2_*.pdf (3)      | e6_v2.json | 3/5 PASS (τ=+0.48 on Adult, n-limited on digits) |
 | E6 cost                 | ✓ | e6_cost_ratio.pdf        | e6_cost.json | PASS |
 | E7 — Concentration      | ✓ | e7_concentration.pdf     | e7.json | PASS |
+| E-K — Falsification     | ✓ | —                        | eK.json | post-hoc |
 
 Reproduce all of the above:
 ```
