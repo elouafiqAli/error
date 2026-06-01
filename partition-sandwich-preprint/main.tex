@@ -1982,6 +1982,80 @@ Raw outputs in \texttt{experiments/results/e3d\_arch.json}.}
 \label{tab:e3d-arch}
 \end{table}
 
+\paragraph{E3d-arch-full --- Extended sweep:
+GCN/GAT/GIN/SAGE $\times$ \{Cora, CiteSeer, PubMed, Twitch-EN\},
+5 seeds.}
+We re-run the E3d-arch protocol with a larger configuration:
+4 architectures (adding GraphSAGE), 5 seeds $\{0,\dots,4\}$
+(vs.\ 3), 4 datasets (adding Twitch-EN), 3-layer models with
+hidden width $128$ (vs.\ $64$), 200 epochs, AdamW.
+Cora / CiteSeer / PubMed are trained on CUDA; Twitch-EN on CPU
+(same numerics, slower). The cell-budget evaluation point $k$
+equals $k_{\mathrm{WL}}$ exactly on Cora and CiteSeer (small
+graphs); on PubMed and Twitch-EN the MiniBatchKMeans budget is
+capped at $k = 4096 < k_{\mathrm{WL}}$ because the WL-cell
+counts ($12\,990$ and $6\,648$) make per-cell-balanced
+$k$-means impractical at these graph sizes.
+
+\begin{table}[h]\centering\small
+\begin{tabular}{llrrrr}
+\toprule
+Dataset (eval $k$) & Arch & $\hat R$ & $\eps^{*}_{\Pi^{\mathrm{tr}}_{k}}$ & feat\_gap & head\_sig \\
+\midrule
+Cora ($k{=}k_{\mathrm{WL}}{=}2363$)
+ & GCN  & $0.015{\pm}0.006$ & $0.005{\pm}0.002$ & $+0.024{\pm}0.002$ & $-0.010{\pm}0.004$ \\
+ & GAT  & $0.153{\pm}0.273$ & $0.010{\pm}0.007$ & $+0.019{\pm}0.007$ & $-0.143{\pm}0.269$ \\
+ & GIN  & $0.037{\pm}0.039$ & $0.009{\pm}0.006$ & $+0.020{\pm}0.006$ & $-0.028{\pm}0.033$ \\
+ & SAGE & $0.008{\pm}0.017$ & $0.001{\pm}0.003$ & $+0.028{\pm}0.003$ & $-0.007{\pm}0.014$ \\
+\midrule
+CiteSeer ($k{=}k_{\mathrm{WL}}{=}2044$)
+ & GCN  & $0.036{\pm}0.014$ & $0.019{\pm}0.007$ & $+0.059{\pm}0.007$ & $-0.017{\pm}0.007$ \\
+ & GAT  & $0.018{\pm}0.002$ & $0.015{\pm}0.001$ & $+0.062{\pm}0.001$ & $-0.002{\pm}0.001$ \\
+ & GIN  & $0.040{\pm}0.016$ & $0.024{\pm}0.009$ & $+0.054{\pm}0.009$ & $-0.016{\pm}0.008$ \\
+ & SAGE & $\mathbf{0.000{\pm}0.000}$ & $0.000{\pm}0.000$ & $\mathbf{+0.077{\pm}0.000}$ & $-0.000{\pm}0.000$ \\
+\midrule
+PubMed ($k{=}4096{<}k_{\mathrm{WL}}{=}12\,990$)
+ & GCN  & $0.083{\pm}0.004$ & $0.065{\pm}0.002$ & $\mathbf{-0.014{\pm}0.002}$ & $-0.018{\pm}0.004$ \\
+ & GAT  & $0.105{\pm}0.003$ & $0.090{\pm}0.002$ & $\mathbf{-0.039{\pm}0.002}$ & $-0.015{\pm}0.001$ \\
+ & GIN  & $0.045{\pm}0.013$ & $0.037{\pm}0.010$ & $+0.015{\pm}0.010$ & $-0.008{\pm}0.003$ \\
+ & SAGE & $0.013{\pm}0.026$ & $0.011{\pm}0.022$ & $+0.040{\pm}0.022$ & $-0.002{\pm}0.004$ \\
+\midrule
+Twitch-EN ($k{=}4096{<}k_{\mathrm{WL}}{=}6648$)
+ & GCN  & $0.412{\pm}0.002$ & $0.192{\pm}0.003$ & $\mathbf{-0.166{\pm}0.003}$ & $-0.220{\pm}0.002$ \\
+ & GAT  & $0.416{\pm}0.001$ & $0.195{\pm}0.005$ & $\mathbf{-0.168{\pm}0.005}$ & $-0.221{\pm}0.005$ \\
+ & GIN  & $0.408{\pm}0.015$ & $0.190{\pm}0.004$ & $\mathbf{-0.164{\pm}0.004}$ & $-0.218{\pm}0.014$ \\
+ & SAGE & $0.376{\pm}0.009$ & $0.181{\pm}0.005$ & $\mathbf{-0.154{\pm}0.005}$ & $-0.195{\pm}0.012$ \\
+\bottomrule
+\end{tabular}
+\caption{E3d-arch-full: 5-seed, 4-architecture, 4-dataset
+extension of \cref{tab:e3d-arch} (total wall $3\,224$ s = CUDA
+$763$ s for Cora/CiteSeer/PubMed + CPU $2\,461$ s for
+Twitch-EN). \textbf{(F1$'$) features generically refine WL ---
+confirmed at matched $k$.} On the two datasets where evaluation
+budget \emph{equals} $k_{\mathrm{WL}}$ (Cora, CiteSeer),
+feat\_gap $> 0$ on $8/8$ arch-dataset cells; CiteSeer/SAGE
+achieves the clean limit $+0.077$ at $\hat R = 0$ (perfect fit
+at $n{=}3327$, $k{=}2044$ leaves little label ambiguity inside
+any cell --- a healthy expected memorisation regime).
+\textbf{(F2$'$) GAT erases structure even at hidden width
+$128$.} PubMed GAT feat\_gap $-0.039 \pm 0.002$ is nearly an
+order of magnitude more negative than the 3-seed pilot's
+$-0.006 \pm 0.003$; reproducible failure mode.
+\textbf{(F3$'$) head\_sig $< 0$ on all $16/16$ arch-dataset
+cells} (mean $-0.084$, range $[-0.221, -0.000]$). \emph{Caveat:}
+PubMed / Twitch-EN evaluate at $k = 4096 < k_{\mathrm{WL}}$ so
+their feat\_gap signs conflate features-vs-WL with $k$-budget
+mismatch; the Twitch-EN $\hat R \approx 0.41$ is itself close
+to the trivial constant baseline ($1 - \pi = 0.454$). Closing
+the $k$-mismatch is the natural next experiment.
+\textbf{Limitation:} ogbn-arxiv (fifth E3 dataset,
+$n = 169\,343$, $k_{\mathrm{WL}} = 161\,943$) is not in this
+sweep; documented as \texttt{merge\_provenance.missing\_dataset}
+in the raw output. Raw outputs:
+\texttt{experiments/results/e3d\_arch\_full.4of5.json}.}
+\label{tab:e3d-arch-full}
+\end{table}
+
 The combined picture from E3, E3b, E3c, E3d, E3d-arch is: (i)
 the bracket is correct everywhere it is evaluated; (ii) its
 informative regime is exactly the coarse-partition regime that

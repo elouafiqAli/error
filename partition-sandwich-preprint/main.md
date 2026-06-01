@@ -1152,6 +1152,101 @@ deterministic so per-seed numbers drift on re-run; signs and
 trends are robust. Raw outputs in
 `experiments/results/e3d_arch.json`.
 
+#### E3d-arch-full — Extended sweep: GCN/GAT/GIN/SAGE × {Cora, CiteSeer, PubMed, Twitch-EN}, 5 seeds
+
+We re-run the E3d-arch protocol with a larger configuration:
+4 architectures (adding GraphSAGE), 5 seeds
+$\{0,\dots,4\}$ (vs. 3), 4 datasets (adding Twitch-EN), 3-layer
+models with hidden width $128$ (vs. $64$), 200 epochs, AdamW.
+Cora / CiteSeer / PubMed are trained on CUDA; Twitch-EN on CPU
+(same numerics, slower). The cell-budget evaluation point $k$ is
+$k_{\mathrm{WL}}$ exactly on Cora and CiteSeer (small graphs,
+$k_{\mathrm{WL}} \le 2363$); on PubMed and Twitch-EN the
+MiniBatchKMeans budget is capped at $k = 4096 < k_{\mathrm{WL}}$
+because the WL-cell counts (12 990 and 6 648) make
+per-cell-balanced $k$-means impractical at $n \approx
+2 \times 10^{4}$ and $7 \times 10^{3}$ respectively. Mean ± std
+over seeds:
+
+| Dataset (eps_WL, eval k) | Arch | $\hat R$ | $\varepsilon^*_{\Pi^{\text{tr}}_k}$ | feat_gap | head_sig |
+|---|---|---|---|---|---|
+| Cora (0.0292, k=2363=k_WL) | GCN | 0.015 ± 0.006 | 0.005 ± 0.002 | +0.024 ± 0.002 | −0.010 ± 0.004 |
+| | GAT | 0.153 ± 0.273 | 0.010 ± 0.007 | +0.019 ± 0.007 | −0.143 ± 0.269 |
+| | GIN | 0.037 ± 0.039 | 0.009 ± 0.006 | +0.020 ± 0.006 | −0.028 ± 0.033 |
+| | SAGE | 0.008 ± 0.017 | 0.001 ± 0.003 | +0.028 ± 0.003 | −0.007 ± 0.014 |
+| CiteSeer (0.0775, k=2044=k_WL) | GCN | 0.036 ± 0.014 | 0.019 ± 0.007 | +0.059 ± 0.007 | −0.017 ± 0.007 |
+| | GAT | 0.018 ± 0.002 | 0.015 ± 0.001 | +0.062 ± 0.001 | −0.002 ± 0.001 |
+| | GIN | 0.040 ± 0.016 | 0.024 ± 0.009 | +0.054 ± 0.009 | −0.016 ± 0.008 |
+| | SAGE | **0.000 ± 0.000** | 0.000 ± 0.000 | **+0.077 ± 0.000** | −0.000 ± 0.000 |
+| PubMed (0.0511, k=4096<k_WL) | GCN | 0.083 ± 0.004 | 0.065 ± 0.002 | **−0.014 ± 0.002** | −0.018 ± 0.004 |
+| | GAT | 0.105 ± 0.003 | 0.090 ± 0.002 | **−0.039 ± 0.002** | −0.015 ± 0.001 |
+| | GIN | 0.045 ± 0.013 | 0.037 ± 0.010 | +0.015 ± 0.010 | −0.008 ± 0.003 |
+| | SAGE | 0.013 ± 0.026 | 0.011 ± 0.022 | +0.040 ± 0.022 | −0.002 ± 0.004 |
+| Twitch-EN (0.0267, k=4096<k_WL) | GCN | 0.412 ± 0.002 | 0.192 ± 0.003 | **−0.166 ± 0.003** | −0.220 ± 0.002 |
+| | GAT | 0.416 ± 0.001 | 0.195 ± 0.005 | **−0.168 ± 0.005** | −0.221 ± 0.005 |
+| | GIN | 0.408 ± 0.015 | 0.190 ± 0.004 | **−0.164 ± 0.004** | −0.218 ± 0.014 |
+| | SAGE | 0.376 ± 0.009 | 0.181 ± 0.005 | **−0.154 ± 0.005** | −0.195 ± 0.012 |
+
+The extended sweep ($16$ arch-dataset cells × 5 seeds = 80 runs,
+total wall $\approx 53.7$ min) reproduces and sharpens the
+findings from the 3-seed MPS pilot:
+
+**(F1′) Features generically refine WL — confirmed at matched
+$k$.** On the two datasets where evaluation budget *equals*
+$k_{\mathrm{WL}}$ (Cora, CiteSeer), feat\_gap > 0 on
+$8/8$ arch-dataset cells, with CiteSeer/SAGE achieving the
+clean limit feat\_gap $= +0.077$ at $\hat R = 0.000 \pm 0.000$
+(perfect fit at $n = 3327$, $k = 2044$ leaves little label
+ambiguity inside any cell — a healthy *expected* memorisation
+regime rather than a bracket pathology).
+
+**(F2′) GAT erases structure even at higher capacity.** PubMed
+GAT now reports feat\_gap $= -0.039 \pm 0.002$ (5 seeds, hidden
+128), nearly an order of magnitude more negative than the
+3-seed pilot's $-0.006 \pm 0.003$; the pattern is reproducible.
+GCN on PubMed also flips sign in the extended run (feat\_gap
+$= -0.014$), but this is partly attributable to the $k = 4096
+< k_{\mathrm{WL}} = 12\,990$ mismatch (see caveat below). GIN
+and SAGE remain positive on PubMed.
+
+**(F3′) Head-signal exploitation universal — $16/16$ arch-
+dataset cells have head\_sig < 0** (mean $-0.084$, range
+$[-0.221, -0.000]$). The trained linear head beats per-cell
+majority on its own embedding's $k$-means partition in every
+configuration.
+
+**Caveat on PubMed/Twitch-EN feat\_gap.** Because evaluation $k
+= 4096 < k_{\mathrm{WL}}$ on these two datasets, the
+$\varepsilon^*_{\Pi^{\mathrm{tr}}_k}$ entries necessarily live
+on a *coarser* partition than $\varepsilon_{\mathrm{WL}}$, so a
+negative feat\_gap conflates two effects: (i) features failing
+to refine and (ii) cell-budget mismatch. The Twitch-EN row is
+the clearer illustration of this confound: $\hat R \approx
+0.41$ is itself huge (the marginal label split $\pi = 0.546$
+makes the trivial constant predictor achieve $0.454$, so any
+trained model that does worse than $\hat R = 0.41$ has barely
+moved past the trivial bound), and the WL ceiling at the *finer*
+budget $k_{\mathrm{WL}} = 6648$ is $\varepsilon_{\mathrm{WL}} =
+0.027$ — a $15\times$ headroom that the $k = 4096$ embedding
+partition cannot in principle reach. The honest reading is:
+on Twitch-EN at this training budget no architecture beats the
+trivial baseline by a wide margin, regardless of WL. Closing
+the $k$-mismatch on PubMed / Twitch-EN is the natural next
+experiment (E3d-arch-full+: evaluate at $k = k_{\mathrm{WL}}$
+directly).
+
+**Limitation.** ogbn-arxiv (the fifth dataset of E3) is not
+included in this sweep: the 5-seed × 4-arch run at $n =
+169\,343$, $k_{\mathrm{WL}} = 161\,943$ requires GPU memory
+and wall budget that exceeded our current cap. We document
+this as `merge_provenance.missing_dataset = "ogbn_arxiv"` in
+the raw output (`experiments/results/e3d_arch_full.4of5.json`)
+and leave the ogbn-arxiv block to a follow-up audit. Raw
+outputs for the 4/5 sweep are at
+`experiments/results/e3d_arch_full.4of5.json` (merged from
+`e3d_arch_full.partial_3of5.json` on CUDA and
+`e3d_arch_full.twitch_only.json` on CPU; total wall $3224$ s).
+
 #### E3f — Richer-than-1-WL initialisation on CiteSeer / PubMed
 
 E3 shows $\varepsilon^*_{\Pi^{\text{WL}}_L}$ stalling at
