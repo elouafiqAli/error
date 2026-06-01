@@ -437,7 +437,68 @@ variance.
 
 - **T7** Symmetric label-noise correction.
 - **T9** Soft / Markov-kernel bracket.
-- **P10** Refinement consistency (φ-monotonicity).
+
+### Proposition P10 — Refinement consistency (φ-monotonicity)
+
+**Statement.** Let $\Pi' = \{S'_{i,k}\}_{i,k}$ be a measurable
+*refinement* of $\Pi = \{S_i\}_i$, meaning every cell $S_i$ is
+the disjoint union $S_i = \bigsqcup_k S'_{i,k}$. Let $\varphi$
+be a concave score functional (Def. 1; only (H1) is used).
+Then
+$$
+\varphi(f \mid \Pi') \;\leq\; \varphi(f \mid \Pi).
+$$
+Consequently the T3 bracket *tightens monotonically* under
+refinement: both endpoints $\varphi^{-1}(\varphi(f \mid \cdot))$
+and $c_\varphi \cdot \varphi(f \mid \cdot)$ are non-increasing in
+the partition order.
+
+**Hypotheses used.** (H1) concavity. None of (H2)–(H5) is
+required.
+
+**Proof.** For each $i$ let $p_i = \mathbb{P}(\Pi(X) = S_i)$
+and $p_{i,k} = \mathbb{P}(\Pi'(X) = S'_{i,k})$, so
+$p_i = \sum_k p_{i,k}$ and the within-cell weights
+$w_{i,k} := p_{i,k}/p_i$ form a convex combination
+($\sum_k w_{i,k} = 1$, $w_{i,k} \geq 0$). The
+cell-conditional rates satisfy the tower property
+$\eta_i = \sum_k w_{i,k}\, \eta_{i,k}$ for binary $f$.
+
+By (H1), $\varphi$ is concave on $[0, 1]$; Jensen on the
+within-cell distribution gives
+$$
+\varphi(\eta_i) \;=\; \varphi\!\Bigl(\sum_k w_{i,k}\, \eta_{i,k}\Bigr)
+\;\geq\; \sum_k w_{i,k}\, \varphi(\eta_{i,k}).
+$$
+Multiply by $p_i$ and sum over $i$:
+$$
+\varphi(f \mid \Pi) \;=\; \sum_i p_i\, \varphi(\eta_i)
+\;\geq\; \sum_i \sum_k p_{i,k}\, \varphi(\eta_{i,k})
+\;=\; \varphi(f \mid \Pi'). \quad \square
+$$
+
+*Equality case.* Strict equality holds iff $\eta_{i,k} =
+\eta_i$ for every $(i, k)$, i.e. every refinement step splits
+a cell into sub-cells with the *same* cell-conditional rate.
+In particular, $\Pi' = \Pi$ trivially achieves equality.
+
+*Failure mode (adversarial).* Drop (H1) — then Jensen reverses
+and a refinement can *increase* $\varphi(f \mid \Pi)$, violating
+the upper bracket endpoint's intended monotonicity in the
+partition lattice.
+
+**Verifier contract.** Mechanically checked by
+`verify_b_t1.py::check_P10_refinement_monotonicity` —
+Hypothesis property test `prop_P10` generates a random base
+partition $\Pi$ ($m \in [2, 8]$, masses Dirichlet$(1)$, rates
+uniform on $[0, 1]$), randomly splits each cell into $k_i \in
+[1, 4]$ sub-cells with internal Dirichlet$(1)$ weights and
+fresh uniform sub-rates, asserts
+$\varphi(f \mid \Pi') \leq \varphi(f \mid \Pi) + 10^{-9}$ for
+each $\varphi \in \{H_{\mathrm{bin}}, \eta(1-\eta),
+2\eta(1-\eta)\}$, on $\geq 200$ random pairs.
+
+---
 
 ## 6. MPNN aggregator-typed Lipschitz (skeleton)
 

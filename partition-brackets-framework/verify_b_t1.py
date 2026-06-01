@@ -502,10 +502,67 @@ def check_CPi_pinsker_constant(args: argparse.Namespace) -> ContractResult:
 
 @contract
 def check_P10_refinement_monotonicity(args: argparse.Namespace) -> ContractResult:
+    """P10: phi(f|Pi') <= phi(f|Pi) whenever Pi' refines Pi.
+
+    Hypothesis @given a random base partition + a random
+    refinement (each cell splits into k in [1,4] sub-cells with
+    internal Dirichlet(1) weights and fresh uniform sub-rates;
+    the base rate is computed as the weighted mean of sub-rates
+    so the tower property holds by construction). Asserts the
+    phi-monotonicity inequality for each of the three named phi.
+    """
+    try:
+        import numpy as np
+        from hypothesis import HealthCheck, given, settings, strategies as st
+    except ImportError as e:
+        return ContractResult("P10_refinement_monotonicity", "fail", f"missing dep: {e}")
+
+    n_examples = max(50, args.samples // 5)
+    eps_tol = 1e-9
+
+    @settings(
+        max_examples=n_examples,
+        deadline=None,
+        suppress_health_check=[HealthCheck.too_slow],
+        derandomize=True,
+    )
+    @given(
+        m=st.integers(min_value=2, max_value=8),
+        local_seed=st.integers(min_value=0, max_value=2**31 - 1),
+    )
+    def prop_P10(m: int, local_seed: int) -> None:
+        rng = np.random.default_rng((args.seed << 8) ^ local_seed ^ 0xB10)
+        p_base = rng.dirichlet(np.ones(m))
+        # Build refinement first; derive base rates by tower property.
+        sub_ps = []
+        sub_etas = []
+        eta_base = np.zeros(m)
+        for i in range(m):
+            k_i = int(rng.integers(1, 5))
+            w_i = rng.dirichlet(np.ones(k_i))
+            e_i = rng.random(k_i)
+            sub_ps.append(p_base[i] * w_i)
+            sub_etas.append(e_i)
+            eta_base[i] = float(np.sum(w_i * e_i))  # tower
+        p_fine = np.concatenate(sub_ps)
+        eta_fine = np.concatenate(sub_etas)
+        for phi_name, phi_data in SCORE_FUNCTIONALS.items():
+            phi = phi_data["numeric"]
+            phi_coarse = float(np.sum(p_base * np.array([phi(e) for e in eta_base])))
+            phi_fine = float(np.sum(p_fine * np.array([phi(e) for e in eta_fine])))
+            assert phi_fine <= phi_coarse + eps_tol, (
+                f"P10 violated for {phi_name}: "
+                f"phi(f|Pi') = {phi_fine} > phi(f|Pi) = {phi_coarse} (diff {phi_fine - phi_coarse:.2e})"
+            )
+
+    try:
+        prop_P10()
+    except AssertionError as e:
+        return ContractResult("P10_refinement_monotonicity", "fail", str(e))
+
     return ContractResult(
-        "P10_refinement_monotonicity",
-        "skipped",
-        "STUB — proof lands in commit paper-b Phase 2b-md.P10",
+        "P10_refinement_monotonicity", "pass",
+        f"phi(f|Pi') <= phi(f|Pi) for 3 phis on {n_examples} examples",
     )
 
 
