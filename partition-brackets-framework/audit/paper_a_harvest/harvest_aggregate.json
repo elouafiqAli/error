@@ -1,0 +1,122 @@
+{
+  "snapshot_paper_a_sha": "e8763fe",
+  "snapshot_date_utc": "2026-06-01",
+  "eK": {
+    "n_sources": 4,
+    "tau_levels": [
+      0.1,
+      0.15,
+      0.2,
+      0.25
+    ],
+    "totals_across_all_tau": {
+      "falsified": 121,
+      "verified": 89,
+      "inconclusive": 198
+    },
+    "by_tau": {
+      "0.1": {
+        "falsified": 72,
+        "verified": 15,
+        "inconclusive": 15
+      },
+      "0.15": {
+        "falsified": 40,
+        "verified": 18,
+        "inconclusive": 44
+      },
+      "0.2": {
+        "falsified": 6,
+        "verified": 25,
+        "inconclusive": 71
+      },
+      "0.25": {
+        "falsified": 3,
+        "verified": 31,
+        "inconclusive": 68
+      }
+    },
+    "tau_010_E6_falsified": 50,
+    "tau_025_E3_verified": 20
+  },
+  "e7": {
+    "dataset": "adult",
+    "m": 16,
+    "alpha": 0.05,
+    "n_subsample_grid": [
+      200,
+      500,
+      1000,
+      2000,
+      5000,
+      10000,
+      20000
+    ],
+    "all_coverage_ge_1_minus_alpha": true,
+    "min_coverage": 1.0,
+    "p95_over_bound_min": 0.34062263673660864,
+    "p95_over_bound_max": 0.39585776385093313,
+    "bound_over_p95_min": 2.5261598769010547,
+    "bound_over_p95_max": 2.9358001851569964,
+    "gates": {
+      "all_coverage_ge_1_minus_alpha": true,
+      "delta_mean_monotone_in_n": true,
+      "delta_p95_le_bound_everywhere": true
+    },
+    "headline_bound_over_p95_geomean": 2.723288569788793
+  },
+  "e3e": {
+    "n_datasets": 2,
+    "per_dataset_summary": [
+      {
+        "dataset": "cora",
+        "n": 2708,
+        "Delta_max": 168,
+        "L": 3,
+        "d_hidden": 32,
+        "K_cells": 2363,
+        "L_op_per_round": [
+          1.7911989326022906,
+          1.8608036840664457,
+          1.9281375000934105
+        ],
+        "predicted_unit_envelope": [
+          1.0,
+          302.7126196097871,
+          95195.8000653771,
+          31020050.040808767
+        ]
+      },
+      {
+        "dataset": "citeseer",
+        "n": 3327,
+        "Delta_max": 99,
+        "L": 3,
+        "d_hidden": 32,
+        "K_cells": 2044,
+        "L_op_per_round": [
+          1.7911989326022906,
+          1.8608036840664457,
+          1.9281375000934105
+        ],
+        "predicted_unit_envelope": [
+          1.0,
+          179.11989326022905,
+          33330.695726822276,
+          6426616.433508922
+        ]
+      }
+    ],
+    "bound_never_violated": true,
+    "worst_looseness_row": {
+      "dataset": "cora",
+      "L": 3,
+      "delta_0_param": 0.1,
+      "delta_0_propagated": 1.1975778281217604,
+      "observed_D": 4.026773990820426,
+      "bound_delta_l": 37148924.15610009,
+      "looseness": 9225480.307756549
+    },
+    "worst_looseness_orders_of_magnitude": 9225480.0
+  }
+}

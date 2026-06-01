@@ -1,0 +1,83 @@
+{
+  "experiment": "E7 real-data Proposition 7 concentration (bootstrap)",
+  "dataset": "adult",
+  "m": 16,
+  "delta_conf": 0.05,
+  "delta_mass": 0.0025872363009154836,
+  "eta_min": 0.0021008403361344463,
+  "sampling": "bootstrap (with replacement)",
+  "deviation": "|\u0394\u03b5*|",
+  "bound": "sqrt(log(4m/alpha) / (2n))",
+  "full": {
+    "n": 45222,
+    "m": 16,
+    "H": 0.48166166007439704,
+    "eps_star": 0.15081155189951792,
+    "lower": 0.10403641120439078,
+    "upper": 0.24083083003719852,
+    "width": 0.13679441883280774
+  },
+  "rows": [
+    {
+      "n": 200,
+      "K": 400,
+      "delta_mean": 0.02035092764583609,
+      "delta_p95": 0.045811551899517924,
+      "bound": 0.13374056375043497,
+      "coverage": 1.0
+    },
+    {
+      "n": 500,
+      "K": 400,
+      "delta_mean": 0.012471079341913225,
+      "delta_p95": 0.02881155189951791,
+      "bound": 0.08458495940126509,
+      "coverage": 1.0
+    },
+    {
+      "n": 1000,
+      "K": 400,
+      "delta_mean": 0.00896180863296625,
+      "delta_p95": 0.022811551899517918,
+      "bound": 0.05981059837902336,
+      "coverage": 1.0
+    },
+    {
+      "n": 2000,
+      "K": 400,
+      "delta_mean": 0.006438925025430094,
+      "delta_p95": 0.01668844810048206,
+      "bound": 0.042292479700632546,
+      "coverage": 1.0
+    },
+    {
+      "n": 5000,
+      "K": 400,
+      "delta_mean": 0.00415255775949759,
+      "delta_p95": 0.01058844810048207,
+      "bound": 0.02674811275008699,
+      "coverage": 1.0
+    },
+    {
+      "n": 10000,
+      "K": 400,
+      "delta_mean": 0.0028694224050241023,
+      "delta_p95": 0.00712539670956612,
+      "bound": 0.018913771909528865,
+      "coverage": 1.0
+    },
+    {
+      "n": 20000,
+      "K": 400,
+      "delta_mean": 0.0019422707089469715,
+      "delta_p95": 0.004814051899517926,
+      "bound": 0.013374056375043495,
+      "coverage": 1.0
+    }
+  ],
+  "gates": {
+    "all_coverage_ge_1_minus_alpha": true,
+    "delta_mean_monotone_in_n": true,
+    "delta_p95_le_bound_everywhere": true
+  }
+}

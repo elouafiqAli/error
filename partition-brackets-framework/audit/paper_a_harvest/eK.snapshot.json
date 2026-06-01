@@ -1,0 +1,110 @@
+{
+  "taus": [
+    0.1,
+    0.15,
+    0.2,
+    0.25
+  ],
+  "sources": {
+    "e1": {
+      "n_rows": 15,
+      "per_tau": {
+        "0.10": {
+          "falsified": 5,
+          "verified": 0,
+          "inconclusive": 10
+        },
+        "0.15": {
+          "falsified": 1,
+          "verified": 0,
+          "inconclusive": 14
+        },
+        "0.20": {
+          "falsified": 0,
+          "verified": 5,
+          "inconclusive": 10
+        },
+        "0.25": {
+          "falsified": 0,
+          "verified": 11,
+          "inconclusive": 4
+        }
+      }
+    },
+    "e2": {
+      "n_rows": 10,
+      "per_tau": {
+        "0.10": {
+          "falsified": 10,
+          "verified": 0,
+          "inconclusive": 0
+        },
+        "0.15": {
+          "falsified": 7,
+          "verified": 0,
+          "inconclusive": 3
+        },
+        "0.20": {
+          "falsified": 2,
+          "verified": 0,
+          "inconclusive": 8
+        },
+        "0.25": {
+          "falsified": 0,
+          "verified": 0,
+          "inconclusive": 10
+        }
+      }
+    },
+    "e3": {
+      "n_rows": 27,
+      "per_tau": {
+        "0.10": {
+          "falsified": 7,
+          "verified": 15,
+          "inconclusive": 5
+        },
+        "0.15": {
+          "falsified": 4,
+          "verified": 18,
+          "inconclusive": 5
+        },
+        "0.20": {
+          "falsified": 4,
+          "verified": 20,
+          "inconclusive": 3
+        },
+        "0.25": {
+          "falsified": 3,
+          "verified": 20,
+          "inconclusive": 4
+        }
+      }
+    },
+    "e6": {
+      "n_rows": 50,
+      "per_tau": {
+        "0.10": {
+          "falsified": 50,
+          "verified": 0,
+          "inconclusive": 0
+        },
+        "0.15": {
+          "falsified": 28,
+          "verified": 0,
+          "inconclusive": 22
+        },
+        "0.20": {
+          "falsified": 0,
+          "verified": 0,
+          "inconclusive": 50
+        },
+        "0.25": {
+          "falsified": 0,
+          "verified": 0,
+          "inconclusive": 50
+        }
+      }
+    }
+  }
+}
