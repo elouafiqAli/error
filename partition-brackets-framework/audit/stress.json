@@ -1,0 +1,1287 @@
+{
+  "tool": "audit_stress",
+  "passed": true,
+  "seed_sweep": {
+    "B-T1": {
+      "0": {
+        "wall_s": 60.2,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 6.75e-07)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "1": {
+        "wall_s": 58.55,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 1.49e-06)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "2": {
+        "wall_s": 62.05,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 2.07e-05)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "3": {
+        "wall_s": 74.64,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 6.19e-07)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "4": {
+        "wall_s": 74.06,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 3.91e-06)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "5": {
+        "wall_s": 78.64,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 3.91e-06)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "6": {
+        "wall_s": 59.62,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 3.91e-06)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "7": {
+        "wall_s": 62.33,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 3.91e-06)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "8": {
+        "wall_s": 58.85,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 6.63e-06)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "9": {
+        "wall_s": 59.95,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 1.22e-05)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "10": {
+        "wall_s": 58.78,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 7.11e-06)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "11": {
+        "wall_s": 58.72,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 4.97e-06)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "12": {
+        "wall_s": 60.24,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 4.11e-06)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "13": {
+        "wall_s": 60.08,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 3.81e-06)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      },
+      "14": {
+        "wall_s": 60.07,
+        "results": [
+          {
+            "name": "T3_jensen_lower",
+            "status": "pass",
+            "message": "sympy (H1,H4) ok for 3 phis; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "T3_upper_constant",
+            "status": "pass",
+            "message": "c_phi certified to 5e-4 on 10^4 grid; hypothesis 10000 examples ok"
+          },
+          {
+            "name": "CSh_reduces_to_paperA",
+            "status": "pass",
+            "message": "meta == Paper A bracket within 1e-9 on 10000 examples"
+          },
+          {
+            "name": "CVa_bayes_variance_identity",
+            "status": "pass",
+            "message": "(C-Va.id) + LTV + T3-bracket all ok on 10000 examples"
+          },
+          {
+            "name": "CPi_pinsker_constant",
+            "status": "pass",
+            "message": "Pinsker symbolic grid ok; (C-Pi.lower) holds on 12500 examples (worst slack 8.06e-07)"
+          },
+          {
+            "name": "P10_refinement_monotonicity",
+            "status": "pass",
+            "message": "phi(f|Pi') <= phi(f|Pi) for 3 phis on 10000 examples"
+          },
+          {
+            "name": "L11_aggregator_deltaL",
+            "status": "pass",
+            "message": "product formula proved symbolically; empirical bound holds on 10000 examples"
+          },
+          {
+            "name": "T7_noise_correction_symbolic",
+            "status": "pass",
+            "message": "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically"
+          }
+        ]
+      }
+    },
+    "B-T2": {
+      "0": {
+        "wall_s": 20.06,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0051)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "1": {
+        "wall_s": 19.08,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0067)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "2": {
+        "wall_s": 20.34,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0061)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "3": {
+        "wall_s": 19.19,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0052)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "4": {
+        "wall_s": 20.61,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0051)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "5": {
+        "wall_s": 19.71,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0076)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "6": {
+        "wall_s": 19.52,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0069)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "7": {
+        "wall_s": 19.59,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0051)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "8": {
+        "wall_s": 20.85,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0063)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "9": {
+        "wall_s": 19.34,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0059)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "10": {
+        "wall_s": 19.64,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0062)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "11": {
+        "wall_s": 19.4,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0063)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "12": {
+        "wall_s": 19.53,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0059)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "13": {
+        "wall_s": 19.38,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0056)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      },
+      "14": {
+        "wall_s": 20.15,
+        "results": [
+          {
+            "name": "CVa_variance_identity_population",
+            "status": "pass",
+            "message": "MSE* = sum p_i eta_i(1-eta_i) within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MSE_identity_population",
+            "status": "pass",
+            "message": "MSE* = E[Var(f|Pi)] within 0.0243 on 500 trials (worst 0.0000)"
+          },
+          {
+            "name": "T6_MAE_upper_population",
+            "status": "pass",
+            "message": "MAE* <= sqrt(MSE*) + 0.0243 on 500 trials (worst residual 0.0000)"
+          },
+          {
+            "name": "T7_noise_correction_population",
+            "status": "pass",
+            "message": "identity holds within 4*Hoeffding(0.0243) on 1500 trials (worst residual 0.0050)"
+          },
+          {
+            "name": "T7_shannon_matches_paperA",
+            "status": "pass",
+            "message": "T7-Shannon bracket == Paper A Prop 7 to 1e-06 on 200 trials x 3 rhos"
+          },
+          {
+            "name": "T9_kernel_bracket_population",
+            "status": "pass",
+            "message": "T9 brackets (Shannon, variance) envelope eps*_K within 0.0243 on 500 trials"
+          }
+        ]
+      }
+    },
+    "summary": {
+      "n_seeds": 15,
+      "samples": 50000,
+      "trials": 500,
+      "n_failures": 0,
+      "failures": [],
+      "passed": true
+    }
+  },
+  "mutation_test": {
+    "mutations": {
+      "T7_wrong_sign": true,
+      "T3_wrong_c_phi": true,
+      "CVa_wrong_identity": true
+    },
+    "all_caught": true,
+    "uncaught": []
+  },
+  "boundary": {
+    "T3_eta_to_0_Hbin_finite": {
+      "pass": true,
+      "detail": "H_bin(1e-12)=4.13e-11"
+    },
+    "T3_eta_half_Hbin_eq_1": {
+      "pass": true,
+      "detail": "H_bin(1/2)=1.0"
+    },
+    "T3_m_eq_1_bracket_envelopes": {
+      "pass": true,
+      "detail": "eta=0.3 lo=0.300000 eps=0.3 up=0.440645"
+    },
+    "T3_m_eq_1000_sparse_bracket": {
+      "pass": true,
+      "detail": "eps=0.226044 lo=0.226044 up=0.385525"
+    },
+    "T7_rho_0.0_identity": {
+      "pass": true,
+      "detail": "eps_noisy=0.280000 predicted=0.280000"
+    },
+    "T7_rho_0.001_identity": {
+      "pass": true,
+      "detail": "eps_noisy=0.280440 predicted=0.280440"
+    },
+    "T7_rho_0.499_identity": {
+      "pass": true,
+      "detail": "eps_noisy=0.499560 predicted=0.499560"
+    },
+    "T7_rho_near_half_blowup_recorded": {
+      "pass": true,
+      "detail": "1/(1-2*0.4999)=5000.0"
+    },
+    "CPi_vacuous_when_H_zero": {
+      "pass": true,
+      "detail": "Pinsker lower at H=0 is -0.0887 (vacuous as expected)"
+    },
+    "CPi_tight_when_H_one": {
+      "pass": true,
+      "detail": "Pinsker lower at H=1 is 0.5"
+    },
+    "CPi_threshold_non_vacuous": {
+      "pass": true,
+      "detail": "Pinsker lower at H=0.2787 is 0.0000e+00"
+    },
+    "T9_deterministic_reduces_to_T3": {
+      "pass": true,
+      "detail": "eps_K=0.226218751217 eps_hard=0.226218751217"
+    },
+    "P10_refinement_to_atoms_phi_zero": {
+      "pass": true,
+      "detail": "phi at atomic = 0.00e+00"
+    },
+    "summary": {
+      "n_checks": 13,
+      "n_failures": 0,
+      "failures": [],
+      "passed": true
+    }
+  }
+}
