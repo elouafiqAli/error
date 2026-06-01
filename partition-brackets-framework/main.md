@@ -294,6 +294,26 @@ $4\times$ inflation of $h$ is precisely the union-bound budget
 for those four McDiarmid coordinates (`verify_b_t2_mc.py`
 in-line comment, ll. 304–306).
 
+*Union-bound derivation of the $4\times$ factor (why 4, not 3
+or 5).* Let $K_T = 4$ be the number of McDiarmid-bounded plug-in
+statistics aggregated inside a single T7 contract evaluation.
+A standard Bonferroni union bound replaces the per-statistic
+level $\alpha$ by $\alpha / K_T$ and demands a per-statistic
+halfwidth $h_{\mathrm{union}} := \sqrt{\ln(2 K_T / \alpha) /
+(2N)}$. At $N = 50{,}000$, $\alpha = 0.05$, $K_T = 4$ this gives
+$h_{\mathrm{union}} \approx 7.12 \times 10^{-3}$, a multiplicative
+inflation of only $\sqrt{\ln(8/\alpha)/\ln(2/\alpha)} \approx 1.17$
+over the single-statistic $h \approx 6.07 \times 10^{-3}$. The
+prose $4 \times$ is therefore **strictly conservative**: it
+budgets a halfwidth $\tau = 4h \approx 2.43 \times 10^{-2}$
+that covers the $K_T = 4$ events at the *original* $\alpha$
+with $4 / 1.17 \approx 3.4 \times$ extra slack. The choice
+$4$ over $3$ or $5$ is the integer matching the plug-in count
+$K_T$, not the union-bound multiplier itself; $3 \times$ would
+also satisfy the Bonferroni budget at $K_T = 4$, while $5 \times$
+would waste statistical efficiency on the upstream contracts
+($K_T \leq 2$).
+
 *Adversarial caveat.* Proposition 0.4 controls *false
 rejections* (Type I): a true population identity being
 flagged as violated. It does **not** control *false
