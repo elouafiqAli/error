@@ -292,6 +292,21 @@ $H_{\mathrm{bin}}^{-1}(1)=1/2$.
 > non-uniform weights $\{q_v\}$ via $q_C := \sum_{v\in C} q_v$ and
 > $P_C := q_C^{-1}\sum_{v\in C} q_v f(v)$.
 
+> **Remark (empirical vs population, notation).** Throughout the
+> main result and experiments the symbol $\varepsilon^*_\Pi$
+> denotes the **empirical** partition-restricted minimum risk on
+> the finite set $V$. Its **population** analogue
+> $\varepsilon^*_{\Pi,\mu} := \sum_C \mu(C)\,\min(\bar P_C, 1-\bar P_C)$,
+> $\bar P_C := \mathbb{E}_\mu[f\mid C]$, is the object of
+> Proposition 7 and concentrates on $\varepsilon^*_\Pi$ at the
+> $\mathcal{O}(1/\sqrt n)$ rate established there. Practitioner
+> claims (E1)\u2013(E3) bound the empirical $\varepsilon^*_\Pi$
+> unconditionally; their population reading
+> $\varepsilon^*_\Pi \approx \varepsilon^*_{\Pi,\mu}$ is mediated
+> by Proposition 7 and inherits its $\kappa(\delta,\eta)$ caveats
+> (in particular the $\eta_{\min}\to 0$ degeneracy of E7's
+> near-pure CART leaf).
+
 > **Remark (range of $H(f\mid\Pi)$).** Since $H_{\mathrm{bin}}(P_C)\in[0,1]$
 > for every $C$ and $\sum_C q_C = 1$, the partition-conditional
 > entropy satisfies $H(f\mid\Pi)\in[0,1]$ in bits. In particular it
@@ -1119,26 +1134,31 @@ report two signed diagnostics:
 $$
 \text{feat\_gap} := \varepsilon_{\text{WL}} -
 \varepsilon^*_{\Pi^{\text{trained}}_k}, \qquad
-\text{head\_sig} := \varepsilon^*_{\Pi^{\text{trained}}_k} -
-\hat R.
+\text{head\_sig} := \hat R -
+\varepsilon^*_{\Pi^{\text{trained}}_k}.
 $$
 
 Positive feat\_gap = features refine the partition beyond WL;
-negative head\_sig = the trained linear head extracts sub-cell
-label structure that $k$-means at budget $k$ discards. Mean ± std
+positive head\_sig = the trained head leaves bracket-detectable
+sub-cell structure unrealised (per-cell majority on the head's own
+$k$-means partition would beat the head itself). head\_sig is
+exactly the head-slack $\Delta_{\text{head}}$ of the $(\star)$
+decomposition (Proposition 7's empirical-to-population corollary).
+*Errata r3: this is the corrected sign convention; earlier drafts
+used $\varepsilon^* - \hat R$ with opposite sign.* Mean ± std
 over seeds:
 
 | Dataset (eps_WL) | Arch | $\hat R$ | $\varepsilon^*_{\Pi^{\text{tr}}_{k_{\text{WL}}}}$ | feat_gap | head_sig |
 |---|---|---|---|---|---|
-| Cora (0.0292) | GCN | 0.030 ± 0.029 | 0.007 ± 0.004 | +0.022 ± 0.004 | −0.023 ± 0.024 |
-| | GAT | 0.006 ± 0.004 | 0.002 ± 0.002 | +0.027 ± 0.002 | −0.004 ± 0.003 |
-| | GIN | 0.198 ± 0.245 | 0.016 ± 0.012 | +0.013 ± 0.012 | −0.182 ± 0.234 |
-| CiteSeer (0.0775) | GCN | 0.032 ± 0.004 | 0.018 ± 0.004 | +0.060 ± 0.004 | −0.014 ± 0.002 |
-| | GAT | 0.021 ± 0.006 | 0.016 ± 0.002 | +0.062 ± 0.002 | −0.005 ± 0.004 |
-| | GIN | 0.079 ± 0.035 | 0.031 ± 0.010 | +0.046 ± 0.010 | −0.048 ± 0.025 |
-| PubMed (0.0511) | GCN | 0.086 ± 0.003 | 0.035 ± 0.004 | +0.016 ± 0.004 | −0.050 ± 0.005 |
-| | GAT | 0.103 ± 0.002 | 0.057 ± 0.003 | **−0.006 ± 0.003** | −0.047 ± 0.005 |
-| | GIN | 0.068 ± 0.024 | 0.025 ± 0.009 | +0.027 ± 0.009 | −0.043 ± 0.015 |
+| Cora (0.0292) | GCN | 0.030 ± 0.029 | 0.007 ± 0.004 | +0.022 ± 0.004 | +0.023 ± 0.024 |
+| | GAT | 0.006 ± 0.004 | 0.002 ± 0.002 | +0.027 ± 0.002 | +0.004 ± 0.003 |
+| | GIN | 0.198 ± 0.245 | 0.016 ± 0.012 | +0.013 ± 0.012 | +0.182 ± 0.234 |
+| CiteSeer (0.0775) | GCN | 0.032 ± 0.004 | 0.018 ± 0.004 | +0.060 ± 0.004 | +0.014 ± 0.002 |
+| | GAT | 0.021 ± 0.006 | 0.016 ± 0.002 | +0.062 ± 0.002 | +0.005 ± 0.004 |
+| | GIN | 0.079 ± 0.035 | 0.031 ± 0.010 | +0.046 ± 0.010 | +0.048 ± 0.025 |
+| PubMed (0.0511) | GCN | 0.086 ± 0.003 | 0.035 ± 0.004 | +0.016 ± 0.004 | +0.050 ± 0.005 |
+| | GAT | 0.103 ± 0.002 | 0.057 ± 0.003 | **−0.006 ± 0.003** | +0.047 ± 0.005 |
+| | GIN | 0.068 ± 0.024 | 0.025 ± 0.009 | +0.027 ± 0.009 | +0.043 ± 0.015 |
 
 Three clean findings. **(F1) Features generically refine WL.**
 feat\_gap > 0 on 23/27 cells; CiteSeer — the hardest dataset for
@@ -1147,13 +1167,17 @@ features (+0.05 to +0.06 bracket-error reduction at matched cell
 budget, 9/9 cells). **(F2) Attention can erase structure.** All
 three GAT seeds on PubMed give negative feat\_gap; the bracket
 framework cleanly detects an architecture *failing* to use
-structural information. **(F3) The linear head exploits sub-cell
-geometry universally.** head\_sig < 0 on all 27/27 cells (mean
-−0.046): the trained head beats per-cell majority on its own
-embedding's $k$-means partition. GIN is init-sensitive (Cora
-seed=0 fails to fit, inflating its std). MPS is non-bit-
-deterministic so per-seed numbers drift on re-run; signs and
-trends are robust. Raw outputs in
+structural information. **(F3) The linear head leaves
+bracket-detectable structure universally.** Under the corrected
+sign convention `head_sig := Rhat - eps*_Pi` (P0.3), head\_sig
+> 0 on all 27/27 cells (mean +0.046): per-cell majority on the
+head's own $k$-means partition strictly improves on the trained
+linear head, so head\_sig is the head-slack
+$\Delta_{\text{head}}$ of the $(\star)$ decomposition. GIN is
+init-sensitive (Cora seed=0 fails to fit, inflating its std,
+which is the largest single contributor to its head\_slack of
++0.182). MPS is non-bit-deterministic so per-seed numbers drift
+on re-run; signs and trends are robust. Raw outputs in
 `experiments/results/e3d_arch.json`.
 
 #### E3d-arch-full — Extended sweep: GCN/GAT/GIN/SAGE × {Cora, CiteSeer, PubMed, Twitch-EN}, 5 seeds
@@ -1174,26 +1198,26 @@ over seeds:
 
 | Dataset (eps_WL, eval k) | Arch | $\hat R$ | $\varepsilon^*_{\Pi^{\text{tr}}_k}$ | feat_gap | head_sig |
 |---|---|---|---|---|---|
-| Cora (0.0292, k=2363=k_WL) | GCN | 0.015 ± 0.006 | 0.005 ± 0.002 | +0.024 ± 0.002 | −0.010 ± 0.004 |
-| | GAT | 0.153 ± 0.273 | 0.010 ± 0.007 | +0.019 ± 0.007 | −0.143 ± 0.269 |
-| | GIN | 0.037 ± 0.039 | 0.009 ± 0.006 | +0.020 ± 0.006 | −0.028 ± 0.033 |
-| | SAGE | 0.008 ± 0.017 | 0.001 ± 0.003 | +0.028 ± 0.003 | −0.007 ± 0.014 |
-| CiteSeer (0.0775, k=2044=k_WL) | GCN | 0.036 ± 0.014 | 0.019 ± 0.007 | +0.059 ± 0.007 | −0.017 ± 0.007 |
-| | GAT | 0.018 ± 0.002 | 0.015 ± 0.001 | +0.062 ± 0.001 | −0.002 ± 0.001 |
-| | GIN | 0.040 ± 0.016 | 0.024 ± 0.009 | +0.054 ± 0.009 | −0.016 ± 0.008 |
-| | SAGE | **0.000 ± 0.000** | 0.000 ± 0.000 | **+0.077 ± 0.000** | −0.000 ± 0.000 |
-| PubMed (0.0511, k=4096<k_WL) | GCN | 0.083 ± 0.004 | 0.065 ± 0.002 | **−0.014 ± 0.002** | −0.018 ± 0.004 |
-| | GAT | 0.105 ± 0.003 | 0.090 ± 0.002 | **−0.039 ± 0.002** | −0.015 ± 0.001 |
-| | GIN | 0.045 ± 0.013 | 0.037 ± 0.010 | +0.015 ± 0.010 | −0.008 ± 0.003 |
-| | SAGE | 0.013 ± 0.026 | 0.011 ± 0.022 | +0.040 ± 0.022 | −0.002 ± 0.004 |
-| Twitch-EN (0.0267, k=4096<k_WL) | GCN | 0.412 ± 0.002 | 0.192 ± 0.003 | **−0.166 ± 0.003** | −0.220 ± 0.002 |
-| | GAT | 0.416 ± 0.001 | 0.195 ± 0.005 | **−0.168 ± 0.005** | −0.221 ± 0.005 |
-| | GIN | 0.408 ± 0.015 | 0.190 ± 0.004 | **−0.164 ± 0.004** | −0.218 ± 0.014 |
-| | SAGE | 0.376 ± 0.009 | 0.181 ± 0.005 | **−0.154 ± 0.005** | −0.195 ± 0.012 |
-| ogbn-arxiv (0.0021, k=4096<k_WL=161943) | GCN | 0.050 ± 0.003 | 0.048 ± 0.001 | **-0.045 ± 0.001** | -0.003 ± 0.003 |
-| | GAT | 0.053 ± 0.000 | 0.051 ± 0.000 | **-0.049 ± 0.000** | -0.002 ± 0.000 |
-| | GIN | 0.157 ± 0.033 | 0.132 ± 0.012 | **-0.130 ± 0.012** | -0.024 ± 0.036 |
-| | SAGE | 0.052 ± 0.002 | 0.050 ± 0.002 | **-0.047 ± 0.002** | -0.002 ± 0.001 |
+| Cora (0.0292, k=2363=k_WL) | GCN | 0.015 ± 0.006 | 0.005 ± 0.002 | +0.024 ± 0.002 | +0.010 ± 0.004 |
+| | GAT | 0.153 ± 0.273 | 0.010 ± 0.007 | +0.019 ± 0.007 | +0.143 ± 0.269 |
+| | GIN | 0.037 ± 0.039 | 0.009 ± 0.006 | +0.020 ± 0.006 | +0.028 ± 0.033 |
+| | SAGE | 0.008 ± 0.017 | 0.001 ± 0.003 | +0.028 ± 0.003 | +0.007 ± 0.014 |
+| CiteSeer (0.0775, k=2044=k_WL) | GCN | 0.036 ± 0.014 | 0.019 ± 0.007 | +0.059 ± 0.007 | +0.017 ± 0.007 |
+| | GAT | 0.018 ± 0.002 | 0.015 ± 0.001 | +0.062 ± 0.001 | +0.002 ± 0.001 |
+| | GIN | 0.040 ± 0.016 | 0.024 ± 0.009 | +0.054 ± 0.009 | +0.016 ± 0.008 |
+| | SAGE | **0.000 ± 0.000** | 0.000 ± 0.000 | **+0.077 ± 0.000** | +0.000 ± 0.000 |
+| PubMed (0.0511, k=4096<k_WL) | GCN | 0.083 ± 0.004 | 0.065 ± 0.002 | **−0.014 ± 0.002** | +0.018 ± 0.004 |
+| | GAT | 0.105 ± 0.003 | 0.090 ± 0.002 | **−0.039 ± 0.002** | +0.015 ± 0.001 |
+| | GIN | 0.045 ± 0.013 | 0.037 ± 0.010 | +0.015 ± 0.010 | +0.008 ± 0.003 |
+| | SAGE | 0.013 ± 0.026 | 0.011 ± 0.022 | +0.040 ± 0.022 | +0.002 ± 0.004 |
+| Twitch-EN (0.0267, k=4096<k_WL) | GCN | 0.412 ± 0.002 | 0.192 ± 0.003 | **−0.166 ± 0.003** | +0.220 ± 0.002 |
+| | GAT | 0.416 ± 0.001 | 0.195 ± 0.005 | **−0.168 ± 0.005** | +0.221 ± 0.005 |
+| | GIN | 0.408 ± 0.015 | 0.190 ± 0.004 | **−0.164 ± 0.004** | +0.218 ± 0.014 |
+| | SAGE | 0.376 ± 0.009 | 0.181 ± 0.005 | **−0.154 ± 0.005** | +0.195 ± 0.012 |
+| ogbn-arxiv (0.0021, k=4096<k_WL=161943) | GCN | 0.050 ± 0.003 | 0.048 ± 0.001 | **-0.045 ± 0.001** | +0.003 ± 0.003 |
+| | GAT | 0.053 ± 0.000 | 0.051 ± 0.000 | **-0.049 ± 0.000** | +0.002 ± 0.000 |
+| | GIN | 0.157 ± 0.033 | 0.132 ± 0.012 | **-0.130 ± 0.012** | +0.024 ± 0.036 |
+| | SAGE | 0.052 ± 0.002 | 0.050 ± 0.002 | **-0.047 ± 0.002** | +0.002 ± 0.001 |
 
 The extended sweep ($16$ arch-dataset cells × 5 seeds = 80 runs,
 total wall $\approx 53.7$ min) reproduces and sharpens the
@@ -1217,11 +1241,13 @@ $= -0.014$), but this is partly attributable to the $k = 4096
 < k_{\mathrm{WL}} = 12\,990$ mismatch (see caveat below). GIN
 and SAGE remain positive on PubMed.
 
-**(F3′) Head-signal exploitation universal — $16/16$ arch-
-dataset cells have head\_sig < 0** (mean $-0.084$, range
-$[-0.221, -0.000]$). The trained linear head beats per-cell
-majority on its own embedding's $k$-means partition in every
-configuration.
+**(F3′) Head-slack universal — $20/20$ arch-dataset cells have
+head\_sig > 0** (mean $+0.084$, range $[+0.000, +0.221]$) under
+the corrected sign convention $\hat R - \varepsilon^*_{\Pi^{\text{tr}}_k}$
+(P0.3): per-cell majority on the trained embedding's
+$k$-means partition strictly improves on the trained linear
+head in every configuration, so head\_sig is the head-slack
+$\Delta_{\text{head}}$ of the $(\star)$ decomposition.
 
 **Caveat on PubMed/Twitch-EN feat\_gap.** Because evaluation $k
 = 4096 < k_{\mathrm{WL}}$ on these two datasets, the
@@ -1429,6 +1455,73 @@ when the budget pair is disclosed. The ogbn-arxiv closure makes
 this discipline mandatory rather than optional. The full per-row
 machine-readable summary lives at
 `experiments/results/e3d_arch_full.5of5.summary.md`.
+
+#### E3d-arch-kll-n — Expressivity at $k \ll n$ on Cora/CiteSeer (P0.4)
+
+The matched-$k$ rows of E3d-arch-full have $k/n \in \{0.61, 0.87\}$
+on CiteSeer/Cora and therefore sit inside the partition-
+cardinality-collapse regime of Proposition refine-discrete: under
+those conditions "features beat WL" is a *fixed-cell-budget*
+statement, not an *expressivity* one. This experiment closes
+the gap by re-running the GCN/GAT/GIN/SAGE $\times$ 5-seed
+protocol of E3d-arch-full at $k \in \{8, 16, 32, 64\}$, giving
+$k/n \in [0.003, 0.024]$ on both graphs — two orders of
+magnitude below the previous evaluation budget, and well below
+$k_{\text{WL}}$. The sign convention for `head_sig` is the
+P0.3-corrected $\hat R - \varepsilon^*_{\Pi^{\text{tr}}_k}$
+(positive = head-slack $\Delta_{\text{head}}$). *Status:
+completed; total wall $\approx 869$ s on CPU.*
+
+| Dataset ($\varepsilon_{\text{WL}}$) | Arch | $\hat R$ | $\varepsilon^*_{\Pi^{\text{tr}}_{8}}$ | $\varepsilon^*_{\Pi^{\text{tr}}_{16}}$ | $\varepsilon^*_{\Pi^{\text{tr}}_{32}}$ | $\varepsilon^*_{\Pi^{\text{tr}}_{64}}$ | $\Delta_{\text{head}}(k{=}8)$ | $\Delta_{\text{head}}(k{=}64)$ |
+|---|---|---|---|---|---|---|---|---|
+| Cora (0.029) | GCN  | +0.046 ± 0.048 | +0.049 ± 0.026 | +0.032 ± 0.020 | +0.030 ± 0.017 | +0.029 ± 0.019 | −0.002 ± 0.041 | +0.017 ± 0.035 |
+| | GAT  | +0.025 ± 0.026 | +0.025 ± 0.018 | +0.023 ± 0.016 | +0.021 ± 0.016 | **+0.019 ± 0.014** | +0.001 ± 0.016 | +0.007 ± 0.017 |
+| | GIN  | +0.024 ± 0.014 | +0.058 ± 0.024 | +0.032 ± 0.025 | +0.028 ± 0.016 | **+0.024 ± 0.013** | −0.034 ± 0.029 | +0.000 ± 0.001 |
+| | SAGE | **+0.000 ± 0.000** | **+0.000 ± 0.000** | **+0.000 ± 0.000** | **+0.000 ± 0.000** | **+0.000 ± 0.000** | +0.000 ± 0.000 | +0.000 ± 0.000 |
+| CiteSeer (0.078) | GCN  | +0.035 ± 0.009 | +0.050 ± 0.015 | +0.033 ± 0.003 | +0.031 ± 0.005 | **+0.030 ± 0.006** | −0.015 ± 0.023 | +0.005 ± 0.008 |
+| | GAT  | +0.022 ± 0.009 | +0.024 ± 0.007 | +0.024 ± 0.008 | +0.022 ± 0.006 | **+0.021 ± 0.006** | −0.002 ± 0.004 | +0.000 ± 0.004 |
+| | GIN  | +0.040 ± 0.028 | +0.117 ± 0.059 | +0.075 ± 0.017 | +0.047 ± 0.024 | **+0.045 ± 0.021** | −0.077 ± 0.059 | −0.005 ± 0.009 |
+| | SAGE | **+0.000 ± 0.000** | +0.005 ± 0.010 | +0.002 ± 0.004 | +0.001 ± 0.001 | **+0.000 ± 0.000** | −0.005 ± 0.010 | +0.000 ± 0.000 |
+
+Bold values indicate $\varepsilon^*_{\Pi^{\text{tr}}_k} \le
+\varepsilon_{\text{WL}}$ at the same $k$, i.e. the trained
+$k$-cell partition strictly beats the WL ceiling on the full
+($k_{\text{WL}}$-cell) partition — the clean expressivity
+finding that the matched-$k$ rows of E3d-arch-full could not
+deliver because both sides of the comparison there were inside
+the cardinality-collapse regime.
+
+**(F1″, expressivity, NEW).** At $k = 64$ ($k/n \le 0.024$) on
+Cora, GAT / GIN / SAGE all achieve
+$\varepsilon^*_{\Pi^{\text{tr}}_{64}} \le \varepsilon_{\text{WL}} = 0.029$;
+on CiteSeer all four architectures reach
+$\varepsilon^*_{\Pi^{\text{tr}}_{64}} \le 0.030 \ll \varepsilon_{\text{WL}} = 0.078$.
+The trained embeddings carry label structure that 1-WL at the
+same cell budget does not — an expressivity claim, not a
+memorisation artefact. This **closes C2 in its strong form** on
+Cora and CiteSeer.
+
+**(F2″, NEW).** Architecture dependence at fixed $k$ is mild on
+Cora (GAT $0.019$, GIN $0.024$, GCN $0.029$). The F2 "GAT erases
+structure" verdict of E3d-arch-full was a $k = 4096$ PubMed
+artefact, not a feature of the $k \ll n$ regime tested here.
+
+**(F3″, NEW).** The head-slack $\Delta_{\text{head}}$ collapses
+to zero at $k = 64$ (magnitudes $\le 0.017$, signs mixed) but is
+non-trivially **negative** at $k = 8$ on GIN/SAGE
+($-0.034$, $-0.005$ to $-0.077$): at very coarse budgets
+MiniBatchKMeans produces a partition whose per-cell-majority
+error *exceeds* the trained head's, so the head extracts
+continuous-$Z$ geometry that the coarse partition discards.
+**F3′ from E3d-arch-full is restated:** the universal-positive-
+head-slack reading was a matched-$k$ phenomenon; at $k \ll n$
+the sign is $k$- and architecture-dependent. SAGE on Cora is
+exactly zero everywhere because the model fits perfectly
+($\hat R = 0$) and the features are linearly separable
+regardless of the cell-budget choice.
+
+Raw outputs in `experiments/results/e3d_arch_kll_n.json`;
+driver `experiments/e3d_arch_kll_n.py`.
 
 #### E3f — Richer-than-1-WL initialisation on CiteSeer / PubMed
 

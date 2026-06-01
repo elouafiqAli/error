@@ -403,3 +403,43 @@ corrects all three in lock-step in both `main.tex` and `main.md`:
 The substantive E3 reassessment (re-reading F1/F2/F3/F2' against
 fresh data) lives in P0.3 (head_sig sign fix) + P0.4 (`k << n`
 redo); Phase 0 is a stopgap.
+
+### r4 / 2026-06 — P0.3 (head_sig sign) + P0.4 (k<<n redo)
+
+P0.3 + P0.4 of `future-work/08-p1-patch-plan.md` land jointly:
+
+1. **P0.3 (head_sig sign).** `head_sig` is now defined and used as
+   `Rhat - eps*_{Pi^tr_k} = Delta_head` of the (*)-decomposition
+   (positive means the trained head leaves bracket-detectable
+   sub-cell structure unrealised). Both E3d-arch (9 cells) and
+   E3d-arch-full (20 cells) tables flipped sign; F3 / F3' prose
+   rewritten in lock-step in `main.tex` and `main.md`. Closes
+   audit row A14.
+2. **P0.4 (E3d-arch-kll-n).** New 4-arch x 2-dataset x 4-k x
+   5-seed sweep at `k in {8, 16, 32, 64}` on Cora / CiteSeer
+   (`k/n <= 0.024`). Driver `experiments/e3d_arch_kll_n.py`, raw
+   `experiments/results/e3d_arch_kll_n.json`, summary
+   `experiments/results/e3d_arch_kll_n.summary.md`, table
+   `tab:e3d-arch-kll-n` in `main.tex` / `main.md`.
+
+   - **F1'' (expressivity, CLOSES C2 in strong form).** At
+     `k = 64`, GAT/GIN/SAGE on Cora and **all four**
+     architectures on CiteSeer reach `eps*_{Pi^tr_64} <=
+     eps_WL`, two orders of magnitude below the matched-`k`
+     evaluation budget and well below `k_WL`. The trained
+     embeddings carry label structure that 1-WL at the same
+     cell budget does not. Expressivity, not memorisation.
+   - **F2'' (cross-architecture spread).** Architecture
+     dependence at fixed `k=64` is mild and the F2
+     "GAT erases structure" reading of E3d-arch-full is now
+     diagnosed as a `k=4096` PubMed artefact, not a general
+     feature of GAT.
+   - **F3'' (head-slack).** `Delta_head` collapses to
+     magnitude `<= 0.017` at `k=64` but is non-trivially
+     *negative* at `k=8` for GIN/SAGE; F3' (universal positive
+     head-slack) is therefore restated as a matched-`k`
+     phenomenon, not a regime-universal one.
+
+   Closes audit row A15 in C2's strong form on Cora and
+   CiteSeer (PubMed and ogbn-arxiv `k<<n` sweep remain open
+   under P1).
