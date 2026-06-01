@@ -74,6 +74,210 @@ entropy $H(f \mid \Pi)$.
 
 ---
 
+## 0.5. Property-testing contracts (formal)
+
+Throughout the paper, each numbered claim ends with a
+**Verifier contract** block. This section turns the informal
+prose of those blocks into a typed mathematical object so that
+"the claim is mechanically checked" carries a precise
+falsification guarantee. We use two tiers:
+
+- **B-T1 (symbolic + random search)** — SymPy identities plus
+  Hypothesis-driven random search over a synthetic input
+  distribution; pass predicate at machine tolerance
+  $\tau \leq 10^{-9}$.
+
+- **B-T2 (Monte-Carlo population)** — IID sampling from a
+  population law with a Hoeffding 95% concentration envelope;
+  pass predicate is *empirical estimator $\in$ population truth
+  $\pm$ inflated halfwidth*.
+
+The two tiers offer **different** falsification guarantees,
+formalised in Definition 0.1 and quantified in
+Propositions 0.3 (B-T1) and 0.4 (B-T2). Pure symbolic
+identities (SymPy `simplify(... ) == 0`) are not "tests"
+in the property sense — they are *constructive proofs* of
+finite-formula tautologies; we keep them disjoint from the
+property-testing apparatus below.
+
+### Definition 0.1 (Property contract)
+
+A **property contract** for a claim $C$ is a tuple
+$$
+\mathcal{C} \;=\; \bigl(\mathcal{D},\, n,\, \tau,\, P,\, \sigma\bigr)
+$$
+where:
+
+- $\mathcal{D}$ is a probability law on an input space
+  $\mathcal{I}$ (the *sampler*) — e.g. for T3, the law
+  "$m \sim \mathrm{Unif}\{2, \dots, 16\}$,
+  $(p_1, \dots, p_m) \sim \mathrm{Dirichlet}(\mathbf{1}_m)$,
+  $\eta_i \stackrel{\mathrm{iid}}{\sim} \mathrm{Unif}[0, 1]$";
+- $n \in \mathbb{N}_{\geq 1}$ is the *sample budget* (number
+  of independent draws from $\mathcal{D}$);
+- $\tau \geq 0$ is the *tolerance* (a pass-predicate slack
+  to absorb floating-point error or Monte-Carlo noise);
+- $P : \mathcal{I} \to \{0, 1\}$ is the *pass predicate*
+  with $P(x) = 1 \Leftrightarrow \text{the claim holds on
+  input } x \text{ up to slack } \tau$;
+- $\sigma$ is a *seed policy* that pins the pseudo-random
+  draws so that the verifier is *bit-deterministic* across
+  reruns at fixed $(\mathcal{D}, n, \tau, P, \sigma)$.
+
+The **pass event** is $\bigwedge_{t=1}^{n} P(x_t)$ where
+$(x_t)_{t=1}^{n} \stackrel{\mathrm{iid}}{\sim} \mathcal{D}$
+under seed policy $\sigma$. We say the verifier **passes**
+the contract iff the pass event holds on the recorded run.
+
+> *Engineering instantiation.* In code, $\sigma$ is the pair
+> `(seed, hypothesis-derandomize=True with xor-mask salt)`.
+> $\mathcal{D}$ is the joint distribution induced by a
+> `@given(...)` strategy plus the per-test salted numpy
+> generator. $n$ is `max_examples` (Hypothesis budget) for
+> B-T1, and `--trials` for B-T2. $\tau$ is one of:
+> $10^{-9}$ (B-T1 floating-point slack),
+> $4 \cdot \sqrt{\ln(2/0.05)/(2 N)}$ (B-T2 inflated
+> Hoeffding halfwidth at MC sample size $N$).
+
+### Definition 0.2 (Mutation-screen coverage)
+
+A **mutation screen** for a verifier suite is a finite set
+$\mathcal{M} = \{\mu_1, \dots, \mu_K\}$ of *injected
+faults*, each $\mu_k$ being a syntactic perturbation of a
+single line of the claim's reference implementation (e.g.
+*flip the sign of the noise term in T7*, *swap $c_\varphi
+= 1/2$ for $c_\varphi = 1/3$ in T3-upper*, *replace the
+Bayes–variance identity by $\eta^2$*). The **discovery
+rate** of the screen is
+$$
+\rho_{\mathcal{M}} \;:=\;
+   \frac{\#\{\mu \in \mathcal{M} : \text{contract fails after } \mu\}}
+        {\#\mathcal{M}},
+$$
+i.e. the fraction of injected mutants caught by *at least
+one* property contract in the suite. A screen is
+**comprehensive** if it covers every load-bearing line of
+the reference implementation; *production discovery rate*
+is $\rho_{\mathcal{M}} = 1$ (no silent mutants).
+
+> *Status (Phase 2b-md.G2).* The mutation screen
+> $\mathcal{M}_{\mathrm{B}}$ in `audit/stress.py` ships
+> $K = 3$ mutants: `T7_wrong_sign`, `T3_wrong_c_phi`,
+> `CVa_wrong_identity`. All three are caught
+> ($\rho_{\mathcal{M}_{\mathrm{B}}} = 1$, log:
+> `audit/external_audit/T3_stress.json`). Comprehensiveness
+> in the Definition-0.2 sense is **open**: the screen
+> samples three of the load-bearing lines, not all of them.
+> Recorded as OP-mut in §7.
+
+### Proposition 0.3 (B-T1 missed-counterexample bound)
+
+Let $\mathcal{C} = (\mathcal{D}, n, \tau, P, \sigma)$ be a
+property contract and let $V := \{x \in \mathcal{I} :
+P(x) = 0\}$ be the *violation set* (the points on which
+the claim, modulo slack $\tau$, fails). Suppose the
+deterministic seed policy $\sigma$ realises $n$ *exchangeable*
+draws from $\mathcal{D}$ (in the Hypothesis-derandomized
+setting this is the formal status of the pseudo-random
+stream). Then under the *measure-$\mu$ violation hypothesis*
+$\mathbb{P}_{x \sim \mathcal{D}}[x \in V] \geq \mu$,
+$$
+\mathbb{P}\bigl[\text{contract passes}\bigr]
+\;=\; \mathbb{P}\!\Bigl[\bigwedge_{t=1}^{n} P(x_t) = 1\Bigr]
+\;\leq\; (1 - \mu)^{n}.
+$$
+*Proof.* Independence/exchangeability of the draws gives
+$\mathbb{P}[\bigwedge_t P(x_t) = 1] =
+\prod_t \mathbb{P}[x_t \notin V] = (1 - \mathbb{P}_{\mathcal{D}}
+[V])^n \leq (1 - \mu)^n$. $\square$
+
+*Numerical instantiation.* For Paper B's B-T1 default
+$n = 200$ and a hypothetical violation manifold of measure
+$\mu = 10^{-2}$ under $\mathcal{D}$, the missed-counterexample
+probability is $\leq (0.99)^{200} \approx 0.134$. For $\mu =
+10^{-1}$ it is $\leq 7.0 \times 10^{-10}$. For the
+production stress configuration $n = 200 \times 15
+\text{ seeds} = 3000$ (audit/stress.py), the same $\mu =
+10^{-2}$ bound becomes $\leq 9.4 \times 10^{-14}$.
+
+*Adversarial caveat.* Proposition 0.3 gives a guarantee
+**conditional on $\mu$**: it says nothing if the violation
+set has measure $0$ under $\mathcal{D}$ (a *Dirichlet-null*
+hypersurface, say). A claim that fails only on a measure-
+zero set under the synthetic sampler is *not* falsified by
+B-T1 at any $n$. This is the structural limit of random-
+search testing and the reason Lean / Mathlib certification
+(Phase 3) is on the roadmap.
+
+### Proposition 0.4 (B-T2 Monte-Carlo concentration)
+
+Let $\theta(x) \in [0, 1]$ be a bounded statistic of an
+input $x \sim \mathcal{D}$, let $\hat\theta_N := N^{-1}
+\sum_{t=1}^{N} \theta(X_t)$ be its empirical mean over $N$
+IID draws, and let $\theta^{*} := \mathbb{E}_{\mathcal{D}}
+[\theta(X)]$ be the population truth. For Paper B's B-T2
+contracts the tolerance is set to
+$\tau = 4 \cdot h$ with the Hoeffding 95%-halfwidth
+$$
+h \;:=\; \sqrt{\tfrac{\ln(2/\alpha)}{2N}}, \qquad
+\alpha = 0.05.
+$$
+Then by Hoeffding's inequality,
+$$
+\mathbb{P}\bigl[|\hat\theta_N - \theta^{*}| > 4h\bigr]
+\;\leq\; 2 \exp\!\bigl(- 2 N (4h)^2\bigr)
+\;=\; 2 \exp\!\bigl(- 16 \ln(2/\alpha)\bigr)
+\;=\; 2 (\alpha/2)^{16}.
+$$
+For $\alpha = 0.05$ this is $\leq 2 \cdot (0.025)^{16}
+\approx 4.6 \times 10^{-26}$ per contract evaluation.
+
+*Numerical instantiation.* For $N = 50{,}000$ (B-T2
+default), $h \approx 6.07 \times 10^{-3}$ and $\tau =
+4h \approx 0.0243$. With $T = 500$ independent trials
+per contract (B-T2 default `--trials`), the per-contract
+expected number of false rejections is $\leq T \cdot
+2 (\alpha/2)^{16} \approx 2.3 \times 10^{-23}$.
+
+*Adversarial caveat.* Proposition 0.4 controls *false
+rejections* (Type I): a true population identity being
+flagged as violated. It does **not** control *false
+acceptances* (Type II) for a claim that is wrong by an
+amount smaller than $4h \approx 0.024$. Closing the Type II
+gap requires either (a) larger $N$ to shrink $h$, or
+(b) a certified proof — see the Lean roadmap in
+[`FORMAL_VERIFICATION_EXECUTION_PLAN.md`](FORMAL_VERIFICATION_EXECUTION_PLAN.md).
+
+### Verifier-contract template (formal)
+
+Every per-claim *Verifier contract* block downstream in this
+paper is now interpreted as carrying the 5-tuple of
+Definition 0.1. Where the prose says, e.g., *"$\geq 200$
+random partitions, masses Dirichlet(1), rates Uniform[0,1],
+tolerance $10^{-9}$, seed 0 with derandomize=True"*, the
+4-tuple is
+
+$$
+\mathcal{C}_{\mathrm{T3-lower}}
+\;=\;
+\bigl(
+   \mathcal{D}_{\Pi}^{(2,16)},\;
+   n = 200,\;
+   \tau = 10^{-9},\;
+   P_{\mathrm{T3-lower}},\;
+   \sigma = (\text{seed}=0,\, \mathrm{derandomize})
+\bigr),
+$$
+
+with the sampler $\mathcal{D}_{\Pi}^{(2,16)}$ as in
+Definition 0.1, and the pass predicate
+$P_{\mathrm{T3-lower}}(\Pi, \eta, \varphi) := \mathbf{1}\bigl[
+\varepsilon^{*}_{\Pi} \geq \varphi^{-1}(\varphi(f \mid \Pi))
+- \tau \bigr]$. Falsification guarantees follow from
+Propositions 0.3 / 0.4 with no further bookkeeping.
+
+---
+
 ## 1. Definitions
 
 ### Definition 1 (Concave score functional)
@@ -1041,20 +1245,32 @@ Listed adversarially per Paper A's discipline:
 4. **(OP-multi)** Lift T3 to multiclass with concave score
    functionals on the probability simplex (e.g. multinomial
    Shannon, Gini).
+5. **(OP-mut)** Comprehensiveness of the mutation screen
+   $\mathcal{M}_{\mathrm{B}}$ (Definition 0.2). Current
+   $K = 3$ mutants cover three load-bearing lines;
+   a saturated screen covering *every* line of
+   `verify_b_t1.py` + `verify_b_t2_mc.py` would upgrade the
+   discovery-rate claim from "3/3 caught" to a quantitative
+   line-coverage statement.
 
 ---
 
 ## 8. Verifier contracts (forward references)
 
-Every numbered claim above will, by the end of Phase 2b-md, end
-with a block of the form:
+Every numbered claim above is interpreted, per §0.5, as
+carrying a property contract $\mathcal{C} = (\mathcal{D},
+n, \tau, P, \sigma)$ in the sense of Definition 0.1, with
+falsification guarantees given by Propositions 0.3 (B-T1) and
+0.4 (B-T2). The downstream prose block has the form:
 
 > **Verifier contract.** Mechanically checked by
 > `verify_b_t1.py::check_<id>` (B-T1, SymPy + Hypothesis) and,
 > for population statements, `verify_b_t2_mc.py::check_<id>`
-> (B-T2, Monte-Carlo). Run commands and JSON manifest fields
-> are documented in [`FORMALISATION.md`](FORMALISATION.md)
-> §4–§6.
+> (B-T2, Monte-Carlo). The 5-tuple $\mathcal{C}$ is the
+> Definition-0.1 instantiation of the sampler / budget /
+> tolerance / pass-predicate / seed-policy quoted in the
+> block. Run commands and JSON manifest fields are documented
+> in [`FORMALISATION.md`](FORMALISATION.md) §4–§6.
 
 The verifier files live alongside this document:
 
