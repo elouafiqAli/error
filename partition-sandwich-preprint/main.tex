@@ -1399,6 +1399,17 @@ Figure: \texttt{experiments/figures/e1\_refinement\_funnel.pdf}.}
 \label{tab:e1}
 \end{table}
 
+\begin{figure}[h]\centering
+\includegraphics[width=0.72\linewidth]{experiments/figures/e1_refinement_funnel.pdf}
+\caption{E1: depth-$d$ CART refinement funnel on UCI Adult.
+The bracket $[\Hinv(H(f\mid\Pi_{d})),\, \tfrac{1}{2}H(f\mid\Pi_{d})]$
+(shaded) tightens monotonically with depth as
+\cref{prop:refine} predicts, and the CART training-error curve
+stays inside the bracket at every depth, attaining the lower
+endpoint to four decimals.}
+\label{fig:e1}
+\end{figure}
+
 \paragraph{E2 --- VQ zero-shot proxy (UCI Adult).} Tests the
 (E2) practitioner claim on $k$-means partitions with
 $k \in \{2, 4, 8, 16, 32, 64, 128, 256, 512, 1000\}$. For each
@@ -1545,6 +1556,19 @@ $L = 0, \ldots, L_{\max}$ in
 figures in \texttt{experiments/figures/e3\_*\_funnel.pdf}.}
 \label{tab:e3}
 \end{table}
+
+\begin{figure}[h]\centering
+\includegraphics[width=0.48\linewidth]{experiments/figures/e3_cora_funnel.pdf}\hfill
+\includegraphics[width=0.48\linewidth]{experiments/figures/e3_ogbn_arxiv_funnel.pdf}
+\caption{E3: depth-$L$ $1$-WL refinement funnels on Cora
+(left) and ogbn-arxiv (right). On Cora the bracket remains
+non-tautological at every depth; on ogbn-arxiv the partition
+collapses to $95.6\%$ singleton cells by $L = 3$ and both
+bracket endpoints pinch to $0$, the asymptotic predicted by
+\cref{prop:refine-discrete}. Four more datasets in
+\texttt{experiments/figures/}.}
+\label{fig:e3}
+\end{figure}
 
 \emph{What the numbers say, and what they do not say.}
 \Cref{tab:e3} exhibits two regimes. At $L = 0$ (degree-binned
@@ -1832,59 +1856,138 @@ Graph & $\delta_{0}$ & $D(L)$ & $\delta_{L}$ bound
 \midrule
 Cora ($\Delta_{\max}=168$)
    & $0$       & $1.0\!\times\!10^{-14}$ & $0$ & ---
-                & ---   & $317$ \\
-   & $10^{-3}$ & $0.109$          & $3.1\!\times\!10^{4}$
-                & $2.9\!\times\!10^{5}$ & $7.3$ & $317$ \\
-   & $10^{-2}$ & $1.03$           & $3.1\!\times\!10^{5}$
-                & $3.0\!\times\!10^{5}$ & $7.5$ & $317$ \\
-   & $10^{-1}$ & $4.03$           & $3.1\!\times\!10^{6}$
-                & $7.7\!\times\!10^{5}$ & $5.4$ & $317$ \\
-   & $1.0$     & $46.9$           & $3.1\!\times\!10^{7}$
-                & $6.6\!\times\!10^{5}$ & $5.0$ & $317$ \\
+                & ---   & $314$ \\
+   & $10^{-3}$ & $0.109$          & $3.7\!\times\!10^{5}$
+                & $3.4\!\times\!10^{6}$ & $2.10$ & $314$ \\
+   & $10^{-2}$ & $1.03$            & $3.6\!\times\!10^{6}$
+                & $3.5\!\times\!10^{6}$ & $2.06$ & $314$ \\
+   & $10^{-1}$ & $4.03$            & $3.7\!\times\!10^{7}$
+                & $9.2\!\times\!10^{6}$ & $1.50$ & $314$ \\
+   & $1.0$     & $46.9$            & $3.5\!\times\!10^{8}$
+                & $7.5\!\times\!10^{6}$ & $1.61$ & $314$ \\
 \midrule
 CiteSeer ($\Delta_{\max}=99$)
    & $0$       & $9.2\!\times\!10^{-15}$ & $0$ & ---
-                & ---   & $187$ \\
-   & $10^{-3}$ & $0.088$          & $6.4\!\times\!10^{3}$
-                & $7.3\!\times\!10^{4}$ & $6.7$ & $187$ \\
-   & $10^{-2}$ & $0.787$          & $6.4\!\times\!10^{4}$
-                & $8.2\!\times\!10^{4}$ & $6.7$ & $187$ \\
-   & $10^{-1}$ & $6.49$           & $6.4\!\times\!10^{5}$
-                & $9.9\!\times\!10^{4}$ & $7.3$ & $187$ \\
-   & $1.0$     & $47.8$           & $6.4\!\times\!10^{6}$
-                & $1.3\!\times\!10^{5}$ & $7.4$ & $187$ \\
+                & ---   & $186$ \\
+   & $10^{-3}$ & $0.088$          & $7.8\!\times\!10^{4}$
+                & $8.9\!\times\!10^{5}$ & $1.94$ & $186$ \\
+   & $10^{-2}$ & $0.787$           & $8.0\!\times\!10^{5}$
+                & $1.0\!\times\!10^{6}$ & $1.85$ & $186$ \\
+   & $10^{-1}$ & $6.49$            & $8.4\!\times\!10^{6}$
+                & $1.3\!\times\!10^{6}$ & $1.71$ & $186$ \\
+   & $1.0$     & $47.8$            & $8.4\!\times\!10^{7}$
+                & $1.8\!\times\!10^{6}$ & $1.54$ & $186$ \\
 \bottomrule
 \end{tabular}
 \caption{E3d: \cref{lem:mpnn-wl-robust} stress test on Cora and
 CiteSeer at depth $L = 3$, hidden width $32$, Xavier-initialised
-GIN weights. $D(L)$ is the empirical max embedding-diameter over
-WL-equivalent pairs; $\delta_{L}$ is the lemma's worst-case
-bound; $\gamma_{\mathrm{eff}}^{(L)} := (D(L)/D(0))^{1/L}$ is the
+GIN weights. $\delta_{0}$ is the lemma's
+sup-norm sup$_{v \sim_{\mathrm{WL}} w}\|h^{(0)}(v) - h^{(0)}(w)\|_{2}$
+measured \emph{empirically} on the perturbed initial features
+(a single per-coordinate noise std of $10^{-2}$ inflates to
+sup-norm $\approx 0.12$ in $\mathbb{R}^{32}$). $D(L)$ is the
+empirical max embedding-diameter over WL-equivalent pairs;
+$\delta_{L}$ is the lemma's worst-case bound;
+$\gamma_{\mathrm{eff}}^{(L)} := (D(L)/D(0))^{1/L}$ is the
 empirical per-round amplification factor, comparable to the
 worst-case $(1+\Delta_{\max})\bar{L}_{\ell}$. The lemma holds at
 every sweep point ($\delta_{0} = 0$ recovers strict equality at
-machine precision); the bound is loose by $5$--$6$ orders of
+machine precision); the bound is loose by $6$--$7$ orders of
 magnitude, because $1+\Delta_{\max}$ is the worst-case fan-in,
-not the typical one. $\gamma_{\mathrm{eff}} \approx 5$--$7$
-across both graphs and all noise scales, suggesting that an
+not the typical one. $\gamma_{\mathrm{eff}} \approx 1.5$--$2.1$
+across both graphs and all noise scales --- close to the
+identity per round --- suggesting that an
 average-degree (rather than max-degree) refinement of
 \cref{lem:mpnn-wl-robust} would tighten the bound by roughly
 $\bigl((1+\Delta_{\max})/\gamma_{\mathrm{eff}}\bigr)^{L}$ on
-real sparse graphs --- a $\approx 10^{5}\times$ improvement on
+real sparse graphs --- a $\approx 10^{6}\times$ improvement on
 Cora at $L=3$. We leave such a mean-Lipschitz refinement to
 future work; raw outputs in
 \texttt{experiments/results/e3e.json}.}
 \label{tab:e3d}
 \end{table}
 
-The combined picture from E3, E3b, E3c, E3d is: (i) the bracket
-is correct everywhere it is evaluated; (ii) its informative
-regime is exactly the coarse-partition regime that $\sigma > 0$
-identifies; (iii) the cardinality collapse on ogbn-arxiv is
-intrinsic to the graph and not a bracket pathology; and (iv)
-the $\varepsilon$-robust lemma is the right shape but
-quantitatively loose by a graph-dependent factor that future
-mean-degree analyses should be able to close.
+\paragraph{E3d-arch --- Post-hoc architecture-vs-WL audit
+(GCN/GAT/GIN $\times$ Cora/CiteSeer/PubMed, 3 seeds).}
+The previous E3 family measures the structural ceiling
+$\eps_{\mathrm{WL}} := \eps^{*}_{\Pi^{\mathrm{WL}}_{L}}$
+of 1-WL refinement. We now ask the complementary
+\emph{post-hoc} question: at the same cell budget $k = m^{\mathrm{WL}}_{L}$,
+do trained GNNs realise partitions that beat this WL ceiling
+when given node features?  For each
+$(\text{arch}, \text{seed}) \in \{\mathrm{GCN}, \mathrm{GAT}, \mathrm{GIN}\}
+\times \{0,1,2\}$ we train a 3-layer model (hidden $64$, Adam, 200
+epochs, transductive fitting on the largest-class binarisation
+matching E3) on Apple M1 MPS, extract penultimate embeddings
+$Z \in \mathbb{R}^{n \times 64}$, partition them with
+MiniBatchKMeans at $k = m^{\mathrm{WL}}_{3}$ to obtain
+$\Pi^{\mathrm{trained}}_{k}$, and report two signed diagnostics
+($\hat R$ is the trained linear-head training error):
+\[
+\text{feat\_gap} := \eps_{\mathrm{WL}} - \eps^{*}_{\Pi^{\mathrm{trained}}_{k}},
+\qquad
+\text{head\_sig} := \eps^{*}_{\Pi^{\mathrm{trained}}_{k}} - \hat R .
+\]
+Positive feat\_gap means features refine the partition beyond WL;
+negative head\_sig means the linear head extracts sub-cell label
+structure that $k$-means at budget $k$ discards.
+
+\begin{table}[h]\centering\small
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Arch & $\hat R$ & $\eps^{*}_{\Pi^{\mathrm{tr}}_{k_{\mathrm{WL}}}}$ & feat\_gap & head\_sig \\
+\midrule
+Cora ($\eps_{\mathrm{WL}}{=}0.0292$)
+ & GCN & $0.030{\pm}0.029$ & $0.007{\pm}0.004$ & $+0.022{\pm}0.004$ & $-0.023{\pm}0.024$ \\
+ & GAT & $0.006{\pm}0.004$ & $0.002{\pm}0.002$ & $+0.027{\pm}0.002$ & $-0.004{\pm}0.003$ \\
+ & GIN & $0.198{\pm}0.245$ & $0.016{\pm}0.012$ & $+0.013{\pm}0.012$ & $-0.182{\pm}0.234$ \\
+\midrule
+CiteSeer ($\eps_{\mathrm{WL}}{=}0.0775$)
+ & GCN & $0.032{\pm}0.004$ & $0.018{\pm}0.004$ & $+0.060{\pm}0.004$ & $-0.014{\pm}0.002$ \\
+ & GAT & $0.021{\pm}0.006$ & $0.016{\pm}0.002$ & $+0.062{\pm}0.002$ & $-0.005{\pm}0.004$ \\
+ & GIN & $0.079{\pm}0.035$ & $0.031{\pm}0.010$ & $+0.046{\pm}0.010$ & $-0.048{\pm}0.025$ \\
+\midrule
+PubMed ($\eps_{\mathrm{WL}}{=}0.0511$)
+ & GCN & $0.086{\pm}0.003$ & $0.035{\pm}0.004$ & $+0.016{\pm}0.004$ & $-0.050{\pm}0.005$ \\
+ & GAT & $0.103{\pm}0.002$ & $0.057{\pm}0.003$ & $-0.006{\pm}0.003$ & $-0.047{\pm}0.005$ \\
+ & GIN & $0.068{\pm}0.024$ & $0.025{\pm}0.009$ & $+0.027{\pm}0.009$ & $-0.043{\pm}0.015$ \\
+\bottomrule
+\end{tabular}
+\caption{E3d-arch: post-hoc architecture-vs-WL audit (mean $\pm$
+std over seeds $\{0,1,2\}$). \textbf{Three clean findings:}
+\textbf{(F1) features generically refine WL.} feat\_gap $> 0$ on
+$23$ of $27$ cells; CiteSeer --- the hardest dataset for any
+pure 1-WL initialisation (cf.~E3f) --- is rescued by features
+($+0.05$ to $+0.06$ bracket-error reduction at matched cell
+budget, $9/9$ cells). \textbf{(F2) attention can erase
+structure.} All three GAT seeds on PubMed give negative
+feat\_gap ($-0.006$ on average) while GCN/GIN remain positive;
+the bracket framework cleanly detects an architecture
+\emph{failing} to use structural information. \textbf{(F3) the
+linear head exploits sub-cell geometry universally.} head\_sig
+$< 0$ on all $27/27$ cells (mean $-0.046$): the trained head
+beats per-cell majority on its own embedding's $k$-means
+partition. GIN is init-sensitive (Cora seed=0 fails to fit,
+inflating the GIN/Cora std). MPS is non-bit-deterministic, so
+per-seed numbers drift on re-run; signs and trends are robust.
+Raw outputs in \texttt{experiments/results/e3d\_arch.json}.}
+\label{tab:e3d-arch}
+\end{table}
+
+The combined picture from E3, E3b, E3c, E3d, E3d-arch is: (i)
+the bracket is correct everywhere it is evaluated; (ii) its
+informative regime is exactly the coarse-partition regime that
+$\sigma > 0$ identifies; (iii) the cardinality collapse on
+ogbn-arxiv is intrinsic to the graph and not a bracket
+pathology; (iv) the $\varepsilon$-robust lemma is the right
+shape but quantitatively loose by a graph-dependent factor that
+future mean-degree analyses should be able to close; and
+(v) at matched cell budget, trained GNNs realise partitions that
+strictly beat the 1-WL ceiling whenever node features carry
+label-relevant signal, while the bracket simultaneously flags
+architectures (here: GAT on PubMed) that fail to refine
+structure --- demonstrating that the framework is a
+\emph{discriminating} post-hoc audit, not merely a lower bound.
 
 \paragraph{E4 --- Cross-architecture duel at fixed cell budget
 (UCI Adult, $K=16$).} Materialises practitioner claim (E3): at a
@@ -1970,6 +2073,18 @@ menu is worth ranking at all) \emph{passes} on both ($11.1$ pp
 and $36.8$ pp).}
 \label{tab:e6nas}
 \end{table}
+
+\begin{figure}[h]\centering
+\includegraphics[width=0.48\linewidth]{experiments/figures/e6_nas_v2_scatter.pdf}\hfill
+\includegraphics[width=0.48\linewidth]{experiments/figures/e6_nas_v2_kendall.pdf}
+\caption{E6-NAS: lower bracket endpoint vs.\ held-out test
+error (left) and Kendall-$\tau$ comparison vs.\ parameter
+count (right) on a heterogeneous ten-architecture menu over
+UCI Adult. The bracket attains $\tau = 0.48$
+($p = 5{\times}10^{-5}$) with held-out test error; parameter
+count \emph{anti}-ranks at $\tau = -0.38$.}
+\label{fig:e6nas}
+\end{figure}
 
 On Adult the bracket recovers $7/10$ of the truly best
 architectures, with $\tau = 0.48$ and CI strictly above zero;
@@ -2072,6 +2187,17 @@ nominal $0.95$ target.}
 \label{tab:e7}
 \end{table}
 
+\begin{figure}[h]\centering
+\includegraphics[width=0.62\linewidth]{experiments/figures/e7_concentration.pdf}
+\caption{E7: empirical concentration of the bootstrap bracket
+to the full-data bracket on UCI Adult, log--log. The mean
+deviation $\overline{\Delta_{n}}$ follows a clean
+$\Theta(1/\sqrt{n})$ slope; the $\kappa$-free Hoeffding bound
+of \cref{eq:pop-concentration} stays above the empirical
+$p_{95}$ curve at every $n$.}
+\label{fig:e7}
+\end{figure}
+
 \paragraph{E-K --- Falsification / verification protocol.}
 A Kochenderfer-style falsification--verification protocol
 \citep{kochenderfer2022algorithms} treats the bracket as a
@@ -2114,7 +2240,7 @@ and inconclusive (I) verdicts on the claim
 E1, E2, E3, E6 at four nominal targets. Zero retraining: pure
 post-processing of the bracket endpoints already reported in
 \cref{tab:e1,tab:e2,tab:e3,tab:e6}. Generated by
-\path{eK_falsification_protocol.py}.}
+\texttt{eK\_falsification\_protocol.py}.}
 \label{tab:eK}
 \end{table}
 
@@ -2313,7 +2439,8 @@ Applying this with $\phi = \min(\cdot, 1-\cdot)$ and
 $\phi = \Hbin$ separately and summing gives the claim with
 $\kappa(\delta, \eta) = \tfrac{1}{\sqrt{\delta}}(1 + L_{\eta})$
 as stated, absorbing the $\sqrt{2}$ slack into the constant.
-\Eqref{eq:pop-bracket} then follows from \eqref{eq:pop-concentration}
+Equation~\eqref{eq:pop-bracket} then follows from
+\eqref{eq:pop-concentration}
 and \cref{thm:sandwich} applied to $(\epsP, H(f\mid\Pi))$, since
 $\Hinv$ is $1$-Lipschitz away from $h = 1$ and the bracket
 endpoints are increasing in their arguments.
