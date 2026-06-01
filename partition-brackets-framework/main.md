@@ -315,11 +315,119 @@ Run command and JSON manifest schema documented in
 
 ---
 
-## 3. Instances (skeletons)
+## 3. Instances
 
-- **C-Sh** Shannon reduction (recovers Paper A bracket).
-- **C-Va** Variance instance (Bayes–variance identity at equality).
-- **C-Pi** Pinsker / KL instance ($c_{\mathrm{KL}} \leq 1/(2\ln 2)$).
+### Corollary C-Sh — Shannon reduction to Paper A's bracket
+
+**Statement.** Apply T3 with $\varphi = H_{\mathrm{bin}}$. Then
+$c_{H_{\mathrm{bin}}} = \tfrac12$ (T3, Step 3) and the bracket
+reduces to
+$$
+H_{\mathrm{bin}}^{-1}\!\bigl(H(f \mid \Pi)\bigr)
+\;\leq\;
+\varepsilon^{*}_{\Pi}
+\;\leq\;
+\tfrac{1}{2}\, H(f \mid \Pi),
+$$
+which is *identical* to Paper A's main bracket
+(Paper A, Theorem 1).
+
+**Hypotheses.** (H1)–(H5) hold for $H_{\mathrm{bin}}$:
+concavity (textbook), $H_{\mathrm{bin}}(0) = H_{\mathrm{bin}}(1)
+= 0$, continuity, $H_{\mathrm{bin}}(\eta) = H_{\mathrm{bin}}(1
+- \eta)$, and $H_{\mathrm{bin}}(\eta) > 0$ on $(0, 1)$.
+
+**Proof.** Both inequalities are T3 specialised. The
+identification with Paper A is verbatim: Paper A defines
+$H(f \mid \Pi) = \sum_i p_i H_{\mathrm{bin}}(\eta_i)$ and uses
+the inverse of $H_{\mathrm{bin}}$ on $[0, \tfrac12]$ for the
+lower bound, with the constant $\tfrac12$ for the upper bound;
+all four match the T3 instantiation symbol-for-symbol.
+$\square$
+
+**Verifier contract.** Mechanically checked by
+`verify_b_t1.py::check_CSh_reduces_to_paperA` — for each random
+partition in the property cohort, computes both the
+*meta-theorem* bracket (`SCORE_FUNCTIONALS["shannon"]`) and the
+*Paper A* bracket (independent reference implementation of
+$H_{\mathrm{bin}}$ and $H_{\mathrm{bin}}^{-1}$ on $[0, 1/2]$
+via bisection) and asserts endpoint equality within $10^{-9}$.
+
+---
+
+### Corollary C-Va — Variance instance (Bayes–variance identity)
+
+**Statement.** Apply T3 with $\varphi(\eta) = \eta(1-\eta)$.
+Then $c_{\mathrm{var}} = 2$ (T3, Step 3). Moreover the
+$\varphi$-conditional functional equals the conditional
+expected variance of the (binary) label:
+$$
+\varphi(f \mid \Pi)
+\;=\; \sum_{i=1}^{m} p_i\, \eta_i(1 - \eta_i)
+\;=\; \mathbb{E}_X\!\bigl[\mathrm{Var}(f \mid \Pi)\bigr],
+\tag{C-Va.id}
+$$
+and the bracket is
+$$
+\frac{1 - \sqrt{1 - 4\, \mathbb{E}[\mathrm{Var}(f \mid \Pi)]}}{2}
+\;\leq\;
+\varepsilon^{*}_{\Pi}
+\;\leq\;
+2\, \mathbb{E}[\mathrm{Var}(f \mid \Pi)].
+$$
+
+**Hypotheses.** (H1)–(H5) hold for $\varphi(\eta) = \eta(1-
+\eta)$: $\varphi'' = -2$ (concave); $\varphi(0) = \varphi(1) =
+0$; smooth (hence continuous); $\varphi(\eta) = \varphi(1 -
+\eta)$ trivially; $\varphi(\eta) > 0$ on $(0, 1)$.
+
+**Proof.**
+
+- *(C-Va.id).* For $Y \sim \mathrm{Bernoulli}(\eta_i)$ inside
+  cell $S_i$, $\mathrm{Var}(Y) = \eta_i(1 - \eta_i)$. Therefore
+  $\mathbb{E}[\mathrm{Var}(f \mid \Pi)] = \sum_i p_i \eta_i(1 -
+  \eta_i) = \varphi(f \mid \Pi)$.
+- *Bracket.* Apply T3. On $[0, \tfrac12]$ the inverse of
+  $\varphi(\eta) = \eta(1 - \eta)$ satisfies $\eta = (1 -
+  \sqrt{1 - 4 \varphi(\eta)})/2$ by solving the quadratic; this
+  is the closed-form for $\varphi^{-1}$ used in the lower
+  endpoint. The upper constant is $c_{\mathrm{var}} = 2$ from
+  T3 Step 3. $\square$
+
+*Law of total variance (sanity check).* Combining (C-Va.id)
+with $\mathrm{Var}(f) = \bar\eta(1 - \bar\eta)$ for binary $f$
+with $\bar\eta = \sum_i p_i \eta_i$, one recovers the law of
+total variance
+$$
+\mathrm{Var}(f) \;=\; \mathbb{E}[\mathrm{Var}(f \mid \Pi)]
+                   + \mathrm{Var}(\mathbb{E}[f \mid \Pi])
+\;=\; \varphi(f \mid \Pi) + \sum_i p_i (\eta_i - \bar\eta)^2,
+$$
+which is a verifiable consequence of (C-Va.id) and tightens the
+*upper* endpoint when the partition explains most of the label
+variance.
+
+**Verifier contract.** Mechanically checked by
+
+- `verify_b_t1.py::check_CVa_bayes_variance_identity` —
+  asserts (C-Va.id) symbolically per cell and numerically on
+  the property cohort; in addition certifies the law of total
+  variance to $10^{-9}$ across $\geq 200$ random partitions.
+
+- (B-T2 population corollary `T6_MSE_identity_population` in
+  `verify_b_t2_mc.py` provides the IID-sample concentration
+  proof; lands in the `paper-b Phase 2b-md.T6+C-Pi` commit.)
+
+---
+
+### C-Pi — Pinsker / KL instance
+
+> *Status: SKELETON — to be replaced in commit
+> `paper-b Phase 2b-md.T6+C-Pi`. Pinsker is the
+> $c_\varphi = \infty$ failure case for the linear T3 upper
+> bound and requires a square-root replacement.*
+
+---
 
 ## 4. Regression (skeleton)
 

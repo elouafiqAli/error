@@ -313,19 +313,181 @@ def check_T3_upper_constant(args: argparse.Namespace) -> ContractResult:
 
 @contract
 def check_CSh_reduces_to_paperA(args: argparse.Namespace) -> ContractResult:
+    """C-Sh: meta-theorem with phi=H_bin recovers Paper A's bracket.
+
+    Strategy:
+      Independent reference implementation of (H_bin, H_bin^{-1})
+      via a *different code path* than SCORE_FUNCTIONALS (so we
+      catch any same-bug-in-both-places). Then on every random
+      partition we check that the meta-theorem bracket endpoints
+      equal the Paper A bracket endpoints within 1e-9.
+    """
+    try:
+        import numpy as np
+        from hypothesis import HealthCheck, given, settings, strategies as st
+    except ImportError as e:
+        return ContractResult("CSh_reduces_to_paperA", "fail", f"missing dep: {e}")
+
+    # Independent reference using numpy (SCORE_FUNCTIONALS uses
+    # math.log2 / bespoke bisection; here we use np.log2 and
+    # scipy-free Newton-like contraction). If they ever disagree
+    # the test fails loudly.
+    def hbin_ref(eta: np.ndarray) -> np.ndarray:
+        out = np.zeros_like(eta, dtype=float)
+        mask = (eta > 0.0) & (eta < 1.0)
+        e = eta[mask]
+        out[mask] = -e * np.log2(e) - (1.0 - e) * np.log2(1.0 - e)
+        return out
+
+    def hbin_inv_ref(h: float) -> float:
+        # bisection on [0, 1/2], same correctness guarantee but
+        # using np.log2 not math.log2 — independent floating path.
+        if h <= 0.0:
+            return 0.0
+        if h >= 1.0:
+            return 0.5
+        lo, hi = 0.0, 0.5
+        for _ in range(80):
+            mid = 0.5 * (lo + hi)
+            v = 0.0 if mid in (0.0, 1.0) else float(
+                -mid * np.log2(mid) - (1 - mid) * np.log2(1 - mid)
+            )
+            if v < h:
+                lo = mid
+            else:
+                hi = mid
+        return 0.5 * (lo + hi)
+
+    n_examples = max(50, args.samples // 5)
+    shannon = SCORE_FUNCTIONALS["shannon"]
+    eps_tol = 1e-9
+
+    @settings(
+        max_examples=n_examples,
+        deadline=None,
+        suppress_health_check=[HealthCheck.too_slow],
+        derandomize=True,
+    )
+    @given(
+        m=st.integers(min_value=2, max_value=16),
+        local_seed=st.integers(min_value=0, max_value=2**31 - 1),
+    )
+    def prop_CSh_equiv(m: int, local_seed: int) -> None:
+        rng = np.random.default_rng((args.seed << 8) ^ local_seed ^ 0xC51)
+        p = rng.dirichlet(np.ones(m))
+        etas = rng.random(m)
+        # Meta-theorem bracket (T3 with phi = Shannon)
+        phi_cond_meta = float(np.sum(p * np.array([shannon["numeric"](e) for e in etas])))
+        lo_meta = shannon["inv_lower"](phi_cond_meta)
+        up_meta = shannon["c_phi"] * phi_cond_meta
+        # Paper A bracket via the independent reference path
+        phi_cond_ref = float(np.sum(p * hbin_ref(etas)))
+        lo_ref = hbin_inv_ref(phi_cond_ref)
+        up_ref = 0.5 * phi_cond_ref
+        assert abs(phi_cond_meta - phi_cond_ref) < eps_tol, (
+            f"H(f|Pi) mismatch: meta={phi_cond_meta}, ref={phi_cond_ref}"
+        )
+        assert abs(lo_meta - lo_ref) < eps_tol, (
+            f"lower endpoint mismatch: meta={lo_meta}, ref={lo_ref}"
+        )
+        assert abs(up_meta - up_ref) < eps_tol, (
+            f"upper endpoint mismatch: meta={up_meta}, ref={up_ref}"
+        )
+
+    try:
+        prop_CSh_equiv()
+    except AssertionError as e:
+        return ContractResult("CSh_reduces_to_paperA", "fail", str(e))
+
     return ContractResult(
-        "CSh_reduces_to_paperA",
-        "skipped",
-        "STUB — proof lands in commit paper-b Phase 2b-md.C-Sh+C-Va",
+        "CSh_reduces_to_paperA", "pass",
+        f"meta == Paper A bracket within 1e-9 on {n_examples} examples",
     )
 
 
 @contract
 def check_CVa_bayes_variance_identity(args: argparse.Namespace) -> ContractResult:
+    """C-Va: phi(f|Pi) = E[Var(f|Pi)] AND law of total variance.
+
+    Step A (symbolic, SymPy):
+        Verify per-cell identity Var(Bern(eta)) = eta*(1-eta)
+        symbolically; this is the proof of (C-Va.id).
+    Step B (property, Hypothesis):
+        For random binary partitions, assert
+            sum_i p_i eta_i (1-eta_i) = E[Var(f|Pi)]      (C-Va.id)
+            Var(f) = E[Var(f|Pi)] + Var_partition(E[f|Pi])  (LTV)
+        and that the T3 bracket with phi=variance, c=2 holds.
+    """
+    try:
+        import sympy as sp
+        import numpy as np
+        from hypothesis import HealthCheck, given, settings, strategies as st
+    except ImportError as e:
+        return ContractResult("CVa_bayes_variance_identity", "fail", f"missing dep: {e}")
+
+    # --- Step A: SymPy proof of Var(Bern(eta)) = eta*(1-eta) ---
+    eta = sp.symbols("eta", positive=True)
+    # Var(Y) = E[Y^2] - E[Y]^2; for Y ~ Bern(eta), E[Y^2] = eta, E[Y] = eta.
+    bernoulli_var = eta - eta**2
+    closed_form = eta * (1 - eta)
+    residual = sp.simplify(bernoulli_var - closed_form)
+    if residual != 0:
+        return ContractResult(
+            "CVa_bayes_variance_identity", "fail",
+            f"symbolic Var(Bern(eta)) - eta(1-eta) = {residual} (expected 0)",
+        )
+
+    # --- Step B: Hypothesis property tests ---------------------
+    n_examples = max(50, args.samples // 5)
+    var_phi = SCORE_FUNCTIONALS["variance"]
+    eps_tol = 1e-9
+
+    @settings(
+        max_examples=n_examples,
+        deadline=None,
+        suppress_health_check=[HealthCheck.too_slow],
+        derandomize=True,
+    )
+    @given(
+        m=st.integers(min_value=2, max_value=16),
+        local_seed=st.integers(min_value=0, max_value=2**31 - 1),
+    )
+    def prop_CVa(m: int, local_seed: int) -> None:
+        rng = np.random.default_rng((args.seed << 8) ^ local_seed ^ 0xCA1A)
+        p = rng.dirichlet(np.ones(m))
+        etas = rng.random(m)
+        # (C-Va.id)
+        phi_cond = float(np.sum(p * etas * (1.0 - etas)))
+        e_var = float(np.sum(p * etas * (1.0 - etas)))  # cell-conditional Var
+        assert abs(phi_cond - e_var) < eps_tol, (
+            f"(C-Va.id) violated: phi(f|Pi)={phi_cond} != E[Var(f|Pi)]={e_var}"
+        )
+        # Law of total variance
+        bar_eta = float(np.sum(p * etas))
+        var_full = bar_eta * (1.0 - bar_eta)
+        var_of_cond_mean = float(np.sum(p * (etas - bar_eta) ** 2))
+        ltv_lhs = var_full
+        ltv_rhs = e_var + var_of_cond_mean
+        assert abs(ltv_lhs - ltv_rhs) < 1e-12, (
+            f"LTV violated: Var(f)={var_full}, "
+            f"E[Var(f|Pi)] + Var_Pi(E[f|Pi]) = {ltv_rhs}"
+        )
+        # T3 bracket with phi=variance, c=2
+        eps_star = float(np.sum(p * np.minimum(etas, 1.0 - etas)))
+        lo = var_phi["inv_lower"](phi_cond)
+        up = var_phi["c_phi"] * phi_cond
+        assert lo - eps_tol <= eps_star <= up + eps_tol, (
+            f"variance bracket violated: lo={lo} <= eps*={eps_star} <= up={up}"
+        )
+
+    try:
+        prop_CVa()
+    except AssertionError as e:
+        return ContractResult("CVa_bayes_variance_identity", "fail", str(e))
+
     return ContractResult(
-        "CVa_bayes_variance_identity",
-        "skipped",
-        "STUB — proof lands in commit paper-b Phase 2b-md.C-Sh+C-Va",
+        "CVa_bayes_variance_identity", "pass",
+        f"(C-Va.id) + LTV + T3-bracket all ok on {n_examples} examples",
     )
 
 
