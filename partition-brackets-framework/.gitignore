@@ -17,8 +17,8 @@ experiments/results/
 
 # Verifier JSON manifests are generated; not source
 verify_b_t1.json
-verify_b_t3.json
-verify_b.json
+verify_b_t2.json
+verify_b_optional.json
 
 # Editor / OS noise
 .DS_Store

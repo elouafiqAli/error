@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
 """
-verify_b_t3_monte_carlo.py — Paper B Tier B-T3 (Monte-Carlo concentration)
-==========================================================================
+verify_b_t2_mc.py — Paper B Tier B-T2 (Monte-Carlo population concentration)
+============================================================================
 
-STATUS: STUB (Phase 2b-md.A012). All check_* functions return
+STATUS: STUB (Phase 2b-md.A013). All check_* functions return
 ContractResult(status="skipped") until the corresponding main.md
 claim is promoted from SKELETON to PROVEN.
+
+Tier renaming (A013): what was 'B-T3' in A012 is now 'B-T2'.
+The previous B-T2 (Julia interval arithmetic) is demoted to
+optional / off-critical-path; see FORMALISATION.md §4 and §9
+for the rationale (the φ-bracket is not sharp for non-Shannon
+φ, so certified-interval audit buys no additional confidence
+over Hypothesis property tests at ε_tol = 1e-12).
 
 Verifier contracts
 ------------------
@@ -38,7 +45,7 @@ contain the theoretical predicted values claimed in the proofs.
 
 Run
 ---
-    python verify_b_t3_monte_carlo.py [--seed 0] [--trials 500] \
+    python verify_b_t2_mc.py [--seed 0] [--trials 500] \
         [--samples 50000]
 
 Dependencies: numpy >= 1.24, scipy >= 1.10 (for stats only).
@@ -124,7 +131,7 @@ def main() -> int:
     parser.add_argument("--trials", type=int, default=500)
     parser.add_argument("--samples", type=int, default=50_000)
     parser.add_argument(
-        "--manifest", default="verify_b_t3.json",
+        "--manifest", default="verify_b_t2.json",
         help="JSON manifest output path",
     )
     args = parser.parse_args()
@@ -142,8 +149,8 @@ def main() -> int:
     print(f"pass={n_pass}  fail={n_fail}  skipped={n_skip}")
 
     manifest = {
-        "tool": "verify_b_t3_monte_carlo",
-        "tier": "B-T3",
+        "tool": "verify_b_t2_mc",
+        "tier": "B-T2",
         "seed": args.seed,
         "trials": args.trials,
         "samples": args.samples,

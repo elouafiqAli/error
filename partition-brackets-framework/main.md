@@ -222,18 +222,26 @@ Every numbered claim above will, by the end of Phase 2b-md, end
 with a block of the form:
 
 > **Verifier contract.** Mechanically checked by
-> `verify_b_t1_symbolic.py::check_<id>` (B-T1) and
-> `verify_b.jl::check_<id>` (B-T2). Run commands and JSON
-> manifest fields are documented in
-> [`FORMALISATION.md`](FORMALISATION.md) §4–§6.
+> `verify_b_t1.py::check_<id>` (B-T1, SymPy + Hypothesis) and,
+> for population statements, `verify_b_t2_mc.py::check_<id>`
+> (B-T2, Monte-Carlo). Run commands and JSON manifest fields
+> are documented in [`FORMALISATION.md`](FORMALISATION.md)
+> §4–§6.
 
-The three verifier files live alongside this document:
+The verifier files live alongside this document:
 
-- [`verify_b_t1_symbolic.py`](verify_b_t1_symbolic.py) — B-T1
-- [`verify_b.jl`](verify_b.jl) — B-T2
-- [`verify_b_t3_monte_carlo.py`](verify_b_t3_monte_carlo.py) — B-T3
+- [`verify_b_t1.py`](verify_b_t1.py) — **B-T1** (symbolic
+  identities + Hypothesis property tests; on the critical
+  path).
+- [`verify_b_t2_mc.py`](verify_b_t2_mc.py) — **B-T2**
+  (Monte-Carlo population concentration; on the critical
+  path).
+- [`verify_b_optional.jl`](verify_b_optional.jl) — **OPTIONAL,
+  off the critical path.** Julia / IntervalArithmetic parity
+  with Paper A's `verify.jl`; not required to close Gate G2.
+  Rationale in [`FORMALISATION.md`](FORMALISATION.md) §4.
 
-They are currently stubs (Phase 2b-md.A012); their docstrings
+They are currently stubs (Phase 2b-md.A013); their docstrings
 declare the contracts that each subsequent commit must satisfy
 before the corresponding claim is promoted from SKELETON to
 PROVEN.

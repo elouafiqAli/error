@@ -1,12 +1,30 @@
 #!/usr/bin/env julia
-# verify_b.jl — Paper B Tier B-T2 (certified per-sample interval audit)
-# =====================================================================
+# verify_b_optional.jl — Paper B OPTIONAL parity audit with Paper A's verify.jl
+# =============================================================================
 #
-# STATUS: STUB (Phase 2b-md.A012). All check_* functions throw
-# ErrorException("not yet implemented") until the corresponding
-# main.md claim is promoted from SKELETON to PROVEN. Each
-# subsequent Phase 2b-md commit lands one check_* and its
-# main.md proof together.
+# STATUS: OPTIONAL, OFF-CRITICAL-PATH (Phase 2b-md.A013). This
+# file is NOT required to close Gate G2. It exists for parity
+# with Paper A's `verify.jl` and as a stretch artefact for
+# downstream readers who want certified interval arithmetic on
+# the Shannon special case of the phi-bracket.
+#
+# Why optional? Paper B's phi-bracket is NOT sharp for non-Shannon
+# phi (the upper constant c_phi is conservative), so the float-
+# noise concerns that motivated Paper A's Julia tier do not
+# translate to Paper B. Hypothesis property tests with relative
+# tolerance 1e-12 on numpy.float64 give the same "1000 random
+# samples, zero violations" guarantee at a fraction of the
+# toolchain cost (no juliaup, no Manifest.toml).
+#
+# The Shannon special case (C-Sh) inherits Paper A's existing
+# `verify.jl` audit by symbolic-reduction identity (C-Sh in
+# main.md is proved as "the meta-theorem bracket equals Paper
+# A's bracket pointwise when phi = Hbin"), so C-Sh already has
+# certified interval coverage via Paper A — no Julia code in
+# Paper B is required to obtain it.
+#
+# This file will be filled in only if a future Paper-C / monograph
+# user explicitly needs it. See FORMALISATION.md §4 and §9.
 #
 # Verifier contracts
 # ------------------
@@ -30,12 +48,12 @@
 #
 # Manifest output
 # ---------------
-#   verify_b.json with version pins (Julia version, IntervalArithmetic
+#   verify_b_optional.json with version pins (Julia version, IntervalArithmetic
 #   version), seed, sample sizes, pass/fail per contract, exec time.
 #
 # Run
 # ---
-#   julia --project=. verify_b.jl [--seed 0] [--samples 1000]
+#   julia --project=. verify_b_optional.jl [--seed 0] [--samples 1000]
 #
 # Dependencies: IntervalArithmetic.jl, Random, JSON3. Pinned in
 # Project.toml / Manifest.toml (to be added in commit T3).
@@ -44,7 +62,7 @@ import Pkg
 const STUB = true
 
 if STUB
-    println("verify_b.jl — STUB (Phase 2b-md.A012)")
+    println("verify_b_optional.jl — OPTIONAL stub (Phase 2b-md.A013)")
     println("Contracts:")
     println("  - check_T3_bracket_random  : NOT IMPLEMENTED")
     println("  - check_T9_kernel_bracket  : NOT IMPLEMENTED")
@@ -55,12 +73,12 @@ if STUB
     println("to PROVEN; see FORMALISATION.md §7 sequencing.")
 
     # Write a minimal manifest so CI-style scripts can diff runs.
-    open("verify_b.json", "w") do io
+    open("verify_b_optional.json", "w") do io
         write(io, """{
-  "tool": "verify_b.jl",
-  "tier": "B-T2",
+  "tool": "verify_b_optional.jl",
+  "tier": "optional / off-critical-path",
   "status": "stub",
-  "phase": "2b-md.A012",
+  "phase": "2b-md.A013",
   "contracts": {
     "check_T3_bracket_random": "not_implemented",
     "check_T9_kernel_bracket": "not_implemented",

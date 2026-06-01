@@ -1,64 +1,40 @@
 #!/usr/bin/env python3
 """
-verify_b_t1_symbolic.py — Paper B Tier B-T1 (symbolic / closed-form)
-====================================================================
+verify_b_t1.py — Paper B Tier B-T1 (symbolic identities + property tests)
+=========================================================================
 
-STATUS: STUB (Phase 2b-md.A012). All check_* functions raise
-NotImplementedError until the corresponding main.md claim is
-promoted from SKELETON to PROVEN. Each subsequent Phase 2b-md
-commit lands one check_* and its main.md proof together.
+STATUS: STUB (Phase 2b-md.A013). All check_* functions return
+ContractResult(status='skipped') until the corresponding main.md
+claim is promoted from SKELETON to PROVEN. Each subsequent
+Phase 2b-md commit lands one check_* and its main.md proof
+together.
 
-Verifier contracts
-------------------
-This file is the single source of truth for the closed-form
-identities underlying Paper B's main.md proofs. Every contract
-returns None on success and raises AssertionError on failure;
-the main entry point runs all enabled contracts, prints a
-tabular summary, writes verify_b_t1.json, and exits non-zero if
-any contract fails.
+This file is the *only* tier on the Gate G2 critical path
+besides B-T2 (Monte-Carlo). It carries TWO responsibilities:
 
-Contracts (in dependency order):
+  1. SymPy closed-form identity checks
+     (the four-step proof template's Step 1+2 are reproduced as
+     symbolic identities — anything that does not survive a
+     SymPy `simplify` is not a proof).
 
-    check_T3_jensen_lower(phi, eta_grid)
-        Asserts phi^{-1}(sum p_i phi(eta_i)) <= sum p_i min(eta_i, 1-eta_i)
-        for a fixed concave score functional phi on a grid of
-        cell-rate vectors eta_i with random masses p_i.
+  2. Hypothesis property tests
+     (Step 3 sharpness witnesses and Step 4 failure modes are
+     stress-tested on hundreds-to-thousands of random
+     constructions, with automatic shrinking to minimal
+     counterexamples).
 
-    check_T3_upper_constant(phi)
-        Asserts that c_phi := sup_eta min(eta,1-eta)/phi(eta) is
-        finite and matches the closed-form value (c_Hbin = 1/2,
-        c_var = 2, c_KL <= 1/(2 ln 2)).
-
-    check_CSh_reduces_to_paperA()
-        Symbolic identity: with phi = Hbin, the meta-theorem
-        bracket equals Paper A's bracket. Numerical agreement to
-        12 decimals on 1000 random partitions.
-
-    check_CVa_bayes_variance_identity()
-        Symbolic identity: with phi(eta) = eta(1-eta), the
-        partition-restricted MSE equals E[Var(f|Pi)] exactly.
-
-    check_CPi_pinsker_constant()
-        c_KL = 1/(2 ln 2) follows from Pinsker; identity checked
-        symbolically via Pinsker(eta || 1/2) and direct
-        differentiation of min(eta,1-eta)/KL(eta||1/2).
-
-    check_P10_refinement_monotonicity(phi)
-        For any concave phi and any refinement Pi' >= Pi:
-        phi(f|Pi') <= phi(f|Pi). Checked symbolically by Jensen
-        on a 2-cell -> 4-cell refinement family.
-
-    check_L11_aggregator_deltaL()
-        delta_L = delta_0 * prod (L_c + r_T * L_m) with
-        r_T in {Delta, 1, 1} for sum/mean/sym-norm; identity
-        checked against Paper A's Lemma 6' delta_L by symbolic
-        substitution.
+This collapses what was three tiers in Phase 2b-md.A012 into
+two: B-T1 absorbs symbolic + property, B-T2 stays Monte-Carlo
+for population statements. Julia (`verify_b_optional.jl`) is
+demoted to optional parity with Paper A and is NOT on the
+critical path; see FORMALISATION.md §4 and §9 for rationale.
 
 Run
 ---
-    python verify_b_t1_symbolic.py [--seed 0] [--samples 1000]
+    python verify_b_t1.py [--seed 0] [--samples 1000] [--hypothesis-deadline 5000]
 
-Dependencies: sympy >= 1.12, numpy >= 1.24. Pin in requirements.txt.
+Dependencies: sympy >= 1.12, numpy >= 1.24, hypothesis >= 6.100.
+Pinned in requirements.txt.
 """
 from __future__ import annotations
 
@@ -185,7 +161,7 @@ def main() -> int:
     print(f"pass={n_pass}  fail={n_fail}  skipped={n_skip}")
 
     manifest = {
-        "tool": "verify_b_t1_symbolic",
+        "tool": "verify_b_t1",
         "tier": "B-T1",
         "seed": args.seed,
         "samples": args.samples,
