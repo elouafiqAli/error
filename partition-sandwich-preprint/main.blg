@@ -3,44 +3,44 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
 The style file: tmlr.bst
 Database file #1: main.bib
-You've used 28 entries,
+You've used 34 entries,
             2773 wiz_defined-function locations,
-            738 strings with 9249 characters,
-and the built_in function-call counts, 12980 in all, are:
-= -- 1090
-> -- 836
-< -- 13
-+ -- 280
-- -- 252
-* -- 1071
-:= -- 2009
-add.period$ -- 87
-call.type$ -- 28
-change.case$ -- 163
-chr.to.int$ -- 28
-cite$ -- 56
-duplicate$ -- 607
-empty$ -- 1079
-format.name$ -- 300
-if$ -- 2699
-int.to.chr$ -- 1
+            759 strings with 10221 characters,
+and the built_in function-call counts, 15918 in all, are:
+= -- 1321
+> -- 1052
+< -- 14
++ -- 353
+- -- 318
+* -- 1317
+:= -- 2459
+add.period$ -- 105
+call.type$ -- 34
+change.case$ -- 203
+chr.to.int$ -- 33
+cite$ -- 68
+duplicate$ -- 747
+empty$ -- 1325
+format.name$ -- 374
+if$ -- 3313
+int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 34
-newline$ -- 151
-num.names$ -- 112
-pop$ -- 356
+missing$ -- 40
+newline$ -- 181
+num.names$ -- 136
+pop$ -- 453
 preamble$ -- 1
-purify$ -- 140
+purify$ -- 174
 quote$ -- 0
-skip$ -- 441
+skip$ -- 534
 stack$ -- 0
-substring$ -- 353
-swap$ -- 42
+substring$ -- 396
+swap$ -- 55
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 278
+type$ -- 344
 warning$ -- 0
-while$ -- 109
+while$ -- 129
 width$ -- 0
-write$ -- 362
+write$ -- 435

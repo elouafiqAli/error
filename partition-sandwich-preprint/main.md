@@ -5,39 +5,56 @@
 ## Abstract
 
 Many machine-learning predictors are constant on the cells of a fixed
-partition of their input space: decision trees on their leaves, vector
-quantisers and codebook classifiers on Voronoi cells, message-passing
-graph neural networks on Weisfeiler–Leman colour classes. For all such
-predictors the partition is the irreducible expressivity bottleneck.
-We give one elementary two-sided closed-form bracket, in the form ML
-practitioners need, between the Bayes error $\varepsilon^{*}_{\Pi}$ of
-the best constant-on-cells predictor and the partition-conditional
-entropy $H(f\mid\Pi)$ of a binary label $f$:
+partition of their input space: decision trees on leaves, vector
+quantisers on Voronoi cells, message-passing graph neural networks
+(MPNNs) on Weisfeiler–Leman colour classes. For every such family
+the partition is the irreducible expressivity bottleneck. Starting
+from the classical Fano (1961) and Hellman–Raviv (1970) inequalities,
+we package a two-sided closed-form bracket between the Bayes error
+$\varepsilon^{*}_{\Pi}$ of the best constant-on-cells predictor of a
+binary label $f$ and the partition-conditional entropy $H(f\mid\Pi)$,
 
 $$
-H_{\mathrm{bin}}^{-1}\!\bigl(H(f\mid\Pi)\bigr) \;\le\; \varepsilon^{*}_{\Pi} \;\le\; \tfrac{1}{2}\,H(f\mid\Pi).
+H_{\mathrm{bin}}^{-1}\!\bigl(H(f\mid\Pi)\bigr) \;\le\; \varepsilon^{*}_{\Pi} \;\le\; \tfrac{1}{2}\,H(f\mid\Pi),
 $$
 
-The bracket is tight on both boundaries by explicit witnesses,
-unimprovable in closed form (no constant smaller than $1/2$, no
-pointwise-larger lower function), and pins $\varepsilon^{*}_{\Pi}$ to a
-window of width at most $w^{*}\approx 0.1610$ uniformly in $\Pi$ and
-$f$. Three worked applications — decision trees, vector quantisation,
-and message-passing networks via Weisfeiler–Leman — show how the
-bracket lifts to architecture-independent, training-free error bounds.
-A short companion Julia script (`verify.jl`) audits the bracket on
-$1{,}000$ random partitions in exact rational arithmetic plus
-certified interval arithmetic; zero violations. On real benchmarks
-the bracket is two orders of magnitude cheaper than a single
-training epoch, on tabular data the empirical Bayes floor matches
-CART and logistic regression to four decimals at every cell budget
-tested, and on featureless structural-WL benchmarks (Cayley and
-Paley graphs) the bracket correctly pins at the marginal-entropy
-ceiling on the tasks $1$-WL is provably blind to — evidence that
-the diagnostic has both the right success regime and the right
-*failure* regime, the latter being the empirical face of an
-$\varepsilon$-robust refinement of the classical MPNN–WL
-constancy lemma (Lemma 6′) that we prove and exercise here.
+tight on both boundaries, with maximal $\varepsilon$-width
+$w^{*} = \tfrac{1}{2}H_{\mathrm{bin}}(1/5) - 1/5 \approx 0.1610$
+across the entire binary achievable region.
+
+The bracket is elementary; our contribution is what it buys for
+graph learning. (i) Substituting the depth-$L$ $1$-WL partition
+turns the qualitative Xu–Morris ceiling ("no MPNN exceeds $1$-WL")
+into a *quantitative* one: no depth-$L$ MPNN can drive transductive
+training error below
+$H_{\mathrm{bin}}^{-1}(H(f\mid\Pi^{\mathrm{WL}}_L))$, and a
+training-free per-cell majority head already attains
+$\tfrac{1}{2}H(f\mid\Pi^{\mathrm{WL}}_L)$. (ii) We give an *exact*
+three-term decomposition (Proposition ★, §8.3.1) of any trained
+MPNN's risk against this ceiling, separating structural ceiling,
+feature refinement, and head/optimisation slack — three confounds
+the standard "accuracy after training" comparison entangles.
+(iii) We prove an $\varepsilon$-robust constancy lemma (Lemma 6′)
+that survives positional encodings and bounded random features,
+together with a spectral refinement (Lemma 6″) replacing the
+worst-case degree $\Delta$ by the adjacency Perron root
+$\lambda_{\max}(A) \in [\bar d, \Delta]$, recovering the empirically
+observed degree-independence of mean/sym-norm aggregators.
+
+Empirically (§8.5): on coarse-partition feature-rich graphs
+(CiteSeer, PubMed) the WL bracket genuinely bounds realised error;
+on a heterogeneous architecture menu over UCI Adult it is a
+statistically significant training-free NAS pre-filter
+(Kendall $\tau = 0.48$, $p = 5{\times}10^{-5}$) while parameter
+count *anti*-ranks the same menu. We report the bracket's failure
+regimes — partition-cardinality collapse on near-discrete graphs,
+small-$n$ overfitting on the NAS pre-filter — with equal prominence,
+and locate both inside the finite-sample theorem (Proposition 7)
+that also gives the tool its bite on large data. Synthetic
+verification (`verify.jl`, $10^{3}$ partitions, exact rational $+$
+interval arithmetic) closes the loop on the bracket itself;
+mechanisation of Theorem 1 and Corollary 2 in Lean 4 is in
+preparation. **Scope.** Finite $V$, finite $\Pi$, binary $f$.
 
 ---
 
@@ -116,6 +133,37 @@ is asked to fit. The triple $(V,\Pi,f)$ is the data of the problem.
   $\varepsilon^{*}_{\Pi}$ from above? Such a certificate would let a
   practitioner read off a guaranteed error level without ever
   training a model.
+
+### The question a node-classification practitioner actually asks
+
+The Weisfeiler–Leman ceiling of Xu et al. (2019) and Morris et al.
+(2019) is the most-cited structural result in graph learning, but
+it is a *binary verdict*: a pair of graphs is either
+$1$-WL-distinguishable or it is not. That is the right abstraction
+for graph-classification expressivity, and it is silent on the
+question a node-classification practitioner faces before training:
+*on my graph, with my label vector, how much can a depth-$L$ MPNN
+possibly recover?* Substituting the depth-$L$ $1$-WL partition
+$\Pi^{\mathrm{WL}}_L$ into the bracket answers this in two numbers
+per $(\text{graph}, L)$ pair — a Fano floor no depth-$L$ MPNN can
+break, and a constructive ceiling a training-free majority head
+attains — computed at the cost of the same $1$-WL hash that already
+underlies every GIN implementation.
+
+Two consequences organise the rest of the paper. First, the bracket
+converts the Xu–Morris ceiling from "cannot distinguish" to "cannot
+drive training error below
+$H_{\mathrm{bin}}^{-1}(H(f\mid\Pi^{\mathrm{WL}}_L))$", with the
+$w^{*}\approx 0.16$ slack of Corollary 2 as the exact,
+closed-form-irreducible gap between that floor and the plug-in
+ceiling. Second — and this is the diagnostic we most want to
+advance — the bracket *decomposes* the gap between a trained MPNN
+and its WL ceiling into a structural term (WL-side), a
+feature-refinement term, and a head/optimisation term
+(Proposition ★, §8.3.1). The current convention of comparing
+architectures by post-training accuracy entangles all three; the
+bracket separates the first cleanly from the other two, at no
+training cost on the structural term.
 
 ### Why entropy?
 

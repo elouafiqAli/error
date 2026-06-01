@@ -1,9 +1,16 @@
-\begin{thebibliography}{28}
+\begin{thebibliography}{34}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Alon \& Yahav(2021)Alon and Yahav]{alon2021bottleneck}
+Uri Alon and Eran Yahav.
+\newblock On the bottleneck of graph neural networks and its practical
+  implications.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2021.
 
 \bibitem[Antos \& Kontoyiannis(2001)Antos and
   Kontoyiannis]{antos2001convergence}
@@ -59,6 +66,14 @@ Luc Devroye, L{\'a}szl{\'o} Gy{\"o}rfi, and G{\'a}bor Lugosi.
 \newblock \emph{A Probabilistic Theory of Pattern Recognition}.
 \newblock Springer, 1996.
 
+\bibitem[Di~Giovanni et~al.(2023)Di~Giovanni, Giusti, Barbero, Luise, Lio, and
+  Bronstein]{digiovanni2023oversquashing}
+Francesco Di~Giovanni, Lorenzo Giusti, Federico Barbero, Giulia Luise, Pietro
+  Lio, and Michael~M. Bronstein.
+\newblock On over-squashing in message passing neural networks: The impact of
+  width, depth, and topology.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, 2023.
+
 \bibitem[Errica et~al.(2020)Errica, Podda, Bacciu, and Micheli]{errica2020fair}
 Federico Errica, Marco Podda, Davide Bacciu, and Alessio Micheli.
 \newblock A fair comparison of graph neural networks for graph classification.
@@ -76,6 +91,12 @@ Meir Feder and Neri Merhav.
 \newblock Relations between entropy and error probability.
 \newblock \emph{IEEE Transactions on Information Theory}, 40\penalty0
   (1):\penalty0 259--266, 1994.
+
+\bibitem[Gama et~al.(2020)Gama, Bruna, and Ribeiro]{gama2020stability}
+Fernando Gama, Joan Bruna, and Alejandro Ribeiro.
+\newblock Stability properties of graph neural networks.
+\newblock \emph{IEEE Transactions on Signal Processing}, 68:\penalty0
+  5680--5695, 2020.
 
 \bibitem[Gersho \& Gray(1991)Gersho and Gray]{gersho1991vq}
 Allen Gersho and Robert~M. Gray.
@@ -112,6 +133,11 @@ Herv{\'e} J{\'e}gou, Matthijs Douze, and Cordelia Schmid.
 \newblock Product quantization for nearest neighbor search.
 \newblock \emph{IEEE Transactions on Pattern Analysis and Machine
   Intelligence}, 33\penalty0 (1):\penalty0 117--128, 2011.
+
+\bibitem[Kenlay et~al.(2021)Kenlay, Thanou, and Dong]{kenlay2021stability}
+Henry Kenlay, Dorina Thanou, and Xiaowen Dong.
+\newblock Interpretable stability bounds for spectral graph filters.
+\newblock In \emph{International Conference on Machine Learning (ICML)}, 2021.
 
 \bibitem[Kochenderfer et~al.(2022)Kochenderfer, Wheeler, and
   Wray]{kochenderfer2022algorithms}
@@ -154,12 +180,20 @@ Igal Sason and Sergio Verd{\'u}.
 \newblock \emph{IEEE Transactions on Information Theory}, 64\penalty0
   (1):\penalty0 4--25, 2018.
 
-\bibitem[Sato et~al.(2021)Sato, Yamada, and Kashima]{sato2020random}
+\bibitem[Sato et~al.(2021{\natexlab{a}})Sato, Yamada, and
+  Kashima]{sato2020random}
 Ryoma Sato, Makoto Yamada, and Hisashi Kashima.
 \newblock Random features strengthen graph neural networks.
 \newblock In \emph{Proceedings of the 2021 SIAM International Conference on
-  Data Mining (SDM)}, 2021.
+  Data Mining (SDM)}, 2021{\natexlab{a}}.
 \newblock arXiv:2002.03155 (2020).
+
+\bibitem[Sato et~al.(2021{\natexlab{b}})Sato, Yamada, and
+  Kashima]{sato2021random}
+Ryoma Sato, Makoto Yamada, and Hisashi Kashima.
+\newblock Random features strengthen graph neural networks.
+\newblock In \emph{SIAM International Conference on Data Mining (SDM)},
+  2021{\natexlab{b}}.
 
 \bibitem[Shchur et~al.(2018)Shchur, Mumme, Bojchevski, and
   G{\"u}nnemann]{shchur2018gnn}
@@ -173,6 +207,14 @@ D.~L. Tebbe and S.~J. Dwyer~III.
 \newblock Uncertainty and the probability of error.
 \newblock \emph{IEEE Transactions on Information Theory}, 14\penalty0
   (3):\penalty0 516--518, 1968.
+
+\bibitem[Topping et~al.(2022)Topping, Di~Giovanni, Chamberlain, Dong, and
+  Bronstein]{topping2022oversquashing}
+Jake Topping, Francesco Di~Giovanni, Benjamin~P. Chamberlain, Xiaowen Dong, and
+  Michael~M. Bronstein.
+\newblock Understanding over-squashing and bottlenecks on graphs via curvature.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2022.
 
 \bibitem[Xu et~al.(2019)Xu, Hu, Leskovec, and Jegelka]{xu2019gin}
 Keyulu Xu, Weihua Hu, Jure Leskovec, and Stefanie Jegelka.

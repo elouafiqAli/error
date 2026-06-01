@@ -559,3 +559,25 @@ Six new BibTeX entries added (`gama2020stability`,
 asserted from common knowledge; a formal literature sweep
 (checking that no prior bound is a relabelling of 6′ in any of
 these references) is the Phase 5 audit gate that remains open.
+
+### r9 (Phase 1 — abstract + intro pivot, PATCH A/B)
+
+- Replaced abstract with quantitative MPNN-ceiling framing
+  committing to (i) closed-form bracket + $w^{*}\approx 0.1610$,
+  (ii) exact star decomposition (`prop:star-decomp`), (iii)
+  $\varepsilon$-robust constancy lemma (`lem:mpnn-wl-robust`) plus
+  spectral refinement (`lem:mpnn-wl-spectral`), and the
+  failure-regime / finite-sample (`prop:pop`) honesty clause.
+- Inserted new intro paragraph "The question a node-classification
+  practitioner actually asks" between "The two questions" and "Why
+  entropy?", motivating the WL ceiling as a quantitative
+  refinement of Xu–Morris and previewing the three-term
+  decomposition.
+- **Caveat (Lean mechanisation).** PATCH A's verbatim text
+  committed to "Lean 4 formalisation of Theorem 1 and Corollary 2";
+  Phase 8 (Lean) is deferred. We hedged the published wording to
+  "in preparation" to remain truthful while the formalisation
+  lands. Audit row: A-abstract-lean kept as MEDIUM until Phase
+  8.1/8.2 commits land.
+- Build: 34 pp, 850 516 B; only pre-existing
+  `sec:experiments` / `sec:slack` undefined-ref warnings.
