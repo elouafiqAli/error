@@ -92,6 +92,52 @@ entropy $H(f \mid \Pi)$.
 
 ---
 
+## 0.4. Relationship to Paper A (consolidation, not novelty)
+
+*Honest framing.* This section's purpose is to tell the reviewer
+exactly what is *new* in Paper B versus what is a *consolidation,
+re-statement, or notational port* of Paper A
+(`../partition-sandwich-preprint/`, the binary-entropy Bayes-error
+bracket). The Paper B contribution is the meta-theorem T3, which
+absorbs Paper A as the Shannon special case; we make no
+generalisation claim that does not pass through that absorption.
+
+| Item | Paper A says | Paper B says | Delta (consolidation vs. new) |
+|------|--------------|--------------|-------------------------------|
+| **T3** (φ-bracket meta-theorem) | — (binary-entropy Thm 1 only) | $\varphi$-indexed two-sided bracket for any concave $\varphi$ with $c_\varphi < \infty$ | **NEW.** Consolidates Paper A as the $\varphi = H_{\mathrm{bin}}$ instance. |
+| **C-Sh** (Shannon corollary) | Thm 1, full proof | Re-statement as `C-Sh`, derived from T3 by substitution | **VERBATIM CONSOLIDATION** of Paper A Thm 1; numerically cross-checked at T5 to $10^{-15}$ (`check_T7_shannon_matches_paperA`). |
+| **C-Va** (variance instance, Bayes–variance identity) | — | Variance instance of T3 with `(C-Va.id)` and Cauchy–Schwarz upper | **NEW INSTANCE** enabled by the meta-theorem framing. |
+| **C-Pi** (Pinsker / KL with sqrt-bound) | — | Pinsker drop-in for $c_\varphi = \infty$ regime | **NEW INSTANCE.** |
+| **T6** (regression MSE identity + MAE upper) | — | $\varepsilon^{*}_{\mathrm{MSE}} = \mathbb{E}[\mathrm{Var}(f\!\mid\!\Pi)]$ + MAE Cauchy–Schwarz | **NEW.** |
+| **T7** (symmetric label-noise correction) | — | $(T7.\mathrm{affine})$ + $(T7.\mathrm{kink})$ + $(T7.\mathrm{correction})$ | **NEW**, but the Shannon corollary of T7 numerically matches Paper A's bracket under the affine relabelling (T5, $|\Delta| \leq 7.8 \times 10^{-16}$, see `[^bk-78e16]`). |
+| **T9** (soft / Markov-kernel bracket) | — | Bracket on $\varepsilon^{*}_K$ for noisy/soft labels via kernel composition | **NEW.** |
+| **P10** (refinement consistency / φ-monotonicity) | — | $\varphi(f\!\mid\!\Pi') \leq \varphi(f\!\mid\!\Pi)$ for any refinement $\Pi' \succeq \Pi$ | **NEW** (paper-A had no partition-refinement statement). |
+| **L11** (MPNN aggregator-typed Lipschitz) | `lem:mpnn-wl-robust`, full proof for $H_{\mathrm{bin}}$ | $r_T \in \{\Delta, 1, 1\}$ table for sum/mean/sym-norm, identical to Paper A under $\varphi = H_{\mathrm{bin}}$ | **NOTATION PORT.** The numerical content is Paper A's; Paper B re-derives it in the $\varphi$-framework so that downstream T7/T9 corollaries can quote it. Verified by `check_L11_aggregator_deltaL` (see `[^bk-rT]`). |
+| **Verifier suite** (B-T1, B-T2, T3-stress, T4-anchor) | — | Six-tier external audit (`audit/run_external_audit.sh`) | **NEW.** Paper A's `verify_t1_*.py` covers the Shannon case only; B-T1/B-T2 cover all $\varphi$ instances and T5 cross-checks back to Paper A. |
+| **Open problems** OP-BH, OP-soft, OP-mut | — | 9 open entries in §7 | **NEW.** |
+
+*Three sentences for the abstract / introduction.* Paper B is a
+**framework** paper: it generalises Paper A's binary-entropy
+bracket to a φ-indexed family (T3), instantiates the framework
+in two genuinely new directions (variance C-Va, Pinsker C-Pi)
+and three robustness directions (regression T6, label-noise T7,
+soft-label T9), and ports Paper A's MPNN robustness lemma (L11)
+into the φ-framework so downstream corollaries can quote it
+without re-deriving the aggregator table. The Shannon corollary
+C-Sh recovers Paper A Thm 1 verbatim (numerically checked at
+$10^{-15}$ in T5); the variance, Pinsker, regression, label-
+noise, soft-label, and refinement-monotonicity claims have no
+Paper A counterpart.
+
+*What this section does NOT claim.* No claim of novelty over the
+broader information-theoretic literature (Cover & Thomas 2006,
+Meilă 2003, Vinh-Epps-Bailey 2010 are all properly cited); only
+a delta vs. Paper A, which is the predecessor preprint by the
+same authors. Novelty over the wider literature is the job of
+§1's related-work discussion, not of this table.
+
+---
+
 ## 0.5. Property-testing contracts (formal)
 
 Throughout the paper, each numbered claim ends with a
