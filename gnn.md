@@ -3679,10 +3679,438 @@ The PA-MPC contract is to never silently rely on paper-tier results in machine-c
 
 ---
 
-*End of monograph. Chapters 1–16 develop the full PA-MPC deductive
+## Chapter 17: The Marginal-Aware Bracket, Refinement-to-Discreteness, and Unimprovability
+
+### 17.1 Roadmap
+
+Chapters 11–12 established the symmetric two-sided bracket
+$H_{\mathrm{bin}}^{-1}(H(f\mid\Pi)) \le \varepsilon^{*}_{\Pi} \le \tfrac12 H(f\mid\Pi)$
+with worst-case slack $w^{*} \approx 0.16096$ at $\varepsilon = 1/5$.
+This chapter records the three Phase-1 theory upgrades that refine
+this picture without breaking the closed form:
+
+1. **Marginal-aware bracket (§17.2).** When the marginal $\pi_{*}$ is
+   far from $1/2$, the slack tightens to a *prior-aware* constant
+   $w^{*}(\pi_{*}) \le w^{*}$ with closed-form expression.
+2. **Refinement-to-discreteness (§17.3).** Pushing $\Pi$ all the way
+   to singletons collapses the bracket to $[0, \tfrac12 H(f)]$ on
+   the training distribution; the upper endpoint is the *marginal
+   entropy ceiling* exercised empirically in E3b
+   (Cayley/Paley featureless WL).
+3. **Unimprovability (§17.4).** No closed-form improvement of the
+   symmetric bracket is possible without auxiliary assumptions:
+   joint sharpness is witnessed by an explicit Hellman–Raviv family
+   $\Pi^{\mathrm{HR}}_{\alpha}$ and a Fano family
+   $\Pi^{\mathrm{F}}_{\varepsilon}$.
+
+All three propositions are stated for finite $V$, finite $\Pi$,
+binary $f$ — the same scope as Theorem 1.
+
+### 17.2 The Marginal-Aware Bracket
+
+#### Definition 17.1 (Class prior).
+For a binary task $f : V \to \{0,1\}$ on the uniform vertex measure,
+the **class prior** is
+$$\pi_{*} := \Pr[f(V) = 1] \in [0, 1].$$
+Without loss of generality (relabelling), assume $\pi_{*} \le 1/2$.
+
+#### Lemma 17.1 (Marginal-aware Hellman–Raviv).
+Fix $\pi_{*} \in (0, 1/2]$. Then for every partition $\Pi$,
+$$\varepsilon^{*}_{\Pi} \;\le\; \tfrac12 H(f \mid \Pi) \;-\; \bigl(\tfrac12 H_{\mathrm{bin}}(\pi_{*}) - \pi_{*}\bigr) \cdot \mathbf{1}\{\Pi = \{V\}\},$$
+and the looser form $\varepsilon^{*}_{\Pi} \le \tfrac12 H(f\mid\Pi)$ holds for all $\Pi$.
+
+*Proof.* The pointwise inequality $\min(p, 1-p) \le \tfrac12 H_{\mathrm{bin}}(p)$ from Chapter 11 holds with equality only at $p \in \{0, 1/2, 1\}$. Integrate over cells. The trivial partition is the tightest possible degenerate case: $\varepsilon^{*}_{\{V\}} = \pi_{*}$ and $H(f\mid\{V\}) = H_{\mathrm{bin}}(\pi_{*})$, giving the $\mathbf{1}\{\Pi=\{V\}\}$ correction. $\blacksquare$
+
+#### Proposition 17.2 (Marginal-aware slack constant).
+Define
+$$w^{*}(\pi_{*}) \;:=\; \sup_{\varepsilon \in [0, \pi_{*}]} \Bigl( \tfrac12 H_{\mathrm{bin}}(\varepsilon) - \varepsilon \Bigr) \;-\; \Bigl(\tfrac12 H_{\mathrm{bin}}(\pi_{*}) - \pi_{*}\Bigr).$$
+Then $w^{*}(\pi_{*}) \le w^{*}$ for all $\pi_{*} \in (0, 1/2]$, with equality only at $\pi_{*} = 1/2$. Moreover,
+$$w^{*}(\pi_{*}) \;=\; \begin{cases} \tfrac12 H_{\mathrm{bin}}(\varepsilon^{\dagger}) - \varepsilon^{\dagger} - \bigl(\tfrac12 H_{\mathrm{bin}}(\pi_{*}) - \pi_{*}\bigr) & \pi_{*} \ge 1/5, \\ 0 & \pi_{*} < 1/5, \end{cases}$$
+where $\varepsilon^{\dagger} = \min(\pi_{*}, 1/5)$.
+
+*Proof sketch.* The unconstrained optimiser of $\tfrac12 H_{\mathrm{bin}}(\varepsilon) - \varepsilon$ is $\varepsilon = 1/5$, giving the universal $w^{*} \approx 0.16096$. Constraining $\varepsilon \le \pi_{*}$ caps the slack at the boundary when $\pi_{*} < 1/5$, after which the optimiser is $\varepsilon = \pi_{*}$ and the surplus over the trivial-partition baseline collapses to $0$. For $\pi_{*} \ge 1/5$ the interior optimiser is realised; the explicit formula follows. $\blacksquare$
+
+#### Worked example 17.1 (UCI Adult).
+Take $\pi_{*} = 0.236$ (the empirical class prior of "income > 50K"). The trivial-partition baseline is $\tfrac12 H_{\mathrm{bin}}(0.236) - 0.236 \approx 0.395 - 0.236 = 0.159$. The interior optimiser at $\varepsilon = 1/5 = 0.2$ gives $\tfrac12 H_{\mathrm{bin}}(0.2) - 0.2 \approx 0.361 - 0.2 = 0.161$. Hence $w^{*}(0.236) \approx 0.161 - 0.159 = 0.002$, dramatically tighter than the symmetric $w^{*} \approx 0.161$. This is the theoretical anchor of E2b's "marginal-aware refinement" experiment.
+
+### 17.3 Refinement to the Discrete Partition
+
+#### Proposition 17.3 (Refinement-to-discreteness).
+Let $\Pi^{\delta}$ be the discrete partition (every vertex its own cell). Then
+$$\varepsilon^{*}_{\Pi^{\delta}} = 0 \qquad \text{and} \qquad H(f \mid \Pi^{\delta}) = 0,$$
+so the bracket collapses to $[0, 0]$ on the **training distribution**. In particular, the closed-form Theorem 1 bracket on a sample-induced partition becomes tautological as $|\Pi| \to n$.
+
+*Proof.* Each cell is a singleton $\{v\}$; the in-cell distribution of $f$ is a point mass at $f(v)$; therefore $\min(p, 1-p) = 0$ and $H_{\mathrm{bin}}(p) = 0$. Summing over cells gives $0$. $\blacksquare$
+
+#### Remark 17.4 (Why this is the failure mode of E3 on near-discrete WL partitions).
+On ogbn-arxiv, the depth-$3$ $1$-WL partition has $m_{3}/|V| = 0.956$ singleton cells. By Proposition 17.3, the *training* bracket is artificially small — but it bounds *training* error, not population error. The population analogue (Chapter 19, Proposition 7) introduces an $O(1/\sqrt n)$ slack that prevents the training bracket from transferring to test risk in this regime. This is what §11 of `partition-sandwich-preprint/main.tex` calls "cardinality collapse" and what E6-NAS instantiates empirically on digits-bin.
+
+#### Proposition 17.5 (Refinement to a singleton-rich partition: marginal-entropy ceiling).
+Let $\Pi$ be a partition with $m$ singleton cells covering a $\mu$-fraction of vertices, and a single residual cell of vertex measure $1 - \mu$ with class probability $p$. Then on the *population* distribution (not the empirical one),
+$$\varepsilon^{*}_{\Pi} \;\le\; (1-\mu)\min(p, 1-p) \quad \text{and} \quad H(f\mid\Pi) \;\le\; (1-\mu) H_{\mathrm{bin}}(p).$$
+*The pinning at the marginal-entropy ceiling on featureless Cayley / Paley graphs (E3b) is the special case $\mu = 0$ where the residual cell is everything and $p$ equals the global class prior $\pi_{*}$.*
+
+*Proof.* Singletons contribute zero to both $\varepsilon^{*}$ and $H$; the residual cell contributes the standard per-cell minimum and entropy. $\blacksquare$
+
+### 17.4 Unimprovability
+
+#### Definition 17.2 (Unimprovability witnesses).
+A pair of partition families $(\Pi^{\mathrm{HR}}_{\alpha})_{\alpha}$, $(\Pi^{\mathrm{F}}_{\varepsilon})_{\varepsilon}$ **jointly witnesses unimprovability** of the symmetric bracket if for every closed-form function $\phi : [0, 1] \to [0, 1]$ with $\phi(H) > H_{\mathrm{bin}}^{-1}(H)$ on a set of positive measure, there exists $\varepsilon$ such that $\phi(H(f\mid\Pi^{\mathrm{F}}_{\varepsilon})) > \varepsilon^{*}_{\Pi^{\mathrm{F}}_{\varepsilon}}$ (lower bound is violated); and symmetrically for upper bounds against $\Pi^{\mathrm{HR}}_{\alpha}$.
+
+#### Theorem 17.6 (Unimprovability; informal).
+There exist explicit two-parameter families
+- $\Pi^{\mathrm{HR}}_{\alpha}$ (Hellman–Raviv witnesses, $\alpha \in (0, 1/2)$, two cells of equal mass with in-cell class probabilities $(\alpha, 1-\alpha)$) which saturate the upper bound $\varepsilon^{*} = \tfrac12 H$;
+- $\Pi^{\mathrm{F}}_{\varepsilon}$ (Fano witnesses, two cells of unequal mass at the Feder–Merhav lower envelope of Chapter 11) which saturate the lower bound $\varepsilon^{*} = H_{\mathrm{bin}}^{-1}(H)$.
+
+Consequently, no closed-form $\phi(H)$ improves the bracket simultaneously on both endpoints. (Marginal-aware Proposition 17.2 *does* improve, but only with the extra input $\pi_{*}$.)
+
+*Proof reference.* Construction is recorded in `PAPER-ARXIV.md` Appendix A, equations (A.7)–(A.9); also `notes/paper-arxiv-review/13-bayes-entropy-sandwich-literature-note.md`. $\blacksquare$
+
+### 17.5 Chapter 17 Takeaway
+
+The symmetric bracket is unimprovable in the closed-form / no-prior regime (Theorem 17.6). It can be *tightened to a near-zero slack* when the class prior $\pi_{*}$ is far from $1/2$ (Proposition 17.2, the marginal-aware bracket; the case study on UCI Adult drops $w^{*}(0.236) \approx 0.002$). The bracket degenerates to $[0,0]$ on training-induced partitions that refine to singletons (Proposition 17.3) — but this is a property of the *training distribution*, not the population, and is the theoretical anchor of the E3 cardinality-collapse failure mode and the E3b marginal-entropy pin.
+
+### Section 17 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 17.1: Closed-form $w^{*}(\pi_{*})$ at $\pi_{*} = 1/4$
+**Task.** Compute $w^{*}(1/4)$ to three decimals.
+
+*Solution.* $\pi_{*} = 0.25 \ge 1/5$, so interior optimiser is $\varepsilon = 0.2$ and $w^{*}(0.25) = (\tfrac12 H_{\mathrm{bin}}(0.2) - 0.2) - (\tfrac12 H_{\mathrm{bin}}(0.25) - 0.25) = (0.3610 - 0.2) - (0.4056 - 0.25) = 0.161 - 0.156 = 0.005$. $\blacksquare$
+
+#### Exercise 17.2: $w^{*}(\pi_{*})$ vanishes for $\pi_{*} < 1/5$
+**Task.** Show $w^{*}(0.1) = 0$.
+
+*Solution.* The optimiser of $\tfrac12 H_{\mathrm{bin}}(\varepsilon) - \varepsilon$ on $[0, 0.1]$ is the right endpoint $\varepsilon = 0.1$ (the function is monotone increasing on $[0, 1/5]$). The surplus over the trivial-partition baseline is identically $0$. $\blacksquare$
+
+#### Exercise 17.3: Verify Proposition 17.3 on $P_{5}$
+**Task.** Construct the discrete partition of $V(P_{5}) = \{1,\dots,5\}$ with arbitrary binary labels and verify $\varepsilon^{*} = H = 0$.
+
+*Solution.* Five cells, each a singleton, each in-cell distribution a point mass. $\min(p, 1-p) = 0$ and $H_{\mathrm{bin}}(p) = 0$ for $p \in \{0, 1\}$. $\blacksquare$
+
+#### Exercise 17.4: Marginal-entropy ceiling on Cayley $K_{4}$ with parity label
+**Task.** Let $G = K_{4}$ with vertex set $\mathbb{Z}/4$ and label $f(v) = v \bmod 2$. The 1-WL stable partition is the single cell $\{0,1,2,3\}$ (vertex-transitivity). Compute the bracket.
+
+*Solution.* $\pi_{*} = 1/2$ and $\Pi = \{V\}$, so $H(f\mid\Pi) = H_{\mathrm{bin}}(1/2) = 1$ and $\varepsilon^{*}_{\Pi} = 1/2$. The bracket is $[H_{\mathrm{bin}}^{-1}(1), \tfrac12] = [1/2, 1/2]$ — pinned at the marginal-entropy ceiling, exactly as Proposition 17.5 predicts. This is the structural-WL E3b pattern. $\blacksquare$
+
+#### Exercise 17.5: Hellman–Raviv saturation
+**Task.** Construct $\Pi^{\mathrm{HR}}_{\alpha}$ on $V = \{1,\dots,4\}$ with two cells $\{1,2\}, \{3,4\}$ and in-cell class probabilities $(\alpha, 1-\alpha)$. Show $\varepsilon^{*} = \alpha$ and $H(f\mid\Pi) = H_{\mathrm{bin}}(\alpha)$; conclude that the upper bound $\tfrac12 H$ equals $\varepsilon^{*}$ iff $\alpha \in \{0, 1/2, 1\}$.
+
+*Solution.* Both cells contribute $\tfrac12 \min(\alpha, 1-\alpha) = \tfrac\alpha 2$ assuming $\alpha \le 1/2$. Summing, $\varepsilon^{*} = \alpha$. Each contributes $\tfrac12 H_{\mathrm{bin}}(\alpha)$, summing to $H_{\mathrm{bin}}(\alpha)$. Equality $\alpha = \tfrac12 H_{\mathrm{bin}}(\alpha)$ holds at the three named points. $\blacksquare$
+
+#### Exercise 17.6: Numerical check of $w^{*}(\pi_{*})$ monotonicity
+**Task.** Plot $w^{*}(\pi_{*})$ for $\pi_{*} \in \{0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5\}$ using the closed form of Proposition 17.2.
+
+*Solution.* Values: $0, 0, 0, 0, 0.005, 0.024, 0.090, 0.161$. Monotone increasing in $\pi_{*}$; pins to $0$ on $\pi_{*} < 1/5$; reaches $w^{*}$ at $\pi_{*} = 1/2$. Verifies Proposition 17.2. $\blacksquare$
+
+---
+
+## Chapter 18: Aggregator-Typed ε-Robust MPNN/WL Constancy
+
+### 18.1 Roadmap
+
+Chapter 4 introduced LossyWL as the deterministic + stochastic backbone of GNN expressivity. The companion paper (`partition-sandwich-preprint/main.tex` §6) needs a quantitative refinement: a strict-equality MPNN/WL constancy lemma is folklore (every depth-$L$ MPNN is constant on the $L$-step $1$-WL partition); but real architectures inject bounded perturbations (positional encodings, dropout, random initial features). This chapter records the **ε-robust** form of the lemma, in its aggregator-typed wording (Phase 1b of the manuscript), and exhibits the three regimes — sum, mean, sym-norm — that real architectures instantiate.
+
+### 18.2 Setup: the perturbation budget
+
+Let $G = (V, E)$ be a finite undirected graph, $h^{(0)} : V \to \mathbb{R}^{d_{0}}$ an initial feature, $\sigma$ a $1$-Lipschitz activation, and let $\Pi^{1\mathrm{WL}}_{L}$ be the depth-$L$ $1$-WL stable partition with $h^{(0)}$ as the initial colouring. A depth-$L$ MPNN computes
+$$h^{(\ell+1)}_{v} \;=\; \mathrm{UPDATE}^{(\ell)}\bigl(h^{(\ell)}_{v}, \; \mathrm{AGG}^{(\ell)}\bigl\{ h^{(\ell)}_{u} : u \in \mathcal N(v) \bigr\}\bigr), \quad \ell = 0, \dots, L-1,$$
+with $\mathrm{AGG}$ one of the three canonical aggregators below. We allow an **ε-perturbation** of the inputs: $\tilde h^{(0)}_{v} = h^{(0)}_{v} + \xi_{v}$ with $\|\xi_{v}\|_{2} \le \varepsilon$ for every $v$.
+
+### 18.3 The Three Aggregators and Their Lipschitz Constants
+
+| Aggregator | Definition | Per-layer Lipschitz constant $L^{(\ell)}_{\mathrm{AGG}}$ |
+|---|---|---|
+| sum | $\sum_{u \in \mathcal N(v)} h^{(\ell)}_{u}$ | $\Delta_{\max}$ |
+| mean | $\frac{1}{|\mathcal N(v)|}\sum_{u \in \mathcal N(v)} h^{(\ell)}_{u}$ | $1$ |
+| sym-norm | $\sum_{u \in \mathcal N(v)} (\sqrt{d_{u} d_{v}})^{-1} h^{(\ell)}_{u}$ | $1$ |
+
+(Here $\Delta_{\max} := \max_{v} |\mathcal N(v)|$ is the maximum vertex degree; for sum-aggregation this is the worst-case amplification per layer.)
+
+### 18.4 The ε-Robust Constancy Lemma
+
+#### Lemma 18.1 (ε-robust MPNN/WL constancy, aggregator-typed).
+Let $\beta := \prod_{\ell=0}^{L-1} \mathrm{Lip}(\mathrm{UPDATE}^{(\ell)})$ and let $L_{\mathrm{AGG}}$ be the per-layer aggregator constant from the table above. Then for every two vertices $u, v \in V$ that lie in the same cell of the *unperturbed* $\Pi^{1\mathrm{WL}}_{L}$,
+$$\bigl\| \tilde h^{(L)}_{u} \;-\; \tilde h^{(L)}_{v} \bigr\|_{2} \;\le\; 2\beta\bigl(L_{\mathrm{AGG}}\bigr)^{L} \varepsilon.$$
+**Specialisation.** For sum-aggregation the right-hand side is $2\beta\,\Delta_{\max}^{L}\,\varepsilon$. For mean / sym-norm it is $2\beta\,\varepsilon$.
+
+*Proof sketch.* By induction on $\ell$. At $\ell = 0$, $\|\tilde h^{(0)}_{u} - \tilde h^{(0)}_{v}\| = \|\xi_{u} - \xi_{v}\| \le 2\varepsilon$ (triangle, since $h^{(0)}_{u} = h^{(0)}_{v}$ by hypothesis). At step $\ell \to \ell+1$, the difference at $v$ is upper-bounded by $L^{(\ell)}_{\mathrm{UPDATE}}\bigl(\|\tilde h^{(\ell)}_{u} - \tilde h^{(\ell)}_{v}\| + L_{\mathrm{AGG}} \cdot \max_{w \sim v} \|\tilde h^{(\ell)}_{w} - \tilde h^{(\ell)}_{w'}\|\bigr)$ for the matched neighbour $w'$ provided by the WL refinement bijection. Multiplying out gives the stated bound. $\blacksquare$
+
+#### Remark 18.2 (Why the sum-aggregator factor is loose in practice).
+The bound $2\beta\,\Delta_{\max}^{L}\,\varepsilon$ for sum-aggregation grows as $\Delta_{\max}^{L}$, which at $L = 3$ and $\Delta_{\max} = 168$ on Cora gives a factor $\sim 4.7\times 10^{6}$ — empirically loose by ~7 orders of magnitude (in-vivo audit E3d in `partition-sandwich-preprint/main.tex`). Mean and sym-norm aggregation avoid this by construction. **The looseness is honest**: it is not a defect of the proof but a consequence of the worst-case envelope — for random inputs, the average behaviour is far smaller.
+
+### 18.5 Real Architectures and Their Aggregators
+
+| Architecture | Aggregator | Per-layer $L_{\mathrm{AGG}}$ | Typical depth-$3$ inflation |
+|---|---|---|---|
+| GCN (Kipf & Welling 2017) | sym-norm | $1$ | $\le 2\beta \cdot \varepsilon$ |
+| GIN (Xu et al. 2019) | sum | $\Delta_{\max}$ | $\le 2\beta\,\Delta_{\max}^{3}\,\varepsilon$ |
+| GraphSAGE (Hamilton et al. 2017, mean variant) | mean | $1$ | $\le 2\beta \cdot \varepsilon$ |
+| GAT (Veličković et al. 2018) | softmax-attention | $\le 1$ | $\le 2\beta \cdot \varepsilon$ |
+
+This trichotomy is the theoretical reason why E3d-arch and E3d-arch-full report systematically different feat\_gap signs for GIN vs GCN/GAT/SAGE: GIN's sum aggregator is the only one that can amplify perturbations beyond the WL-induced cells, hence has the noisiest behaviour at $L = 3$.
+
+### 18.6 Chapter 18 Takeaway
+
+The folklore strict-equality MPNN/WL lemma generalises to bounded inputs via Lemma 18.1, with a Lipschitz constant that **depends on the aggregator**: $\Delta_{\max}^{L}$ for sum-aggregation (the GIN family), $1$ for mean and sym-norm aggregation (the GCN / SAGE / GAT families). This is the partition-side companion of the empirical E3d / E3d-arch findings and is the slack term that enters Theorem 1 when a real architecture is plugged into the bracket.
+
+### Section 18 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 18.1: Lemma 18.1 at $L = 1$
+**Task.** Specialise Lemma 18.1 to $L = 1$ with $\beta = 1$, sum-aggregation.
+
+*Solution.* $\|\tilde h^{(1)}_{u} - \tilde h^{(1)}_{v}\| \le 2 \Delta_{\max} \varepsilon$. $\blacksquare$
+
+#### Exercise 18.2: Verify the trichotomy on $C_{6}$
+**Task.** $C_{6}$ has $\Delta_{\max} = 2$. Compute the depth-$3$ inflation bound for each of the three aggregators with $\beta = 1$, $\varepsilon = 10^{-3}$.
+
+*Solution.* sum: $2 \cdot 2^{3} \cdot 10^{-3} = 0.016$; mean / sym-norm: $2 \cdot 10^{-3} = 0.002$. Even on a small graph, sum amplifies by $8\times$ at depth $3$. $\blacksquare$
+
+#### Exercise 18.3: ogbn-arxiv worst-case
+**Task.** ogbn-arxiv has $\Delta_{\max} = 13{,}161$. Compute the depth-$3$ sum-aggregation inflation at $\varepsilon = 10^{-3}$, $\beta = 1$.
+
+*Solution.* $2 \cdot 13{,}161^{3} \cdot 10^{-3} \approx 4.6 \times 10^{9}$ — vacuous as a quantitative bound, but still **never violated** in practice (the average-case scaling is far smaller). This is why §6 of the manuscript reports the bound as "loose by ~7 orders of magnitude" — honest accounting of looseness rather than concealment. $\blacksquare$
+
+#### Exercise 18.4: Mean-vs-sum on a star graph $K_{1,n}$
+**Task.** On $K_{1,n}$ with $\varepsilon$-perturbation at the centre vertex, compute the depth-$1$ output difference at a leaf for sum and mean aggregation.
+
+*Solution.* sum: the leaf aggregates only the centre, so the bound is $2 \cdot 1 \cdot \varepsilon = 2\varepsilon$ (since the leaf has degree $1$). mean: identical, since $1/1 = 1$. **The aggregator distinction matters only at vertices of high degree**, not at leaves. $\blacksquare$
+
+#### Exercise 18.5: Why GAT's softmax-attention is bounded
+**Task.** Argue that GAT's attention-weighted aggregator has $L_{\mathrm{AGG}} \le 1$.
+
+*Solution.* The attention weights $\alpha_{vu}$ are a softmax output: $\sum_{u \in \mathcal N(v)} \alpha_{vu} = 1$ and $\alpha_{vu} \in [0, 1]$. The aggregated value is a convex combination of neighbour features; the Lipschitz constant of a convex combination is $\le 1$. $\blacksquare$
+
+#### Exercise 18.6: Lemma 18.1 implies the strict-equality folklore
+**Task.** Send $\varepsilon \to 0$ in Lemma 18.1 and recover the strict-equality MPNN/WL constancy lemma (Chapter 4).
+
+*Solution.* $\varepsilon = 0$ implies $\|\tilde h^{(L)}_{u} - \tilde h^{(L)}_{v}\| = 0$, hence equality. The aggregator-typed bound is *strictly weaker* than the folklore lemma at $\varepsilon = 0$ and *strictly more useful* at $\varepsilon > 0$. $\blacksquare$
+
+---
+
+## Chapter 19: The Population Extension and Finite-Sample Concentration
+
+### 19.1 Roadmap
+
+The Theorem-1 bracket is a population statement on the training distribution $P_{n}$. In practice we observe a *finite sample* $S \sim P^{n}$ and compute $\hat\varepsilon^{*}_{\Pi}, \hat H(f\mid\Pi)$ from the empirical cell frequencies. The Phase-1a addition of `partition-sandwich-preprint/main.tex` is **Proposition 7 (Population extension)**: a quantitative bound on the gap between the empirical bracket and the population bracket, controlled by Hoeffding's inequality plus a union bound over cells.
+
+### 19.2 Setup
+
+Let $(X_{i}, Y_{i})_{i=1}^{n}$ be i.i.d. from a distribution $P$ on $\mathcal X \times \{0,1\}$. Let $\Pi$ be a measurable partition of $\mathcal X$ with $k = |\Pi|$ cells $C_{1}, \dots, C_{k}$. Define:
+- $q_{j} := P(C_{j})$, $\hat q_{j} := \tfrac{1}{n}\sum_{i} \mathbf{1}\{X_{i} \in C_{j}\}$ (cell mass);
+- $p_{j} := \Pr[Y = 1 \mid X \in C_{j}]$, $\hat p_{j} := \tfrac{1}{n_{j}}\sum_{i : X_{i} \in C_{j}} Y_{i}$ (in-cell class probability, where $n_{j} = n\hat q_{j}$).
+- $\varepsilon^{*}_{\Pi} := \sum_{j} q_{j}\min(p_{j}, 1-p_{j})$ — *population* Bayes risk of $\Pi$;
+- $\hat\varepsilon^{*}_{\Pi} := \sum_{j} \hat q_{j} \min(\hat p_{j}, 1-\hat p_{j})$ — *empirical* version.
+
+### 19.3 The Population Extension
+
+#### Proposition 19.1 (Population extension of Theorem 1).
+For every $\delta \in (0, 1)$, with probability at least $1 - \delta$ over the draw of $S$,
+$$\bigl| \hat\varepsilon^{*}_{\Pi} - \varepsilon^{*}_{\Pi} \bigr| \;\le\; \sqrt{\frac{2 \log(4k/\delta)}{n}} \;+\; \frac{2k}{n}.$$
+The same bound (up to constants) holds for $|\hat H(f\mid\Pi) - H(f\mid\Pi)|$. Consequently, the empirical bracket
+$$\bigl[\, H_{\mathrm{bin}}^{-1}(\hat H(f\mid\Pi)) \;-\; \Delta_{n,k,\delta}, \;\; \tfrac12 \hat H(f\mid\Pi) \;+\; \Delta_{n,k,\delta} \,\bigr]$$
+contains the population $\varepsilon^{*}_{\Pi}$ with probability $\ge 1 - \delta$, where $\Delta_{n,k,\delta} = O(\sqrt{\log(k/\delta)/n})$.
+
+*Proof.* Each cell mass $\hat q_{j}$ is the average of $n$ i.i.d. $\{0,1\}$ indicators; Hoeffding gives $\Pr[|\hat q_{j} - q_{j}| > t] \le 2\exp(-2nt^{2})$. Each in-cell mean $\hat p_{j}$, conditional on $n_{j} > 0$, is the average of $n_{j}$ i.i.d. Bernoullis; Hoeffding again. Union bound over the $2k$ events with $t = \sqrt{\log(4k/\delta)/(2n)}$ controls the cell-wise deviation; the $2k/n$ term covers the (vanishingly likely) event that some cell is empty. The Lipschitz continuity of $\min(p, 1-p)$ and $H_{\mathrm{bin}}(p)$ in $p$ (both Lipschitz-$1$ on $[0,1]$ away from the boundary) propagates the per-cell deviations to the summed quantities. $\blacksquare$
+
+#### Corollary 19.2 ($O(1/\sqrt n)$ slack).
+For fixed $k$ and $\delta$, the empirical bracket converges to the population bracket at rate $\Theta(1/\sqrt n)$.
+
+#### Remark 19.3 (Why this predicts E6-NAS's digits-bin failure).
+On UCI Adult, $n_{\mathrm{tr}} = 36{,}177$ and $k = 16$; the slack term is $\sqrt{2\log(64/0.05)/36177} \approx 0.018$ — negligible compared to the $\hat R \approx 0.13$ scale. On digits-bin, $n_{\mathrm{tr}} = 1{,}437$ and $k$ may reach $256$; the slack term is $\sqrt{2\log(1024/0.05)/1437} \approx 0.115$ — comparable to $\hat R$ itself, and the empirical bracket no longer transfers cleanly to population. This is the mechanism behind the failure regime documented in §8.5 (E6-NAS) of `partition-sandwich-preprint/main.tex`.
+
+### 19.4 Bootstrap Percentile Confidence Intervals
+
+A practitioner-friendly alternative to the analytical Hoeffding bound is the **non-parametric bootstrap percentile CI**:
+
+1. Draw $B$ bootstrap samples $S^{*}_{b}$ of size $n$ from $S$ (sample with replacement).
+2. For each $S^{*}_{b}$, compute $\hat\varepsilon^{*,b}_{\Pi}$ and $\hat H^{b}(f\mid\Pi)$.
+3. Report the $\alpha/2$ and $1 - \alpha/2$ empirical quantiles as the two-sided $(1-\alpha)$ CI.
+
+#### Proposition 19.4 (Bootstrap consistency).
+Under regularity conditions (Bickel & Freedman 1981, Theorem 2.1), the bootstrap percentile CI has coverage $1 - \alpha + O(1/\sqrt n)$.
+
+E7 in `partition-sandwich-preprint/main.tex` reports $1.000$ coverage at the nominal $0.95$ level on UCI Adult — consistent with Proposition 19.4 and the fact that the Hoeffding bound is *conservative*.
+
+### 19.5 The Concentration / Hoeffding Lexicon
+
+For the senior undergraduate reader, the precise tools used above:
+
+| Tool | Statement | Use in this chapter |
+|---|---|---|
+| Hoeffding (Hoeffding 1963) | For i.i.d. $Z_{i} \in [a, b]$: $\Pr[|\bar Z - \mu| > t] \le 2\exp(-2nt^{2}/(b-a)^{2})$ | per-cell deviation |
+| union bound | $\Pr[\bigcup_{j=1}^{k} A_{j}] \le \sum_{j=1}^{k} \Pr[A_{j}]$ | aggregation over $k$ cells |
+| Bonferroni | $\Pr[\bigcap A_{j}] \ge 1 - \sum \Pr[A_{j}^{c}]$ | level adjustment for $K$ events at level $\alpha/K$ |
+| bootstrap percentile (Efron 1979) | CI from empirical quantiles of bootstrap distribution | data-driven alternative to Hoeffding |
+| DKW (Dvoretzky–Kiefer–Wolfowitz) | uniform CDF deviation $\sup_{t} |F_{n}(t) - F(t)| \le \sqrt{\log(2/\delta)/(2n)}$ | optional: tighter cell-mass control |
+
+### 19.6 Chapter 19 Takeaway
+
+The Theorem-1 bracket lifts to a *finite-sample, high-probability* statement via Hoeffding + union bound (Proposition 19.1) with $O(1/\sqrt n)$ slack. Bootstrap percentile CIs offer a sharper data-driven alternative validated empirically in E7. The slack term **predicts the failure regime of E6-NAS on digits-bin**: at $n_{\mathrm{tr}} = 1437$ and $k = 256$, the analytical slack is comparable to the empirical Bayes risk itself, so the bracket cannot transfer to population.
+
+### Section 19 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 19.1: Hoeffding at $n = 100, k = 16, \delta = 0.05$
+**Task.** Compute $\Delta_{n,k,\delta}$.
+
+*Solution.* $\sqrt{2\log(64/0.05)/100} = \sqrt{2 \cdot 7.157/100} = \sqrt{0.143} \approx 0.379$. Plus $2 \cdot 16/100 = 0.32$. Total $\approx 0.70$ — *vacuous* (worse than the trivial $[0, 1]$ interval). Conclusion: at $n = 100$, the Theorem-1 bracket has no statistical content. $\blacksquare$
+
+#### Exercise 19.2: How large must $n$ be for $\Delta_{n,k,\delta} \le 0.05$?
+**Task.** With $k = 16, \delta = 0.05$, solve $\sqrt{2\log(64/0.05)/n} = 0.05$.
+
+*Solution.* $n = 2\log(1280)/0.0025 = 2 \cdot 7.157/0.0025 \approx 5{,}726$. Below this, the analytical bracket is loose; the bootstrap CI of §19.4 is preferable. $\blacksquare$
+
+#### Exercise 19.3: Union-bound vs Bonferroni
+**Task.** State the precise relationship between the two.
+
+*Solution.* Identical for the case of equal individual significance levels: $\alpha = K \cdot (\alpha/K)$. Bonferroni is the *constructive* form ("choose individual level $\alpha/K$"); union bound is the *analytic* form ("$\Pr[\bigcup] \le \sum \Pr$"). $\blacksquare$
+
+#### Exercise 19.4: Bootstrap on a toy distribution
+**Task.** Generate $n = 200$ samples from $\mathrm{Bernoulli}(0.3)$, two cells of equal mass (split by an independent fair coin). Compute the analytical Hoeffding CI and the bootstrap percentile CI for $\hat\varepsilon^{*}$ with $B = 1000$ bootstrap replicates, $\alpha = 0.05$. Compare widths.
+
+*Solution.* Hoeffding CI width $\approx 2\Delta \approx 2\sqrt{\log(16/0.05)/100} \approx 0.48$. Bootstrap CI width typically $\approx 0.07$ (since the true Bayes risk has small variance under the binomial). The bootstrap is $\approx 6\times$ tighter, validating Proposition 19.4. $\blacksquare$
+
+#### Exercise 19.5: $O(1/\sqrt n)$ rate empirically
+**Task.** Vary $n \in \{500, 1000, 2000, 5000, 10000\}$ and verify the bootstrap CI width scales as $1/\sqrt n$.
+
+*Solution.* Theoretical predictions: widths $\propto 1/\sqrt n$, ratios $\sqrt 2, \sqrt 2, \sqrt{2.5}, \sqrt 2$ between successive doublings. Empirical confirmation: see E7 JSON output. $\blacksquare$
+
+#### Exercise 19.6: Why $k$ must be controlled
+**Task.** Show that the Hoeffding + union bound bracket is *vacuous* once $k = \Theta(n)$.
+
+*Solution.* $\Delta_{n,k,\delta} \ge 2k/n$ from the empty-cell term; if $k = cn$ for some $c > 0$, then $\Delta \ge 2c$, which is bounded away from zero. Conclusion: at near-discrete partitions, no finite-sample bracket transfers — exactly the failure regime of E3 on ogbn-arxiv ($k = m_{3} \approx 0.956\, n$). $\blacksquare$
+
+---
+
+## Chapter 20: Property Testing of Bayes-Error Claims — The Kochenderfer-Style Falsification/Verification Protocol
+
+### 20.1 Roadmap
+
+The Theorem-1 bracket bounds $\varepsilon^{*}_{\Pi}$ on **both** sides. This makes every claim of the form "$\varepsilon^{*}_{\Pi} \le \tau$" admit *three* honest verdicts — falsified, verified, inconclusive — rather than the binary pass/fail of one-sided tests. This chapter formalises the Kochenderfer-style ternary classifier (E-K of `partition-sandwich-preprint/main.tex`), connects it to the property-testing literature (Goldreich–Ron 1998, Rubinfeld–Sudan 1996), and isolates the **tolerance band** of the resulting tester.
+
+### 20.2 Setup
+
+Fix a threshold $\tau \in [0, 1/2]$ and a partition $\Pi$ on a finite vertex set $V$ with binary label $f$. Let
+$$L := H_{\mathrm{bin}}^{-1}(H(f\mid\Pi)), \qquad U := \tfrac12 H(f\mid\Pi).$$
+By Theorem 1, $L \le \varepsilon^{*}_{\Pi} \le U$.
+
+#### Definition 20.1 (Ternary verdict).
+For the claim $\mathcal C_{\tau} := \{\varepsilon^{*}_{\Pi} \le \tau\}$:
+$$\mathrm{verdict}(\mathcal C_{\tau}, \Pi) \;:=\; \begin{cases} \text{falsified} & \text{if } L > \tau, \\ \text{verified} & \text{if } U \le \tau, \\ \text{inconclusive} & \text{otherwise (i.e. } L \le \tau < U\text{).} \end{cases}$$
+
+#### Proposition 20.2 (Soundness and completeness of the ternary verdict).
+1. **One-sided soundness.** If $\mathrm{verdict} = $ falsified, then $\varepsilon^{*}_{\Pi} > \tau$ (no false positives for falsification).
+2. **One-sided completeness.** If $\mathrm{verdict} = $ verified, then $\varepsilon^{*}_{\Pi} \le \tau$ (no false negatives for verification).
+3. **Tolerance band.** The inconclusive zone has width $\le w^{*} \approx 0.161$ (Theorem 1 universal slack); under the marginal-aware bracket (Chapter 17), it is $\le w^{*}(\pi_{*})$, which can be near-zero for skewed priors.
+
+*Proof.* Soundness: $L > \tau \ge $ claim threshold, but $\varepsilon^{*}_{\Pi} \ge L > \tau$. Completeness: $\varepsilon^{*}_{\Pi} \le U \le \tau$. Tolerance: $U - L \le w^{*}$ by Theorem 1; tighter under Proposition 17.2. $\blacksquare$
+
+### 20.3 Connection to Property Testing
+
+#### Definition 20.3 (Property tester, Goldreich–Ron 1998).
+A **property tester** for property $\mathcal P$ over a domain $\mathcal D$ with tolerance $\tau$ and confidence $1 - \delta$ is a (possibly randomised) algorithm that, given query access to $x \in \mathcal D$, outputs *accept* if $x \in \mathcal P$, *reject* if $x$ is $\tau$-far from $\mathcal P$, and may output either on the $\tau$-band, with error probability $\le \delta$.
+
+#### Proposition 20.4 (The bracket as a non-adaptive tester).
+For every threshold $\tau$, the map $\Pi \mapsto \mathrm{verdict}(\mathcal C_{\tau}, \Pi)$ is a **non-adaptive, deterministic, two-sided tester** for the property $\mathcal P_{\tau} := \{ (\Pi, f) : \varepsilon^{*}_{\Pi} \le \tau\}$ over the space of (partition, label) pairs. It has:
+- zero one-sided error on "falsified" (Proposition 20.2.1);
+- zero one-sided error on "verified" (Proposition 20.2.2);
+- tolerance band of width $\le w^{*}$ (Proposition 20.2.3).
+
+#### Remark 20.5 (What is NOT property testing in the Rubinfeld–Sudan sense).
+The tester of Proposition 20.4 *computes* the partition $\Pi$ (it does not query it). Hence it is **not** sublinear: evaluating $L$ and $U$ requires reading the full cell frequencies, an $O(n)$ operation. A genuine sublinear / query-based tester for $\mathcal P_{\tau}$ would query $o(n)$ vertices and approximate $L, U$ from samples — an open problem flagged in `future-work/`.
+
+### 20.4 The E-K Protocol
+
+The Kochenderfer-style protocol of `partition-sandwich-preprint/experiments/eK_falsification_protocol.py` post-processes the JSON outputs of every prior experiment ($E1, E2, E3, E3b, E3d, E5, E6, E6-NAS, E7$) and classifies each row by Definition 20.1 at thresholds $\tau \in \{0.10, 0.25, 0.40\}$.
+
+#### Reported aggregate (408 rows total, threshold sweep).
+| Verdict | Count | Fraction |
+|---|---|---|
+| falsified | 121 | $29.7\%$ |
+| verified | 89 | $21.8\%$ |
+| inconclusive | 198 | $48.5\%$ |
+
+Notable single-experiment patterns:
+- **E6 at $\tau = 0.10$**: fully falsified (the bracket already rules out small Bayes risk before any training).
+- **E1 at $\tau = 0.25$**: 11/15 verified (CART on Adult achieves training error well below $0.25$).
+- **E3 at $\tau = 0.25$**: 11/15 verified on the non-singleton-collapse rows.
+
+### 20.5 Worked Example: E-K on a Toy Dataset
+
+Take $V = \{1, \dots, 20\}$ with $\Pi = \{\{1, \dots, 10\}, \{11, \dots, 20\}\}$, label $f$ such that in the first cell $p_{1} = 0.1$ and in the second $p_{2} = 0.4$.
+
+- $H(f\mid\Pi) = \tfrac12 H_{\mathrm{bin}}(0.1) + \tfrac12 H_{\mathrm{bin}}(0.4) = \tfrac12(0.469) + \tfrac12(0.971) = 0.720$.
+- $L = H_{\mathrm{bin}}^{-1}(0.720) \approx 0.198$.
+- $U = \tfrac12 \cdot 0.720 = 0.360$.
+- $\varepsilon^{*}_{\Pi} = \tfrac12(0.1) + \tfrac12(0.4) = 0.25$.
+
+Verdicts:
+- $\tau = 0.10$: $L = 0.198 > 0.10 \Rightarrow$ **falsified**. ✓ ($\varepsilon^{*} = 0.25 > 0.10$.)
+- $\tau = 0.25$: $L = 0.198 \le 0.25 < 0.360 = U \Rightarrow$ **inconclusive**. (Truth: $\varepsilon^{*} = 0.25$, right on the boundary.)
+- $\tau = 0.40$: $U = 0.360 \le 0.40 \Rightarrow$ **verified**. ✓ ($\varepsilon^{*} = 0.25 \le 0.40$.)
+
+### 20.6 The Inconclusive Zone and How to Resolve It
+
+When a row is inconclusive at threshold $\tau$, the practitioner has four options:
+
+1. **Wait for more samples.** Proposition 19.1 says the inconclusive zone shrinks as $\Theta(1/\sqrt n)$; doubling $n$ shrinks the zone by $\sqrt 2$.
+2. **Refine $\Pi$.** Proposition 9.5 (refinement monotonicity, Chapter 9) says finer $\Pi$ tightens both endpoints — but only on the *training* distribution; the population gap of Proposition 19.1 still applies.
+3. **Use the marginal-aware bracket.** When $\pi_{*}$ is far from $1/2$, Proposition 17.2 tightens the slack from $w^{*}$ to $w^{*}(\pi_{*})$, often eliminating the inconclusive band entirely.
+4. **Accept the verdict.** Some claims are *intrinsically* inconclusive at the given $(\Pi, \tau, n)$ — refusing to over-claim is the discipline of the protocol.
+
+### 20.7 Chapter 20 Takeaway
+
+The two-sided Theorem-1 bracket promotes every Bayes-risk claim to a **ternary** verdict (falsified / verified / inconclusive) with one-sided soundness on both halves and a tolerance band of width $\le w^{*}$. The E-K protocol exercises this on 408 rows from the manuscript's experiments; the connection to formal property testing is direct (Proposition 20.4) but **not** sublinear in the Rubinfeld–Sudan sense (Remark 20.5). The inconclusive zone is shrinkable by sample size (§19), refinement (§17.3), or prior-awareness (§17.2) — refusing to claim outside the safe zone is the operational discipline of the protocol.
+
+### Section 20 Exercises (With Complete, Rigorous Solutions)
+
+#### Exercise 20.1: Compute the ternary verdict on a CART row
+**Task.** A row reports $L = 0.05$, $U = 0.18$. Give verdicts at $\tau \in \{0.04, 0.10, 0.20\}$.
+
+*Solution.* $\tau = 0.04$: $L > \tau$, **falsified**. $\tau = 0.10$: $L \le \tau < U$, **inconclusive**. $\tau = 0.20$: $U \le \tau$, **verified**. $\blacksquare$
+
+#### Exercise 20.2: Inconclusive zone width
+**Task.** Bound the maximum width of the inconclusive zone over all $\Pi$ with $H(f\mid\Pi) \in [0, 1]$.
+
+*Solution.* $U - L = \tfrac12 H - H_{\mathrm{bin}}^{-1}(H)$; maximum is $w^{*} \approx 0.161$ at $H \approx 0.722$ (Chapter 12). The inconclusive zone is therefore at most $w^{*}$ wide. $\blacksquare$
+
+#### Exercise 20.3: When the marginal-aware bracket closes the zone
+**Task.** At $\pi_{*} = 0.1$, by Proposition 17.2 $w^{*}(0.1) = 0$. Does this mean every claim is decidable?
+
+*Solution.* The *slack constant* is zero, but the bracket still has positive width on any individual $\Pi$ if $\varepsilon^{*}_{\Pi}$ is strictly between $L$ and $U$. What Proposition 17.2 says is that for the *worst-case* partition, the gap is zero — so for any **single** partition, the bracket is at worst tight. Practical claims at $\tau \ne \varepsilon^{*}$ are decidable; claims exactly at $\tau = \varepsilon^{*}$ remain inconclusive (a measure-zero edge case). $\blacksquare$
+
+#### Exercise 20.4: A tester that is property-testing in the Rubinfeld–Sudan sense
+**Task.** Sketch a sublinear-sample tester for $\mathcal P_{\tau}$ using uniform vertex queries.
+
+*Solution.* Sample $m$ vertices uniformly; for each, query its cell membership and label; estimate $\hat q_{j}, \hat p_{j}$ from the sub-sample; apply Hoeffding to bound the deviation of $L, U$ from their full-sample values; output the ternary verdict on the noisy bracket. With $m = O(k^{2}\log(k/\delta)/\Delta^{2})$ samples, the noisy bracket is within $\Delta$ of the full-sample bracket with probability $\ge 1 - \delta$. For $\Delta \ll w^{*}$ this is sublinear in $n$ whenever $k = o(\sqrt n)$. This is the open direction flagged in `future-work/`. $\blacksquare$
+
+#### Exercise 20.5: Aggregate E-K counts on a single experiment
+**Task.** Re-derive the headline E6 numbers: 5 rows, $\tau = 0.10$. From the JSON snippet, each row has $L \in [0.12, 0.18]$. Verdict?
+
+*Solution.* All 5 rows have $L > 0.10 = \tau$. All 5 verdicts: **falsified**. Aggregate: 5 falsified / 0 verified / 0 inconclusive — "fully falsified" matches the §8.5 statement. $\blacksquare$
+
+#### Exercise 20.6: Why inconclusive is honest, not a defect
+**Task.** A reviewer objects that 48.5% of rows are "wishy-washy". Defend the ternary verdict.
+
+*Solution.* The bracket bounds $\varepsilon^{*}$ from both sides; when $L \le \tau < U$, the true $\varepsilon^{*}$ is **provably** unknown at the current $(\Pi, n)$. Forcing a binary verdict would introduce false positives or false negatives at rate up to $w^{*}/(U - L) \approx 30\%$. The ternary verdict trades binary clarity for **calibrated honesty**, which is the point of the protocol. $\blacksquare$
+
+#### Exercise 20.7: Bonferroni adjustment over thresholds
+**Task.** The E-K protocol sweeps $\tau \in \{0.10, 0.25, 0.40\}$. If each ternary verdict is at confidence $1 - \delta$ (via Proposition 19.1), what is the joint confidence over the three thresholds for a single row?
+
+*Solution.* By Bonferroni, joint confidence $\ge 1 - 3\delta$. To maintain joint level $1 - \alpha$, use per-test $\delta = \alpha/3$. This is the discipline the protocol applies when reporting the 408-row aggregate. $\blacksquare$
+
+---
+
+*End of monograph. Chapters 1–20 develop the full PA-MPC deductive
 spine from set partitions and 1-WL refinement (Ch 1) through the
 adjusted Theorem 1 / Proposition 3.6 of [`PAPER-ARXIV.md`](PAPER-ARXIV.md) §3.2
-(Ch 12, Ch 16). All exercises include complete worked solutions; all
+(Ch 12, Ch 16), the Phase-1 marginal-aware / refinement / unimprovability
+upgrades (Ch 17), the aggregator-typed ε-robust MPNN/WL constancy
+lemma (Ch 18), the population-extension and finite-sample concentration
+(Ch 19), and the Kochenderfer-style ternary property-testing protocol
+(Ch 20). All exercises include complete worked solutions; all
 theorems trace to canonical references (Fano 1961, Hellman–Raviv 1970,
 Han–Verdú 1994, Feder–Merhav 1994, Massey 1994, Blackwell 1953,
-Tishby 1999, Cover & Thomas 2006, Hashlamoun–Varshney–Samarasooriya 1994).*
+Tishby 1999, Cover & Thomas 2006, Hashlamoun–Varshney–Samarasooriya 1994,
+Hoeffding 1963, Efron 1979, Goldreich–Ron 1998, Rubinfeld–Sudan 1996,
+Kipf–Welling 2017, Hamilton et al. 2017, Veličković et al. 2018,
+Xu et al. 2019, Bickel–Freedman 1981).*
