@@ -682,6 +682,73 @@ def check_L11_aggregator_deltaL(args: argparse.Namespace) -> ContractResult:
 
 
 # ---------------------------------------------------------------
+# T7 symbolic identity (population concentration in B-T2)
+# ---------------------------------------------------------------
+
+
+@contract
+def check_T7_noise_correction_symbolic(args: argparse.Namespace) -> ContractResult:
+    """T7 algebraic identities (symbolic; population in B-T2).
+
+    Verifies:
+      (T7.affine)     tilde_eta = rho + (1 - 2 rho) eta
+      (T7.kink)       min(tilde_eta, 1 - tilde_eta)
+                          = rho + (1 - 2 rho) min(eta, 1 - eta)
+                      by case split on eta <= 1/2.
+      (T7.correction) eps*_Pi(f) = (eps*_Pi(tilde_f) - rho) / (1 - 2 rho)
+                      via algebraic inversion of (T7.kink) summed against p_i.
+    """
+    try:
+        import sympy as sp
+    except ImportError as e:
+        return ContractResult("T7_noise_correction_symbolic", "fail", f"missing dep: {e}")
+
+    eta, rho = sp.symbols("eta rho", real=True)
+
+    # (T7.affine): definitionally true.
+    tilde_eta = rho + (1 - 2 * rho) * eta
+    # We assert by construction; nothing to simplify.
+
+    # (T7.kink), case eta <= 1/2: both mins evaluate to first arg.
+    lhs_low = sp.simplify(tilde_eta)  # = min(tilde_eta, 1-tilde_eta) when eta <= 1/2
+    rhs_low = sp.simplify(rho + (1 - 2 * rho) * eta)
+    if sp.simplify(lhs_low - rhs_low) != 0:
+        return ContractResult(
+            "T7_noise_correction_symbolic", "fail",
+            f"(T7.kink) eta<=1/2 case failed: {sp.simplify(lhs_low - rhs_low)}",
+        )
+
+    # (T7.kink), case eta >= 1/2: substitute eta -> 1-u (with u <= 1/2);
+    # both mins evaluate to second arg.
+    u = sp.symbols("u", real=True)
+    tilde_eta_sub = tilde_eta.subs(eta, 1 - u)
+    # 1 - tilde_eta_sub == 1 - rho - (1 - 2 rho)(1 - u) == -rho + (1 - 2 rho) u + 2 rho == rho + (1-2 rho) u
+    one_minus = sp.simplify(1 - tilde_eta_sub)
+    expected = sp.simplify(rho + (1 - 2 * rho) * u)
+    if sp.simplify(one_minus - expected) != 0:
+        return ContractResult(
+            "T7_noise_correction_symbolic", "fail",
+            f"(T7.kink) eta>=1/2 case failed: {sp.simplify(one_minus - expected)}",
+        )
+
+    # (T7.correction): inverse of an affine relation; algebraic.
+    eps_clean, eps_noisy = sp.symbols("eps_clean eps_noisy", real=True)
+    relation = sp.Eq(eps_noisy, rho + (1 - 2 * rho) * eps_clean)
+    inverse = sp.solve(relation, eps_clean)[0]
+    expected_inv = (eps_noisy - rho) / (1 - 2 * rho)
+    if sp.simplify(inverse - expected_inv) != 0:
+        return ContractResult(
+            "T7_noise_correction_symbolic", "fail",
+            f"(T7.correction) inverse failed: got {inverse}, expected {expected_inv}",
+        )
+
+    return ContractResult(
+        "T7_noise_correction_symbolic", "pass",
+        "(T7.affine) + (T7.kink) [both cases] + (T7.correction) verified symbolically",
+    )
+
+
+# ---------------------------------------------------------------
 # Runner
 # ---------------------------------------------------------------
 

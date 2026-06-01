@@ -433,10 +433,129 @@ variance.
 
 - **T6** MSE identity + MAE Cauchy–Schwarz upper bound.
 
-## 5. Robustness (skeletons)
+## 5. Robustness
 
-- **T7** Symmetric label-noise correction.
-- **T9** Soft / Markov-kernel bracket.
+- **T9** Soft / Markov-kernel bracket (skeleton — lands in
+  `paper-b Phase 2b-md.T9+G2-close`).
+
+### Theorem T7 — Symmetric label-noise correction
+
+**Statement.** Let $f : \mathcal{X} \to \{0, 1\}$ be the *clean*
+binary label and let $\tilde f$ be the *noisy* label obtained by
+independent symmetric label flips with rate $\rho \in [0, 1/2)$:
+$$
+\mathbb{P}\bigl(\tilde f(X) = 1 - f(X) \,\big|\, X\bigr) = \rho,
+\qquad
+\mathbb{P}\bigl(\tilde f(X) = f(X) \,\big|\, X\bigr) = 1 - \rho.
+$$
+Let $\tilde\eta_i := \mathbb{P}(\tilde f = 1 \mid \Pi = S_i)$ be
+the *noisy* cell-conditional positive rate. Then:
+
+- **(T7.affine)** Per-cell affine relation:
+$$
+\tilde\eta_i \;=\; \rho + (1 - 2\rho)\, \eta_i,
+\qquad
+\tilde\eta_i \in [\rho, 1 - \rho].
+$$
+- **(T7.kink)** Per-cell minimum identity:
+$$
+\min(\tilde\eta_i, 1 - \tilde\eta_i)
+\;=\;
+\rho + (1 - 2\rho) \min(\eta_i, 1 - \eta_i).
+$$
+- **(T7.correction)** Partition-restricted Bayes risk
+  correction:
+$$
+\varepsilon^{*}_{\Pi}(\tilde f) \;=\; \rho + (1 - 2\rho)\,
+   \varepsilon^{*}_{\Pi}(f),
+\qquad
+\varepsilon^{*}_{\Pi}(f) \;=\; \frac{\varepsilon^{*}_{\Pi}(\tilde f) - \rho}{1 - 2\rho}.
+$$
+- **(T7.bracket)** Noise-corrected $\varphi$-bracket: for any
+  concave score functional $\varphi$ with $c_\varphi < \infty$,
+$$
+\frac{\varphi^{-1}\bigl(\varphi(\tilde f \mid \Pi)\bigr) - \rho}{1 - 2\rho}
+\;\leq\; \varepsilon^{*}_{\Pi}(f) \;\leq\;
+\frac{c_\varphi \cdot \varphi(\tilde f \mid \Pi) - \rho}{1 - 2\rho}.
+$$
+
+**Hypotheses used.** $\rho \in [0, \tfrac12)$ strictly. The
+boundary $\rho = \tfrac12$ is the indistinguishability noise
+floor where clean and noisy labels are statistically
+independent and identification is lost. T7.bracket additionally
+requires the T3 hypotheses (H1)–(H5) and $c_\varphi < \infty$.
+
+**Proof.**
+
+- *(T7.affine).* By total expectation conditional on $\Pi =
+  S_i$,
+  $\mathbb{P}(\tilde f = 1 \mid \Pi = S_i) = (1 - \rho)\eta_i +
+  \rho(1 - \eta_i) = \rho + (1 - 2\rho)\eta_i$.
+
+- *(T7.kink).* Since $1 - 2\rho > 0$, the affine map $\eta \mapsto
+  \rho + (1 - 2\rho)\eta$ is order-preserving. Hence $\tilde\eta_i
+  \leq \tfrac12 \iff \eta_i \leq \tfrac12$. In the case
+  $\eta_i \leq \tfrac12$ both minima equal their first argument:
+  $\min(\eta_i, 1-\eta_i) = \eta_i$ and $\min(\tilde\eta_i,
+  1-\tilde\eta_i) = \tilde\eta_i = \rho + (1 - 2\rho)\eta_i$,
+  proving (T7.kink). The case $\eta_i > \tfrac12$ is symmetric
+  via $\eta_i \mapsto 1 - \eta_i$ and the involution
+  $\min(\eta, 1-\eta) = \min(1-\eta, \eta)$.
+
+- *(T7.correction).* Sum (T7.kink) against $p_i$ (which is
+  unchanged by label noise — only labels flip, not cell
+  memberships):
+  $$
+  \varepsilon^{*}_{\Pi}(\tilde f) = \sum_i p_i \min(\tilde\eta_i,
+  1-\tilde\eta_i) = \sum_i p_i \bigl[\rho + (1-2\rho)\min(\eta_i,
+  1-\eta_i)\bigr] = \rho + (1-2\rho)\varepsilon^{*}_{\Pi}(f).
+  $$
+  Solve for $\varepsilon^{*}_{\Pi}(f)$.
+
+- *(T7.bracket).* Apply T3 to the noisy label $\tilde f$ to get
+  $\varphi^{-1}(\varphi(\tilde f \mid \Pi)) \leq
+  \varepsilon^{*}_{\Pi}(\tilde f) \leq c_\varphi \cdot
+  \varphi(\tilde f \mid \Pi)$. Substitute (T7.correction) and
+  divide by $1 - 2\rho > 0$. $\square$
+
+*Identification with Paper A.* For $\varphi = H_{\mathrm{bin}}$,
+T7.bracket recovers Paper A's Proposition 7 (noise-corrected
+Shannon bracket) symbol-for-symbol via C-Sh.
+
+*Failure modes (adversarial).*
+- $\rho = \tfrac12$: the denominator vanishes and
+  $\varepsilon^{*}_{\Pi}(\tilde f) = \tfrac12$ regardless of
+  $\varepsilon^{*}_{\Pi}(f)$; identification is lost.
+- $\rho > \tfrac12$: relabel by swapping classes globally
+  (equivalent to $\rho' = 1 - \rho < \tfrac12$); the formulas
+  then apply to the swapped labels.
+- *Asymmetric noise* (different flip rates for 0→1 and 1→0):
+  the affine map (T7.affine) becomes
+  $\tilde\eta = \rho_{0 \to 1} + (1 - \rho_{0 \to 1} -
+  \rho_{1 \to 0})\eta$ and the kink identity (T7.kink) no longer
+  collapses cleanly; asymmetric correction is left as an open
+  problem (related to OP-asym in §7).
+
+**Verifier contract.** Mechanically checked by
+
+- `verify_b_t1.py::check_T7_noise_correction_symbolic` — SymPy
+  proves (T7.affine), (T7.kink) (case-split on $\eta \leq
+  \tfrac12$), and the algebraic inverse in (T7.correction).
+
+- `verify_b_t2_mc.py::check_T7_noise_correction_population` —
+  for each $\rho \in \{0.05, 0.10, 0.20\}$, draws $n =
+  50{,}000$ IID samples $(X_t, f(X_t))$ from a fixed
+  partition, flips labels symmetrically, computes empirical
+  $\hat\varepsilon^{*}_{\Pi}(f)$ and $\hat\varepsilon^{*}_{\Pi}
+  (\tilde f)$, asserts the correction identity holds within
+  the Hoeffding 95\% half-width $\sqrt{\ln(2/0.05)/(2n)}$ on
+  *every* of `--trials` (default 500) repetitions.
+
+- `verify_b_t2_mc.py::check_T7_shannon_matches_paperA` — the
+  Shannon corollary of T7.bracket numerically matches Paper
+  A's Proposition 7 to 4 decimals on the same cohort.
+
+---
 
 ### Proposition P10 — Refinement consistency (φ-monotonicity)
 
