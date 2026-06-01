@@ -335,72 +335,104 @@ def check_T7_noise_correction_population(args) -> ContractResult:
 
 @contract
 def check_T7_shannon_matches_paperA(args) -> ContractResult:
-    """T7 Shannon corollary: noise-corrected bracket matches Paper A's Prop 7.
+    """T7 Shannon corollary: noise-corrected bracket matches Paper A's
+    independent implementation (B.5 cross-paper reconciliation).
 
-    For the Shannon special case phi = H_bin, apply T3 to the noisy
-    label tilde_f, then invert the affine correction to obtain a
-    bracket on eps*_Pi(f). Compare against the closed-form Paper A
-    Proposition 7 expression (which is algebraically identical by C-Sh).
+    Strategy. Paper B and Paper A both implement the binary-entropy
+    bracket, but with independently authored code:
+
+      * Paper B: vectorised numpy ``h_bin`` / bisection ``h_bin_inv``
+        defined in ``verify_b_t1.py``.
+      * Paper A: pure-Python scalar ``hbin`` / bisection ``hbin_inv``
+        defined in ``partition-sandwich-preprint/verify_t1_float.py``.
+
+    The two paths differ in (a) array vs scalar, (b) iteration count
+    (80 vs 200) and stopping tol (none vs 1e-15), (c) numpy log2 vs
+    math.log2 rounding. A bug in either ``H_bin^{-1}`` would diverge
+    them.
+
+    Contract: for each (Pi, eta, rho) trial we compute the T7-corrected
+    clean-Bayes bracket via BOTH stacks and assert agreement to
+    1e-6 on the lower endpoint (bisection tol) and 1e-12 on the upper
+    endpoint (closed form ``H/2``).
     """
     try:
         import numpy as np
     except ImportError as e:
         return ContractResult("T7_shannon_matches_paperA", "fail", f"missing dep: {e}")
 
-    def h_bin(eta: np.ndarray) -> np.ndarray:
-        out = np.zeros_like(eta, dtype=float)
-        m = (eta > 0.0) & (eta < 1.0)
-        e = eta[m]
-        out[m] = -e * np.log2(e) - (1.0 - e) * np.log2(1.0 - e)
-        return out
+    # --- Paper B primitives (vectorised) ----------------------------
+    from verify_b_t1 import _h_bin as h_bin_B, _h_bin_inv_on_lower_half as h_bin_inv_B
 
-    def h_bin_inv(h: float) -> float:
-        if h <= 0.0:
-            return 0.0
-        if h >= 1.0:
-            return 0.5
-        lo, hi = 0.0, 0.5
-        for _ in range(80):
-            mid = 0.5 * (lo + hi)
-            v = h_bin(np.array([mid]))[0]
-            if v < h:
-                lo = mid
-            else:
-                hi = mid
-        return 0.5 * (lo + hi)
+    # --- Paper A primitives (independent scalar implementation) -----
+    import pathlib, sys
+    paperA_dir = pathlib.Path(__file__).resolve().parent.parent / "partition-sandwich-preprint"
+    if not paperA_dir.is_dir():
+        return ContractResult(
+            "T7_shannon_matches_paperA", "fail",
+            f"Paper A directory not found at {paperA_dir}",
+        )
+    if str(paperA_dir) not in sys.path:
+        sys.path.insert(0, str(paperA_dir))
+    try:
+        import verify_t1_float as paperA  # type: ignore
+    except ImportError as e:
+        return ContractResult(
+            "T7_shannon_matches_paperA", "fail",
+            f"failed to import Paper A verify_t1_float: {e}",
+        )
+    hbin_A, hbin_inv_A = paperA.hbin, paperA.hbin_inv  # scalar, in bits
 
-    rng = np.random.default_rng(args.seed)
+    rng = np.random.default_rng(args.seed ^ 0x7A7A_B0B0)
     n_trials = min(args.trials, 200)
     rhos = (0.05, 0.10, 0.20)
-    eps_tol = 1e-6  # population identity is algebraic; tight tol ok
+    tol_lo = 1e-6   # bisection-vs-bisection
+    tol_up = 1e-12  # closed-form vs closed-form
+
+    worst_lo = 0.0
+    worst_up = 0.0
+    worst_phi = 0.0
+    n_done = 0
 
     for _ in range(n_trials):
         m = int(rng.integers(2, 9))
         p, etas = _draw_partition(rng, m)
         for rho in rhos:
-            tilde_etas = rho + (1 - 2 * rho) * etas
-            # Bracket on noisy data (T3 with Shannon)
-            phi_noisy = float(np.sum(p * h_bin(tilde_etas)))
-            lo_noisy = h_bin_inv(phi_noisy)
-            up_noisy = 0.5 * phi_noisy
-            # Invert affine
-            lo_clean_T7 = (lo_noisy - rho) / (1 - 2 * rho)
-            up_clean_T7 = (up_noisy - rho) / (1 - 2 * rho)
-            # Paper A Prop 7 formulation (algebraically the same path).
-            phi_paperA = float(np.sum(p * h_bin(tilde_etas)))
-            lo_paperA = (h_bin_inv(phi_paperA) - rho) / (1 - 2 * rho)
-            up_paperA = (0.5 * phi_paperA - rho) / (1 - 2 * rho)
-            if abs(lo_clean_T7 - lo_paperA) > eps_tol or abs(up_clean_T7 - up_paperA) > eps_tol:
+            tilde = rho + (1 - 2 * rho) * etas
+
+            # ----- Paper B path ----------------------------------
+            phi_B = sum(float(p[i]) * h_bin_B(float(tilde[i])) for i in range(m))
+            lo_noisy_B = h_bin_inv_B(phi_B)
+            up_noisy_B = 0.5 * phi_B
+            lo_clean_B = (lo_noisy_B - rho) / (1 - 2 * rho)
+            up_clean_B = (up_noisy_B - rho) / (1 - 2 * rho)
+
+            # ----- Paper A path (independent code) ---------------
+            phi_A = sum(float(p[i]) * hbin_A(float(tilde[i])) for i in range(m))
+            lo_noisy_A = hbin_inv_A(phi_A)
+            up_noisy_A = 0.5 * phi_A
+            lo_clean_A = (lo_noisy_A - rho) / (1 - 2 * rho)
+            up_clean_A = (up_noisy_A - rho) / (1 - 2 * rho)
+
+            d_phi = abs(phi_A - phi_B)
+            d_lo = abs(lo_clean_A - lo_clean_B)
+            d_up = abs(up_clean_A - up_clean_B)
+            worst_phi = max(worst_phi, d_phi)
+            worst_lo = max(worst_lo, d_lo)
+            worst_up = max(worst_up, d_up)
+
+            if d_phi > 1e-12 or d_lo > tol_lo or d_up > tol_up:
                 return ContractResult(
                     "T7_shannon_matches_paperA", "fail",
-                    f"T7-Shannon endpoint mismatch vs Paper A Prop 7 "
-                    f"at rho={rho}: lo_diff={lo_clean_T7 - lo_paperA}, "
-                    f"up_diff={up_clean_T7 - up_paperA}",
+                    f"Paper A vs Paper B divergence at rho={rho}, m={m}: "
+                    f"d_phi={d_phi:.2e}, d_lo={d_lo:.2e}, d_up={d_up:.2e}",
                 )
+        n_done += 1
 
     return ContractResult(
         "T7_shannon_matches_paperA", "pass",
-        f"T7-Shannon bracket == Paper A Prop 7 to {eps_tol:.0e} on {n_trials} trials x 3 rhos",
+        f"Paper A (verify_t1_float) == Paper B (verify_b_t1) on {n_done} trials x 3 rhos; "
+        f"worst |dphi|={worst_phi:.1e}, |dlo|={worst_lo:.1e}, |dup|={worst_up:.1e}",
     )
 
 
