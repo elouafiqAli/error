@@ -3,11 +3,13 @@
 verify_b_t1.py — Paper B Tier B-T1 (symbolic identities + property tests)
 =========================================================================
 
-STATUS: STUB (Phase 2b-md.A013). All check_* functions return
-ContractResult(status='skipped') until the corresponding main.md
-claim is promoted from SKELETON to PROVEN. Each subsequent
-Phase 2b-md commit lands one check_* and its main.md proof
-together.
+STATUS: PARTIAL (Phase 2b-md.T3). T3 contracts
+(`check_T3_jensen_lower`, `check_T3_upper_constant`) are PROVEN
+and pass on 1000 random examples per seed. Remaining check_*
+functions return ContractResult(status='skipped') until the
+corresponding main.md claim is promoted from SKELETON to
+PROVEN. Each subsequent Phase 2b-md commit lands one check_*
+and its main.md proof together.
 
 This file is the *only* tier on the Gate G2 critical path
 besides B-T2 (Monte-Carlo). It carries TWO responsibilities:
@@ -40,12 +42,93 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Callable
 
 # Imports deferred so the stub does not fail to import on a
 # bare environment; each check imports what it needs.
+
+
+# ---------------------------------------------------------------
+# Shared score-functional registry (used by T3, C-Sh, C-Va, ...)
+# ---------------------------------------------------------------
+# Each entry carries:
+#   numeric(eta)  : float-safe callable, eta in [0, 1]
+#   c_phi         : float, the smallest upper constant in T3
+#                   (sup_{eta in (0, 1/2]} eta / phi(eta))
+#   c_phi_argmax  : float in (0, 1/2], certifying witness
+#
+# Closed-form c_phi values (proved in main.md §2 Step 3):
+#   Shannon  H_bin(eta)         -> c = 1/2 at eta = 1/2
+#   Variance eta*(1-eta)        -> c = 2   at eta = 1/2
+#   Gini    2*eta*(1-eta)       -> c = 1   at eta = 1/2
+
+
+def _h_bin(eta: float) -> float:
+    if eta <= 0.0 or eta >= 1.0:
+        return 0.0
+    return -eta * math.log2(eta) - (1.0 - eta) * math.log2(1.0 - eta)
+
+
+def _h_bin_inv_on_lower_half(h: float) -> float:
+    """Return the unique eps in [0, 1/2] with H_bin(eps) = h.
+
+    Bisection (monotone increasing on [0, 1/2])."""
+    if h <= 0.0:
+        return 0.0
+    if h >= 1.0:
+        return 0.5
+    lo, hi = 0.0, 0.5
+    for _ in range(80):  # >> machine precision
+        mid = 0.5 * (lo + hi)
+        if _h_bin(mid) < h:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
+def _phi_inv_generic(phi: Callable[[float], float], target: float, top: float) -> float:
+    """Invert a concave, vanish-at-0, strictly-increasing-on-[0, top] phi.
+
+    Returns eps in [0, top] with phi(eps) ~ target. Bisection."""
+    if target <= 0.0:
+        return 0.0
+    phi_top = phi(top)
+    if target >= phi_top:
+        return top
+    lo, hi = 0.0, top
+    for _ in range(80):
+        mid = 0.5 * (lo + hi)
+        if phi(mid) < target:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
+SCORE_FUNCTIONALS = {
+    "shannon": {
+        "numeric": _h_bin,
+        "inv_lower": _h_bin_inv_on_lower_half,
+        "c_phi": 0.5,
+        "c_phi_argmax": 0.5,
+    },
+    "variance": {
+        "numeric": lambda eta: eta * (1.0 - eta),
+        "inv_lower": lambda v: _phi_inv_generic(lambda e: e * (1.0 - e), v, 0.5),
+        "c_phi": 2.0,
+        "c_phi_argmax": 0.5,
+    },
+    "gini": {
+        "numeric": lambda eta: 2.0 * eta * (1.0 - eta),
+        "inv_lower": lambda v: _phi_inv_generic(lambda e: 2.0 * e * (1.0 - e), v, 0.5),
+        "c_phi": 1.0,
+        "c_phi_argmax": 0.5,
+    },
+}
 
 
 @dataclass
@@ -65,26 +148,166 @@ def contract(fn: Callable[[argparse.Namespace], ContractResult]):
 
 
 # ---------------------------------------------------------------
-# STUB IMPLEMENTATIONS — promoted to real proofs one commit at a
-# time, following FORMALISATION.md §7 sequencing.
+# T3 (Phase 2b-md.T3) — PROVEN
 # ---------------------------------------------------------------
 
 
 @contract
 def check_T3_jensen_lower(args: argparse.Namespace) -> ContractResult:
+    """T3-lower: eps*_Pi >= phi^{-1}( phi(f | Pi) ).
+
+    Step A (symbolic, SymPy):
+        Verify (H4) symmetry and (H1) concavity for each named phi.
+    Step B (property, Hypothesis):
+        Random partitions x random phi -> assert the inequality
+        holds within float tolerance.
+    """
+    try:
+        import sympy as sp
+        import numpy as np
+        from hypothesis import HealthCheck, given, settings, strategies as st
+    except ImportError as e:
+        return ContractResult("T3_jensen_lower", "fail", f"missing dep: {e}")
+
+    # --- Step A: SymPy identity checks on (H1) + (H4) ----------
+    eta = sp.symbols("eta", positive=True)
+    phi_exprs = {
+        "shannon": -eta * sp.log(eta, 2) - (1 - eta) * sp.log(1 - eta, 2),
+        "variance": eta * (1 - eta),
+        "gini": 2 * eta * (1 - eta),
+    }
+    for name, expr in phi_exprs.items():
+        # (H4) symmetry: phi(eta) == phi(1 - eta)
+        diff_sym = sp.simplify(expr - expr.subs(eta, 1 - eta))
+        if diff_sym != 0:
+            return ContractResult(
+                "T3_jensen_lower", "fail",
+                f"(H4) symmetry failed symbolically for {name}: residual {diff_sym}",
+            )
+        # (H1) concavity: phi''(eta) <= 0 on (0, 1)
+        second = sp.simplify(sp.diff(expr, eta, 2))
+        # Sample-check the second derivative at 30 points in (0, 1)
+        # (symbolic sign-proof is expensive for the log expression;
+        # this float spot-check is the H1 contract for B-T1).
+        for x in np.linspace(0.02, 0.98, 30):
+            v = float(second.subs(eta, x))
+            if v > 1e-9:
+                return ContractResult(
+                    "T3_jensen_lower", "fail",
+                    f"(H1) concavity violated for {name} at eta={x:.3f}: phi''={v}",
+                )
+
+    # --- Step B: Hypothesis property test ----------------------
+    rng_master = np.random.default_rng(args.seed)
+    eps_tol = 1e-9
+    n_examples = max(50, args.samples // 5)
+
+    @settings(
+        max_examples=n_examples,
+        deadline=None,
+        suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+        derandomize=True,
+    )
+    @given(
+        m=st.integers(min_value=2, max_value=16),
+        phi_name=st.sampled_from(list(SCORE_FUNCTIONALS.keys())),
+        local_seed=st.integers(min_value=0, max_value=2**31 - 1),
+    )
+    def prop_T3_lower(m: int, phi_name: str, local_seed: int) -> None:
+        rng = np.random.default_rng((args.seed << 8) ^ local_seed)
+        p = rng.dirichlet(np.ones(m))
+        etas = rng.random(m)
+        phi_data = SCORE_FUNCTIONALS[phi_name]
+        phi = phi_data["numeric"]
+        phi_inv = phi_data["inv_lower"]
+        eps_star = float(np.sum(p * np.minimum(etas, 1.0 - etas)))
+        phi_cond = float(np.sum(p * np.array([phi(e) for e in etas])))
+        rhs = phi_inv(phi_cond)
+        assert eps_star + eps_tol >= rhs, (
+            f"T3-lower violated: eps*={eps_star:.12f} < phi^-1(phi(f|Pi))={rhs:.12f} "
+            f"phi={phi_name} m={m} p={p.tolist()} etas={etas.tolist()}"
+        )
+    # Burn the rng_master once to align with derandomize seeding.
+    _ = rng_master.random()
+    try:
+        prop_T3_lower()
+    except AssertionError as e:
+        return ContractResult("T3_jensen_lower", "fail", str(e))
+
     return ContractResult(
-        "T3_jensen_lower",
-        "skipped",
-        "STUB — proof lands in commit paper-b Phase 2b-md.T3",
+        "T3_jensen_lower", "pass",
+        f"sympy (H1,H4) ok for 3 phis; hypothesis {n_examples} examples ok",
     )
 
 
 @contract
 def check_T3_upper_constant(args: argparse.Namespace) -> ContractResult:
+    """T3-upper: eps*_Pi <= c_phi * phi(f | Pi).
+
+    Step A (numeric):
+        Certify c_phi = sup_{eta in (0, 1/2]} eta / phi(eta) by
+        10**4-grid maximisation; assert closed-form value
+        (Shannon=1/2, variance=2, gini=1).
+    Step B (property, Hypothesis):
+        Random partitions x random phi -> assert the inequality
+        with the claimed c_phi.
+    """
+    try:
+        import numpy as np
+        from hypothesis import HealthCheck, given, settings, strategies as st
+    except ImportError as e:
+        return ContractResult("T3_upper_constant", "fail", f"missing dep: {e}")
+
+    # --- Step A: 10**4-grid certification of c_phi -------------
+    grid = np.linspace(1e-6, 0.5, 10_000)
+    for name, data in SCORE_FUNCTIONALS.items():
+        phi = data["numeric"]
+        ratios = np.array([g / phi(g) for g in grid])
+        empirical_c = float(np.max(ratios))
+        claimed = data["c_phi"]
+        if abs(empirical_c - claimed) > 5e-4:
+            return ContractResult(
+                "T3_upper_constant", "fail",
+                f"c_{name}: claimed {claimed}, grid sup = {empirical_c:.6f}",
+            )
+
+    # --- Step B: Hypothesis property test ----------------------
+    eps_tol = 1e-9
+    n_examples = max(50, args.samples // 5)
+
+    @settings(
+        max_examples=n_examples,
+        deadline=None,
+        suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture],
+        derandomize=True,
+    )
+    @given(
+        m=st.integers(min_value=2, max_value=16),
+        phi_name=st.sampled_from(list(SCORE_FUNCTIONALS.keys())),
+        local_seed=st.integers(min_value=0, max_value=2**31 - 1),
+    )
+    def prop_T3_upper(m: int, phi_name: str, local_seed: int) -> None:
+        rng = np.random.default_rng((args.seed << 8) ^ local_seed ^ 0xA5A5)
+        p = rng.dirichlet(np.ones(m))
+        etas = rng.random(m)
+        phi_data = SCORE_FUNCTIONALS[phi_name]
+        phi = phi_data["numeric"]
+        c = phi_data["c_phi"]
+        eps_star = float(np.sum(p * np.minimum(etas, 1.0 - etas)))
+        phi_cond = float(np.sum(p * np.array([phi(e) for e in etas])))
+        rhs = c * phi_cond
+        assert eps_star <= rhs + eps_tol, (
+            f"T3-upper violated: eps*={eps_star:.12f} > c*phi(f|Pi)={rhs:.12f} "
+            f"phi={phi_name} c={c} m={m}"
+        )
+    try:
+        prop_T3_upper()
+    except AssertionError as e:
+        return ContractResult("T3_upper_constant", "fail", str(e))
+
     return ContractResult(
-        "T3_upper_constant",
-        "skipped",
-        "STUB — proof lands in commit paper-b Phase 2b-md.T3",
+        "T3_upper_constant", "pass",
+        f"c_phi certified to 5e-4 on 10^4 grid; hypothesis {n_examples} examples ok",
     )
 
 

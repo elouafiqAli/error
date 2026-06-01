@@ -1,11 +1,11 @@
 # Partition Brackets: A Framework with Entropy, Variance, and Noise-Robust Instances
 
-> **Status (Phase 2b-md.A012).** Notation, definitions, and the
-> proof template are in place. Numbered claims `T3`, `C-Sh`,
-> `C-Va`, `C-Pi`, `T6`, `T7`, `P10`, `T9`, `L11` are placeholders
-> below; they will be replaced by full machine-verifiable proofs
-> in subsequent commits following the critical path in
-> [`FORMALISATION.md`](FORMALISATION.md).
+> **Status (Phase 2b-md.T3).** Notation, definitions, and **T3
+> (meta-theorem)** are PROVEN with verifier contracts. Numbered
+> claims `C-Sh`, `C-Va`, `C-Pi`, `T6`, `T7`, `P10`, `T9`, `L11`
+> remain placeholders; they will be replaced by full
+> machine-verifiable proofs in subsequent commits following the
+> critical path in [`FORMALISATION.md`](FORMALISATION.md).
 
 This is the **markdown twin** for the Phase 2b work. The LaTeX
 source is frozen at the Phase 2a scaffold; mirroring is deferred
@@ -150,31 +150,168 @@ for in Phase 2b.
 
 ## 2. Theorem 3 — φ-bracket meta-theorem
 
-> *Status: SKELETON — to be replaced in commit
-> `paper-b Phase 2b-md.T3`. The proof must follow the four-step
-> template in [`FORMALISATION.md`](FORMALISATION.md) §5 and end
-> with an explicit verifier contract block.*
+**Statement (T3).** Let $\Pi = \{S_1, \dots, S_m\}$ be a finite
+measurable partition, $f : \mathcal{X} \to \{0, 1\}$ a binary
+label, and $\varphi : [0, 1] \to \mathbb{R}_{\geq 0}$ a concave
+score functional (Def. 1, hypotheses (H1)–(H5)). Define the
+**upper constant**
+$$
+c_\varphi \;:=\; \sup_{\eta \in (0,\, 1/2]}\,
+   \frac{\eta}{\varphi(\eta)} \;\in\; (0, \infty].
+$$
+Then:
 
-**Statement (placeholder).** Let $\Pi$ be a finite measurable
-partition, $f$ a binary label, and $\varphi$ a concave score
-functional (Def. 1). Then
+- **(T3-lower / Jensen)** The partition-restricted Bayes risk
+  satisfies
 $$
 \varphi^{-1}\!\bigl(\varphi(f \mid \Pi)\bigr)
 \;\leq\;
+\varepsilon^{*}_{\Pi}.
+$$
+
+- **(T3-upper / linear)** If $c_\varphi < \infty$, then
+$$
 \varepsilon^{*}_{\Pi}
 \;\leq\;
 c_\varphi \cdot \varphi(f \mid \Pi),
 $$
-where $c_\varphi$ is the smallest constant for which the upper
-bound holds uniformly; the Shannon instance achieves
-$c_{H_{\mathrm{bin}}} = \tfrac12$.
+and $c_\varphi$ is the *smallest* constant for which this
+inequality holds uniformly in $(\Pi, f)$. For
+$\varphi = H_{\mathrm{bin}}$ one has $c_{H_{\mathrm{bin}}} =
+\tfrac12$; for $\varphi = \eta(1-\eta)$ one has
+$c_{\mathrm{var}} = 2$; for $\varphi = 2\eta(1-\eta)$
+(Gini) one has $c_{\mathrm{Gini}} = 1$.
 
-**Failure mode (advance notice).** If $\varphi$ fails (H5)
-strict-positivity at the interior, the lower bound collapses to
-$0$ on cells where $\varphi(\eta_i) = 0$ even when $\eta_i \neq 0,
-1$. The kink-at-$\tfrac12$ functional $\min(\eta, 1-\eta)$ is the
-canonical example and forces the separate non-smooth derivation
-used in Paper A.
+**Hypotheses used.** (H1) concavity, (H3) continuity, (H4)
+symmetry, (H5) strict-positivity-on-interior. (H2) boundary
+vanishing is used only to keep $\varphi^{-1}(0) = 0$ in the
+degenerate case.
+
+**Proof.**
+
+*Step 1 — Cell-wise reduction via (H4).* For every $\eta \in
+[0, 1]$ set $\eta_\min := \min(\eta, 1 - \eta) \in [0, \tfrac12]$.
+By (H4), $\varphi(\eta) = \varphi(1 - \eta)$, so
+$\varphi(\eta) = \varphi(\eta_\min)$ regardless of which side of
+$\tfrac12$ the cell-conditional rate lies on. Therefore
+$$
+\varphi(f \mid \Pi) \;=\; \sum_{i=1}^{m} p_i\, \varphi(\eta_i)
+\;=\; \sum_{i=1}^{m} p_i\, \varphi(\eta_{i,\min}). \tag{$\ast$}
+$$
+
+*Step 2 — Jensen lower bound.* By (H1), $\varphi$ is concave on
+$[0, 1]$ (hence on $[0, \tfrac12]$). Apply Jensen's inequality
+to the random variable taking value $\eta_{i,\min}$ with
+probability $p_i$:
+$$
+\varphi\!\Bigl(\sum_i p_i\, \eta_{i,\min}\Bigr)
+\;\geq\;
+\sum_i p_i\, \varphi(\eta_{i,\min}).
+$$
+The left-hand argument is exactly $\varepsilon^{*}_{\Pi} =
+\sum_i p_i \min(\eta_i, 1-\eta_i) \in [0, \tfrac12]$ (Notation,
+§0). Combining with $(\ast)$,
+$$
+\varphi(\varepsilon^{*}_{\Pi})
+\;\geq\;
+\varphi(f \mid \Pi).
+$$
+By (H1)+(H3)+(H5), $\varphi$ restricted to $[0, \tfrac12]$ is
+continuous and strictly increasing from $0$ to
+$\varphi(\tfrac12)$ (a strict monotone follows because a
+concave function that vanishes at $0$ and is strictly positive
+on $(0, 1)$ cannot decrease on $[0, \tfrac12]$ without
+contradicting (H4) on $[\tfrac12, 1]$). Applying $\varphi^{-1}$
+on this interval — which is order-preserving — gives
+$$
+\varepsilon^{*}_{\Pi}
+\;\geq\;
+\varphi^{-1}\!\bigl(\varphi(f \mid \Pi)\bigr),
+$$
+establishing (T3-lower).
+
+*Step 3 — Upper bound via the linear ratio.* For each cell,
+$\eta_{i,\min} \in [0, \tfrac12]$. By the definition of
+$c_\varphi$, for every $\eta \in (0, \tfrac12]$ we have $\eta
+\leq c_\varphi\, \varphi(\eta)$; the inequality is trivial at
+$\eta = 0$. Therefore $\eta_{i,\min} \leq c_\varphi\,
+\varphi(\eta_{i,\min})$ for every $i$. Multiply by $p_i$, sum,
+and apply $(\ast)$:
+$$
+\varepsilon^{*}_{\Pi}
+\;=\; \sum_i p_i\, \eta_{i,\min}
+\;\leq\; c_\varphi \sum_i p_i\, \varphi(\eta_{i,\min})
+\;=\; c_\varphi \cdot \varphi(f \mid \Pi),
+$$
+which is (T3-upper). Smallness of $c_\varphi$: the
+single-cell partition $m = 1$ with $\eta_1$ chosen to attain
+$\sup_{\eta \in (0, 1/2]} \eta/\varphi(\eta)$ (or a maximising
+sequence if the sup is not attained) certifies that no smaller
+constant suffices.
+
+*Step 4 — Sharpness witnesses.*
+
+- (Lower-bound sharpness.) Take $m = 2$, $p_1 = p_2 = \tfrac12$,
+  $\eta_1 = a \in [0, 1]$, $\eta_2 = 1 - a$. Then
+  $\eta_{1,\min} = \eta_{2,\min} = \min(a, 1-a)$, so
+  $\varepsilon^{*}_{\Pi} = \min(a, 1-a)$ and $\varphi(f \mid
+  \Pi) = \varphi(a) = \varphi(\min(a, 1-a))$ by (H4). Hence
+  $\varphi^{-1}(\varphi(f \mid \Pi)) = \min(a, 1-a) =
+  \varepsilon^{*}_{\Pi}$. The lower bound is tight for **every**
+  $a \in [0, 1]$ in this construction.
+
+- (Upper-bound sharpness, Shannon.) Take $m = 1$, $\eta_1 =
+  \tfrac12$. Then $\varepsilon^{*}_{\Pi} = \tfrac12$,
+  $H_{\mathrm{bin}}(\tfrac12) = 1$, and $c_{H_{\mathrm{bin}}}
+  \cdot 1 = \tfrac12$. Upper bound is tight.
+
+- (Upper-bound sharpness, variance.) Take $m = 1$, $\eta_1 =
+  \tfrac12$. Then $\varepsilon^{*}_{\Pi} = \tfrac12$,
+  $\eta(1-\eta)|_{1/2} = \tfrac14$, and $c_{\mathrm{var}} \cdot
+  \tfrac14 = \tfrac12$.
+
+*Step 5 — Failure modes (adversarial).* We explicitly name the
+hypotheses that, if dropped, kill the corresponding inequality:
+
+- *Drop (H1) concavity.* Jensen reverses; (T3-lower) becomes an
+  upper bound and the bracket inverts on counterexamples.
+- *Drop (H4) symmetry.* The identity $\varphi(\eta) =
+  \varphi(\eta_\min)$ in Step 1 fails; the partition-restricted
+  Bayes risk for the *asymmetric* matched loss must be
+  redefined (open problem OP-asym in §7).
+- *Drop (H5) interior positivity.* $\varphi$ may have a
+  plateau on $[0, \tfrac12]$ so $\varphi^{-1}$ ceases to be a
+  function; (T3-lower) ill-posed.
+- *$c_\varphi = \infty$.* The upper bound is vacuous. This is
+  the **Pinsker regime** (treated in C-Pi via a square-root
+  bound, not a linear one). $\square$
+
+**Verifier contract.** Mechanically checked by
+
+- `verify_b_t1.py::check_T3_jensen_lower` — SymPy identity
+  `phi(eta) - phi(1 - eta) == 0` (H4) and concavity test
+  `phi''(eta) <= 0 on (0,1)` (H1) for
+  $\varphi \in \{H_{\mathrm{bin}},\, \eta(1-\eta),\,
+  2\eta(1-\eta)\}$; plus a Hypothesis property test
+  `prop_T3_lower` asserting $\varepsilon^{*}_{\Pi} \geq
+  \varphi^{-1}(\varphi(f \mid \Pi))$ on $\geq 200$ random
+  partitions $\Pi$ (cells $m \in [2, 16]$, masses
+  Dirichlet$(1)$, rates uniform on $[0, 1]$) crossed with each
+  of the three named $\varphi$.
+
+- `verify_b_t1.py::check_T3_upper_constant` — SymPy/numeric
+  certification that
+  $c_{H_{\mathrm{bin}}} = \tfrac12$,
+  $c_{\mathrm{var}} = 2$,
+  $c_{\mathrm{Gini}} = 1$
+  by maximising $\eta/\varphi(\eta)$ on a $10^4$-point grid of
+  $(0, 1/2]$ and confirming derivative sign at the optimum;
+  plus a Hypothesis property test `prop_T3_upper` asserting
+  $\varepsilon^{*}_{\Pi} \leq c_\varphi\, \varphi(f \mid \Pi)$
+  on the same random-partition cohort.
+
+Run command and JSON manifest schema documented in
+[`FORMALISATION.md`](FORMALISATION.md) §4–§6.
 
 ---
 
