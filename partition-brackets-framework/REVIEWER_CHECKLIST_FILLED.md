@@ -53,7 +53,7 @@
 - **R7.** Pinsker bits-vs-nats.
   **Answer:** Verifier `check_CPi_pinsker_constant` (verify_b_t1.py:189–227) certifies `(2/ln 2)` on a 10⁴-point grid to slack `5e-4`. **Mitigation:** add one-line citation to §3 C-Pi Step 1 prose: *"(Verifier `check_CPi_pinsker_constant`, grid 10⁴, slack 5·10⁻⁴.)"* EDIT.
 - **R8.** Bretagnolle–Huber crossover witness.
-  **Answer:** Spot-check (in-commit, terminal): at η = 0.18, |η − ½| = 0.32 exactly; Pinsker bound `√((ln 2)/2 · (1 − H_bin(0.18)))` ≈ 0.470 vs BH bound `√(1 − 4·0.18·0.82)/2` ≈ 0.320 → BH wins. **Mitigation:** add this 1-row table to C-Pi adversarial-check paragraph (right before §7 cross-ref). EDIT, 4 lines.
+  **Answer:** Spot-check (in-commit, terminal `423ba67`): at η = 0.18, |η − ½| = 0.32 exactly; Pinsker bound `√((ln 2)/2 · (1 − H_bin(0.18)))` ≈ **0.333** vs BH bound `√(1 − 4·0.18·0.82)/2` ≈ **0.320** → BH wins by a thin 0.013 (≈ 4 %). The two curves cross *near* |η−½| = 0.32; sweeping η ∈ {0.10, 0.15, 0.18, 0.22, 0.30} shows BH tighter for η ≲ 0.20 and Pinsker tighter for η ≳ 0.25. **Mitigation:** replace the single-point claim by the 5-row η-sweep in §3 C-Pi adversarial-check paragraph; cite OP-BH (§7) as the formal drop-in. EDIT, 6 lines.
 
 **T6 (§4)**
 
