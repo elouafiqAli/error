@@ -1,6 +1,6 @@
 {
-  "sha": "7666a76",
-  "date_utc": "2026-06-01T14:09:03Z",
+  "sha": "c381a4f",
+  "date_utc": "2026-06-01T14:55:25Z",
   "tiers": {
     "T0": {
       "rc": 0,
@@ -8,19 +8,19 @@
     },
     "T1": {
       "rc": 0,
-      "wall_s": 2
+      "wall_s": 3
     },
     "T2": {
       "rc": 0,
-      "wall_s": 21
+      "wall_s": 20
     },
     "T3": {
       "rc": 0,
-      "wall_s": 1165
+      "wall_s": 1415
     },
     "T4": {
       "rc": 0,
-      "wall_s": 10
+      "wall_s": 9
     },
     "T5": {
       "rc": 0,
@@ -29,7 +29,7 @@
   },
   "all_pass": true,
   "notes": {
-    "T3": "run separately (audit/external_audit/T3_stress.json); 15 seeds x 14 contracts, 0 failures; 3/3 mutations caught (T7_wrong_sign, T3_wrong_c_phi, CVa_wrong_identity); 13/13 boundary checks pass.",
+    "T3": "seeds=15, samples=50000, trials=200, failures=0; mutations caught 3/3 (T7_wrong_sign, T3_wrong_c_phi, CVa_wrong_identity); boundary 13/13",
     "T4_rows": 20,
     "T4_datasets": [
       "cora",
