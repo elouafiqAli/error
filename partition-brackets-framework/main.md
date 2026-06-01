@@ -465,9 +465,15 @@ $c_{\mathrm{var}} = 2$; for $\varphi = 2\eta(1-\eta)$
 (Gini) one has $c_{\mathrm{Gini}} = 1$.
 
 **Hypotheses used.** (H1) concavity, (H3) continuity, (H4)
-symmetry, (H5) strict-positivity-on-interior. (H2) boundary
-vanishing is used only to keep $\varphi^{-1}(0) = 0$ in the
-degenerate case.
+symmetry, (H5) strict-positivity-on-interior, plus the
+implicit **(H1$'$) strict concavity on $(0, \tfrac12)$** that
+upgrades the (H1)+(H5) consequence "non-decreasing on
+$[0, \tfrac12]$" to *strictly* increasing (needed to give
+$\varphi^{-1}$ as a single-valued function). All three named
+instances satisfy (H1$'$) directly: $H_{\mathrm{bin}}'' < 0$,
+$\eta(1-\eta)'' = -2$, $(2\eta(1-\eta))'' = -4$ on $(0, 1)$.
+(H2) boundary vanishing is used only to keep $\varphi^{-1}(0)
+= 0$ in the degenerate case.
 
 **Proof.**
 
@@ -499,12 +505,21 @@ $$
 \varphi(f \mid \Pi).
 $$
 By (H1)+(H3)+(H5), $\varphi$ restricted to $[0, \tfrac12]$ is
-continuous and strictly increasing from $0$ to
-$\varphi(\tfrac12)$ (a strict monotone follows because a
-concave function that vanishes at $0$ and is strictly positive
-on $(0, 1)$ cannot decrease on $[0, \tfrac12]$ without
-contradicting (H4) on $[\tfrac12, 1]$). Applying $\varphi^{-1}$
-on this interval — which is order-preserving — gives
+continuous and non-decreasing from $0$ to $\varphi(\tfrac12)$
+(a concave function that vanishes at $0$ and is strictly
+positive on $(0, 1)$ cannot decrease on $[0, \tfrac12]$
+without contradicting (H4) on $[\tfrac12, 1]$). Under the
+additional hypothesis **(H1$'$) strict concavity on
+$(0, \tfrac12)$** the restriction is *strictly* increasing
+and $\varphi^{-1} : [0, \varphi(\tfrac12)] \to [0, \tfrac12]$
+is a homeomorphism (all three named instances satisfy (H1$'$)
+by direct second-derivative computation, listed above).
+Without (H1$'$), one may still define
+$\varphi^{-1}(y) := \inf\{x \in [0, \tfrac12] : \varphi(x) \geq y\}$,
+which is well-defined, monotone, and order-preserving by
+continuity of $\varphi$; both readings give the same
+inequality below. Applying $\varphi^{-1}$ — which is
+order-preserving — gives
 $$
 \varepsilon^{*}_{\Pi}
 \;\geq\;
@@ -825,10 +840,28 @@ $$
   $\mathrm{MSE}^{*}_{\Pi}(f) = \sum_i p_i \mathrm{Var}(f \mid \Pi=S_i) =
   \mathbb{E}[\mathrm{Var}(f \mid \Pi)]$. For *binary* $f$ this
   specialises to $\sum_i p_i \eta_i(1 - \eta_i) =
-  \varphi_{\mathrm{var}}(f \mid \Pi)$, recovering (C-Va.id);
-  the equality is *degenerate* T3 with both bracket endpoints
-  coinciding ($\varphi^{-1} \circ \varphi = \mathrm{id}$ when
-  the per-cell loss equals $\varphi$).
+  \varphi_{\mathrm{var}}(f \mid \Pi)$, recovering (C-Va.id).
+  *Caveat — this is **not** a degenerate T3 bracket.* T3
+  brackets the **0-1 Bayes risk** $\varepsilon^{*}_{\Pi}$
+  (and for binary $f$, the C-Va bracket reads
+  $\tfrac{1 - \sqrt{1 - 4\mathbb{E}[\mathrm{Var}]}}{2} \leq
+  \varepsilon^{*}_{\Pi} \leq 2\mathbb{E}[\mathrm{Var}]$,
+  with the two endpoints **distinct** in general — e.g. at
+  $\mathbb{E}[\mathrm{Var}] = 1/8$, the bracket reads
+  $\approx 0.146 \leq \varepsilon^{*}_{\Pi} \leq 1/4$).
+  Theorem T6.MSE lives at a different object: it is the
+  underlying *matched-loss identity* of Def. 2 — when the
+  loss is matched to $\varphi_{\mathrm{var}}$ via squared
+  loss, the matched-loss partition-Bayes risk
+  $\mathrm{MSE}^{*}_{\Pi}(f)$ **equals**
+  $\varphi_{\mathrm{var}}(f \mid \Pi)$ on the nose, with no
+  bracket gap. The T3 bracket arises only when one applies a
+  $\varphi$-conditional functional to a *different* loss
+  (e.g. Shannon $\varphi$ bracketing the 0-1 risk in C-Sh).
+  This distinction is load-bearing for the verifier contracts
+  in §0.5: `check_T6_MSE_identity_population` is a B-T2
+  identity test (Hoeffding 95\% halfwidth), whereas
+  `check_T3_jensen_lower` is a B-T1 inequality test.
 
 - *(T6.MAE).* For any predictor $\hat y$, Cauchy–Schwarz with
   the constant weight $\mathbf{1}$ yields $\mathbb{E}[|f - \hat
