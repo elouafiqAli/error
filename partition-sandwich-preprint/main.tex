@@ -307,10 +307,17 @@ regression on three of the four datasets.
 
 The bracket is tight on both boundaries by explicit witnesses,
 and we show in \cref{prop:sharp} that no closed-form improvement
-is possible. The width of the bracket is bounded above by an
-explicit constant $w^{*} \approx 0.1610$ uniformly in $\Pi$ and
-$f$ --- to our knowledge the first \emph{uniform conservativeness
-gap} reported in the entropy-bounds-Bayes-error literature.
+is possible. The bracket width is bounded above by an explicit
+constant $w^{*}\approx 0.1610$ uniformly in $\Pi$ and $f$ ---
+the maximal $\eps$-extent of the binary achievable region of
+\citet{feder1994}, whose closed form
+$\tfrac{1}{2}\Hbin(1/5)-1/5$ we record here.\footnote{In the
+binary case the Fano lower curve and the Hellman--Raviv upper
+line are \emph{exactly} the boundaries of the achievable region
+(\cref{prop:region}), so $w^{*}$ is the genuine maximal width
+of the realisable $(\eps,H)$ set, not merely the gap between
+two bounds. We make no priority claim for the constant itself,
+which is a direct calculus consequence of standard inequalities.}
 
 \paragraph{Contributions.}
 \begin{enumerate}[(C1)]
@@ -322,9 +329,12 @@ gap} reported in the entropy-bounds-Bayes-error literature.
     $w^{*} = \tfrac{1}{2}\Hbin(1/5) - 1/5 \approx 0.1610$
     (\cref{cor:slack}), bounding the bracket's width uniformly
     over \emph{all} finite partitions and \emph{all} binary
-    labels. To our knowledge this is the first such uniform
-    conservativeness gap for the entropy/error relation, and it
-    is the central theoretical novelty of the paper.
+    labels. This is the maximal $\eps$-extent of the binary
+    achievable region of \citet{feder1994}; we make no priority
+    claim for the constant itself (a direct calculus consequence
+    of standard inequalities), but record its closed form and
+    deploy it as the uniform conservativeness ceiling driving
+    every downstream application of this paper.
   \item \emph{Marginal-aware refinement.} A sharper bracket
     (\cref{prop:marginal}) using the global label marginal
     $\pi$: the marginal-aware slack $w^{*}(\pi_{*})$ shrinks

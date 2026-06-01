@@ -190,9 +190,18 @@ can:
 The bracket is tight on both boundaries with explicit witnesses, and
 Proposition 5 shows no closed-form improvement is possible. The
 bracket width is bounded above by an explicit constant
-$w^{*}\approx 0.1610$ uniformly in $\Pi$ and $f$ — to our knowledge
-the first **uniform conservativeness gap** reported in the
-entropy-bounds-Bayes-error literature.
+$w^{*}\approx 0.1610$ uniformly in $\Pi$ and $f$ — the maximal
+$\varepsilon$-extent of the binary achievable region of
+Feder–Merhav (1994), whose closed form $\tfrac{1}{2}H_{\mathrm{bin}}(1/5)-1/5$
+we record here.[^wstar]
+
+[^wstar]: In the binary case the Fano lower curve and the
+    Hellman–Raviv upper line are *exactly* the boundaries of the
+    achievable region (Proposition 1.5), so $w^{*}$ is the genuine
+    maximal width of the realisable $(\varepsilon,H)$ set, not
+    merely the gap between two bounds. We make no priority claim
+    for the constant itself, which is a direct calculus consequence
+    of standard inequalities.
 
 ### Contributions
 
@@ -201,7 +210,9 @@ entropy-bounds-Bayes-error literature.
   predictor of a binary label, with an elementary finite-sum proof.
 - **(C2) Uniform slack.** The explicit constant
   $w^{*}\approx 0.1610$ (Corollary 2) bounding the bracket's width
-  uniformly over all $\Pi$ and $f$.
+  uniformly over all $\Pi$ and $f$ — the maximal $\varepsilon$-extent
+  of the binary achievable region of Feder–Merhav (1994); no priority
+  claim for the constant itself.
 - **(C3) Sharpness.** A negative result (Proposition 5) ruling out
   any uniform improvement of either side by simpler closed-form
   expressions.
