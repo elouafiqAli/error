@@ -680,6 +680,89 @@ $1/2\le 1/2\le 1/2$: both sides saturate, the task is exactly
 $1$-WL-indistinguishable, no admissible depth-$L$ MPNN beats chance.
 Recovers the canonical $C_4$ counter-example as a one-line instance.
 
+#### 8.3.1 An exact decomposition of trained risk against the WL ceiling
+
+The architecture-level bracket of Corollary 7 is training-free;
+in practice a learner instantiates a particular trained head and
+lands at empirical risk $\hat R$ that need not equal either
+endpoint. The following identity decomposes $\hat R$ against the
+WL ceiling $\varepsilon^*_{\Pi^{\mathrm{WL}}_L}$ into three
+named, signed terms whose magnitudes are individually
+interpretable and individually verifiable on every row of the
+E3d / E3d-arch family.
+
+**Proposition ($\star$ exact three-term decomposition).** Let
+$\widehat f = \tau \circ h^{(L)}$ be any classifier with $h^{(L)}$
+drawn from an admissible MPNN family (in the sense of
+Corollary 7), with trained empirical risk
+$\hat R := |V|^{-1}\sum_v \mathbf 1\{\widehat f(v)\neq f(v)\}$, and
+let $\Pi^Z_k$ be any post-hoc $k$-cell partition of $V$ built
+from the trained embeddings $h^{(L)}$ (e.g. $k$-means on the
+penultimate-layer features), with minimum-risk constant-on-cells
+predictor reaching $\varepsilon^*_{\Pi^Z_k}$. Then
+
+$$
+\hat R = \varepsilon^*_{\Pi^{\mathrm{WL}}_L}
+   + \underbrace{(\varepsilon^*_{\Pi^Z_k}
+                   - \varepsilon^*_{\Pi^{\mathrm{WL}}_L})}_{\Delta_{\text{feat}}}
+   + \underbrace{(\hat R - \varepsilon^*_{\Pi^Z_k})}_{\Delta_{\text{head}}}.
+\tag{$\star$}
+$$
+
+*Proof.* Algebraic: add and subtract $\varepsilon^*_{\Pi^{\mathrm{WL}}_L}$ and
+$\varepsilon^*_{\Pi^Z_k}$ on the right-hand side; both cancel. ∎
+
+The three terms admit a uniform reading:
+
+- **WL floor $\varepsilon^*_{\Pi^{\mathrm{WL}}_L}$.** Architecture-level
+  lower endpoint of Corollary 7: best per-cell-majority error on
+  the $1$-WL partition at depth $L$. Pinned by the graph, the
+  labels, and $L$ — independent of architecture or optimiser.
+- **Feature refinement $\Delta_{\text{feat}} :=
+  \varepsilon^*_{\Pi^Z_k} - \varepsilon^*_{\Pi^{\mathrm{WL}}_L}$.**
+  Signed gap between trained-feature per-cell-majority and the WL
+  floor. Negative $\Delta_{\text{feat}}$ means the trained
+  features carry label structure that $1$-WL at depth $L$ does
+  not capture — an *expressivity* statement when both sides are
+  evaluated at the same cell budget $k = |\Pi^Z_k| =
+  |\Pi^{\mathrm{WL}}_L|$ and $k \ll n$ (cf. Proposition
+  refine-discrete for the cardinality-collapse regime in which
+  the comparison becomes vacuous).
+- **Head slack $\Delta_{\text{head}} := \hat R -
+  \varepsilon^*_{\Pi^Z_k}$.** Signed gap between the trained
+  head's empirical risk and the per-cell-majority error of the
+  partition it implicitly induces. Non-negative
+  $\Delta_{\text{head}}$ means the head leaves bracket-detectable
+  sub-cell structure unrealised. Strictly negative
+  $\Delta_{\text{head}}$ (empirically seen at very coarse $k$ in
+  table E3d-arch-kll-n) means the head extracts continuous-$Z$
+  geometry that the post-hoc partition discards.
+
+**Remark (resolution condition).** Equation ($\star$) is an
+unconditional identity, but the interpretive reading of
+$\Delta_{\text{feat}}$ as an expressivity statement requires the
+cell budgets on both sides to agree and both partitions to be
+coarse enough that per-cell-majority is not trivially
+memorisation:
+
+$$ k = |\Pi^Z_k| = |\Pi^{\mathrm{WL}}_L|,
+   \qquad k/|V| \le \kappa $$
+
+for a small constant $\kappa$ (we use $\kappa \le 0.1$ in the
+E3d-arch-kll-n sweep, giving $k/|V| \le 0.024$ on Cora and
+$\le 0.019$ on CiteSeer). Outside this resolution condition the
+matched-$k$ rows of E3d-arch-full (Cora $k/n=0.87$, CiteSeer
+$0.61$) test *fixed-cell-budget* per-cell-majority error, not
+expressivity — the matched-$k$ verdict of P0.3 / P0.4 is
+explicitly confined to that statement.
+
+A symbolic check of ($\star$) — namely that the three bracketed
+terms sum to $\hat R$ identically — is folded into `verify.jl`
+as a one-line assertion (it is an algebraic tautology; no
+interval arithmetic needed). The same identity is used,
+unannotated, in every E3d / E3d-arch / E3d-arch-full /
+E3d-arch-kll-n row reported below.
+
 ### 8.4 Mechanised verification
 
 `verify.jl` (shipped) samples $10^3$ random partitions of

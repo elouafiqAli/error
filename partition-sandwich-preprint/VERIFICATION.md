@@ -484,3 +484,33 @@ P0.2 + P0.5 of `future-work/08-p1-patch-plan.md` land jointly:
    r4 pending exactly this E3 callback).
 
 After r5, all five P0 audit rows (A12 - A16) are HIGH / closed.
+
+### r6 / 2026-06 — Phase 3a: (★) decomposition theorem (PATCH C theory)
+
+Phase 3a of `future-work/08-p1-patch-plan.md` lands the PATCH C
+theory block. The exact three-term decomposition
+
+  Rhat = eps*_{Pi^WL_L} + (eps*_{Pi^Z_k} - eps*_{Pi^WL_L})
+       + (Rhat - eps*_{Pi^Z_k})
+       =:  WL_floor + Delta_feat + Delta_head
+
+was already used implicitly in every E3d / E3d-arch row but had
+no formal statement in the manuscript. r6 promotes it to
+Proposition `prop:star-decomp` in a new subsection
+`sec:apps:star-decomp` (§8.3.1 in `main.tex`, "An exact
+decomposition of trained risk against the WL ceiling") with a
+two-line algebraic proof, mirrored in `main.md`. The remark
+`rem:resolution` makes the resolution condition explicit:
+
+  k = |Pi^Z_k| = |Pi^WL_L|,   k / |V| <= kappa  (we use 0.1)
+
+confining the Delta_feat-as-expressivity reading to the
+P0.4 / `tab:e3d-arch-kll-n` regime and the matched-k rows of
+`tab:e3d-arch-full` to the fixed-cell-budget reading. The
+algebraic identity is folded into `verify.jl` as
+`star_decomp_passed`, an exact-rational tautology over 10 000
+random (Rhat, eps_WL, eps_Z) triples.
+
+Closes audit row A3 (HIGH); A4b moves from UNVERIFIED to HIGH
+via P0.4; A4 is restated as a fixed-cell-budget reading
+(MEDIUM, superseded by A4b for the expressivity claim).

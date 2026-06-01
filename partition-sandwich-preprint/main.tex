@@ -1364,6 +1364,118 @@ canonical $C_{4}$ counter-example
 \end{example}
 
 % ----------------------------------------------------------
+\subsubsection{An exact decomposition of trained risk against the
+WL ceiling}\label{sec:apps:star-decomp}
+% ----------------------------------------------------------
+
+The architecture-level bracket of \cref{cor:mpnn-bracket} is
+training-free; in practice a learner instantiates a particular
+trained head and lands at empirical risk $\hat R$ that need not
+equal either endpoint of the bracket. The following identity
+decomposes $\hat R$ against the WL ceiling
+$\eps^{*}_{\Pi^{\mathrm{WL}}_{L}}$ into three named, non-negative
+terms whose signs and magnitudes are individually interpretable
+and individually verifiable on every row of the E3d / E3d-arch
+family.
+
+\begin{proposition}[$(\star)$ exact three-term decomposition]\label{prop:star-decomp}
+Let $G$ be a graph, $f : V \to \{0, 1\}$ a binary vertex task,
+$\Pi^{\mathrm{WL}}_{L} := \mathrm{WL}_{L}(G)$ the $L$-round
+$1$-WL partition, and let $\widehat f : V \to \{0, 1\}$ be any
+classifier of the form
+$\widehat f = \tau \circ h^{(L)}$ for $h^{(L)}$ from an admissible
+MPNN family (in the sense of \cref{cor:mpnn-bracket}) with
+trained empirical risk $\hat R := |V|^{-1}\sum_{v} \mathbf 1\{\widehat f(v) \ne f(v)\}$.
+Write $\Pi^{Z}_{k}$ for any \emph{post-hoc} partition of $V$ into
+$k$ cells built from the trained embeddings $h^{(L)}$
+(e.g.\ a $k$-means quantisation of the penultimate-layer
+features), with associated minimum-risk constant-on-cells
+predictor reaching $\eps^{*}_{\Pi^{Z}_{k}}$. Then the
+following identity holds exactly:
+\begin{equation}\label{eq:star-decomp}
+  \hat R \;=\; \eps^{*}_{\Pi^{\mathrm{WL}}_{L}}
+   \;+\; \underbrace{\bigl(\eps^{*}_{\Pi^{Z}_{k}}
+                          - \eps^{*}_{\Pi^{\mathrm{WL}}_{L}}\bigr)}_{
+       \displaystyle \Delta_{\mathrm{feat}}}
+   \;+\; \underbrace{\bigl(\hat R - \eps^{*}_{\Pi^{Z}_{k}}\bigr)}_{
+       \displaystyle \Delta_{\mathrm{head}}}.
+       \tag{$\star$}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Algebraic: add and subtract $\eps^{*}_{\Pi^{\mathrm{WL}}_{L}}$
+and $\eps^{*}_{\Pi^{Z}_{k}}$ on the right-hand side; both
+cancel. The terms are well-defined because $\hat R$,
+$\eps^{*}_{\Pi^{Z}_{k}}$, and $\eps^{*}_{\Pi^{\mathrm{WL}}_{L}}$
+are each empirical minimum-risk numbers on $V$.
+\end{proof}
+
+The three terms admit a uniform reading:
+\begin{description}
+  \item[$\eps^{*}_{\Pi^{\mathrm{WL}}_{L}}$ --- WL floor.]
+    The architecture-level lower endpoint of
+    \cref{cor:mpnn-bracket}: the best per-cell-majority error
+    available on the $1$-WL partition at depth $L$. Pinned
+    by the graph, the labels, and $L$, independent of
+    architecture or optimiser.
+  \item[$\Delta_{\mathrm{feat}} := \eps^{*}_{\Pi^{Z}_{k}} -
+    \eps^{*}_{\Pi^{\mathrm{WL}}_{L}}$ --- feature refinement.]
+    The signed gap between the per-cell-majority error of the
+    trained-feature partition $\Pi^{Z}_{k}$ and the WL floor.
+    Negative $\Delta_{\mathrm{feat}}$ means the trained features
+    carry label structure that $1$-WL at depth $L$ does not
+    capture --- an expressivity statement when both sides are
+    evaluated at the same cell budget $k = |\Pi^{Z}_{k}| \le
+    |\Pi^{\mathrm{WL}}_{L}|$ and $k \ll n$ (cf.\
+    \Cref{prop:refine-discrete} for the cardinality-collapse
+    regime in which the comparison becomes vacuous).
+  \item[$\Delta_{\mathrm{head}} := \hat R -
+    \eps^{*}_{\Pi^{Z}_{k}}$ --- head slack.]
+    The signed gap between the trained head's empirical risk and
+    the per-cell-majority error of the partition it implicitly
+    induces. Non-negative $\Delta_{\mathrm{head}}$ means the head
+    leaves bracket-detectable sub-cell structure unrealised:
+    a better constant-on-cells decision exists. Strictly
+    negative $\Delta_{\mathrm{head}}$ means the head extracts
+    sub-cell, continuous-$Z$ geometry that the post-hoc
+    partition $\Pi^{Z}_{k}$ discards --- empirically observed at
+    very coarse $k$ in \cref{tab:e3d-arch-kll-n}.
+\end{description}
+
+\begin{remark}[resolution condition]\label{rem:resolution}
+Equation~\eqref{eq:star-decomp} is an unconditional identity,
+but the interpretive reading of $\Delta_{\mathrm{feat}}$ as an
+expressivity statement requires the cell budgets on both sides
+to be the same and both partitions to be coarse enough that
+per-cell-majority is not trivially memorisation:
+\[
+  k = |\Pi^{Z}_{k}| = |\Pi^{\mathrm{WL}}_{L}|,
+  \qquad
+  k / |V| \le \kappa
+\]
+for a small constant $\kappa$ (we use $\kappa \le 0.1$ in the
+E3d-arch-kll-n sweep of \cref{tab:e3d-arch-kll-n}, giving
+$k/|V| \le 0.024$ on Cora and $\le 0.019$ on CiteSeer). Outside
+this resolution condition, the matched-$k$ rows of
+\cref{tab:e3d-arch-full} (Cora $k/n = 0.87$, CiteSeer $0.61$)
+test \emph{fixed-cell-budget} per-cell-majority error, not
+expressivity --- the matched-$k$ verdict of P0.3/P0.4 is
+explicitly confined to that statement. Under the resolution
+condition, the empirical content of $\Delta_{\mathrm{feat}}$
+is the expressivity claim that the trained representation
+strictly refines $1$-WL with respect to the labelling.
+\end{remark}
+
+A symbolic check of the identity \eqref{eq:star-decomp} ---
+namely that the three bracketed terms sum to $\hat R$
+identically --- is folded into \path{verify.jl} as a one-line
+assertion (it is an algebraic tautology and does not need
+interval arithmetic to certify). The same identity is used,
+unannotated, in every E3d / E3d-arch / E3d-arch-full /
+E3d-arch-kll-n row reported in \cref{sec:apps:empirical}.
+
+% ----------------------------------------------------------
 \subsection{Mechanised verification}\label{sec:apps:verify}
 % ----------------------------------------------------------
 

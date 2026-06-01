@@ -154,6 +154,20 @@ function main(N::Int=1000; seed::Int=20260531)
         end
     end
 
+    # ---- Proposition (★) three-term decomposition (sec:apps:star-decomp).
+    # Algebraic identity:  Rhat == eps_WL + (eps_Z - eps_WL) + (Rhat - eps_Z).
+    # Verified symbolically on random (Rhat, eps_WL, eps_Z) triples in Q.
+    star_ok = true
+    for _ in 1:10_000
+        a = Rational(rand(rng, 0:99), 100)   # Rhat
+        b = Rational(rand(rng, 0:99), 100)   # eps_WL
+        c = Rational(rand(rng, 0:99), 100)   # eps_Z
+        if !(a == b + (c - b) + (a - c))
+            star_ok = false
+            break
+        end
+    end
+
     summary = Dict(
         "samples"            => N,
         "n_violations"       => n_violations,
@@ -161,6 +175,7 @@ function main(N::Int=1000; seed::Int=20260531)
         "seed"               => seed,
         "upper_iv_passed"    => all(v.upper_iv_ok   for v in verdicts),
         "lower_iv_passed"    => all(v.lower_iv_ok   for v in verdicts),
+        "star_decomp_passed" => star_ok,
         "max_eps_star"       => maximum(Float64(v.eps_star) for v in verdicts),
         "max_slack_upper"    => maximum(v.H_hi/2 - Float64(v.eps_star) for v in verdicts),
         "max_slack_lower_iv" => maximum(Float64(v.eps_star) - v.H_lo/2  for v in verdicts),
@@ -175,6 +190,7 @@ function main(N::Int=1000; seed::Int=20260531)
     println("  violations:        $n_violations  (target: 0)")
     println("  upper ε≤H/2 (iv):  $(summary["upper_iv_passed"])")
     println("  lower H≤Hbin(ε):   $(summary["lower_iv_passed"])")
+    println("  (★) decomp (Q):    $(summary["star_decomp_passed"])")
     println("  max ε*:            $(round(summary["max_eps_star"], digits=4))")
     println("  max upper slack:   $(round(summary["max_slack_upper"], digits=4))")
     println("  manifest:          verify.json")
