@@ -669,6 +669,86 @@ blow-up of sum-pooled MPNNs (GIN, PNA); for **mean** or
 and is degree-independent, matching the empirical robustness of
 GCN/GAT/GraphSAGE-mean.
 
+**Lemma 6″ (spectral refinement of the sum-aggregator envelope).**
+Adopt the hypotheses of Lemma 6′ with sum aggregation and layer-wise
+Lipschitz constants $(L^{c}_\ell, L^{m}_\ell) \ge 0$. For each
+vertex $v$ and level $\ell$ define the within-WL-cell potential
+$$
+x^{(\ell)}_v \;:=\; \max_{w\,\sim_{\mathrm{WL}_\ell}\,v}\,
+  d\bigl(h^{(\ell)}(v), h^{(\ell)}(w)\bigr),
+\qquad x^{(0)}_v \le \delta_0,
+$$
+and let $A$ be the adjacency matrix of $G$. Then, componentwise,
+$$
+x^{(L)} \;\le\; \delta_0\,
+  \Bigl[\textstyle\prod_{\ell=1}^{L}\bigl(L^{c}_\ell I + L^{m}_\ell A\bigr)\Bigr]\mathbf 1, \tag{6″a}
+$$
+and the mass-weighted within-cell spread
+$\bar\delta_L := \sum_v q_v\, x^{(L)}_v$ obeys
+$$
+\bar\delta_L \;\le\; \delta_0\,
+  \Bigl\|\textstyle\prod_{\ell=1}^{L}\bigl(L^{c}_\ell I + L^{m}_\ell A\bigr)\Bigr\|_{\mathrm{op}}
+  \;=\; \delta_0\,\max_{k}\Bigl|\textstyle\prod_{\ell=1}^{L}\bigl(L^{c}_\ell + L^{m}_\ell\lambda_k\bigr)\Bigr|, \tag{6″b}
+$$
+where $\{\lambda_k\}$ is the spectrum of $A$. For connected
+non-bipartite $G$ (Perron root dominating,
+$\lambda_{\max}(A)\ge|\lambda_{\min}(A)|$),
+$$
+\bar\delta_L \;\le\; \delta_0\,
+  \prod_{\ell=1}^{L}\bigl(L^{c}_\ell + L^{m}_\ell\,\lambda_{\max}(A)\bigr),
+\qquad \bar d \;\le\; \lambda_{\max}(A) \;\le\; \Delta. \tag{6″c}
+$$
+Consequently, for an $L_\tau$-Lipschitz readout thresholded at
+$\tfrac{1}{2}$ *and a cell-margin condition* (per-cell readout
+confidence at least $\gamma>0$ away from the threshold),
+$$
+R_V(\hat f) \;\ge\; \varepsilon^{*}_{\Pi_L} \;-\;
+  \frac{L_\tau\,\bar\delta_L}{\gamma}. \tag{6″d}
+$$
+
+*Proof.* The Lemma 6′ Step 2 recursion, instantiated for sum
+aggregation with the WL-cellmate bijection $\sigma:N(v)\to N(w)$,
+gives
+$d(h^{(\ell+1)}(v),h^{(\ell+1)}(w))\le L^{c}_{\ell+1}\,x^{(\ell)}_v
++ L^{m}_{\ell+1}\sum_{u\in N(v)} x^{(\ell)}_u$,
+since $w\sim_{\mathrm{WL}_\ell} v$ and each
+$\sigma(u)\sim_{\mathrm{WL}_\ell} u$. Maximising over $w$ yields
+$x^{(\ell+1)} \le (L^{c}_{\ell+1}I + L^{m}_{\ell+1}A)\,x^{(\ell)}$
+entrywise; the matrix is entrywise non-negative, so iteration
+preserves the inequality, giving (6″a). All factors are
+polynomials in the symmetric matrix $A$ and hence commute, so the
+product is order-independent and shares the eigenbasis of $A$;
+(6″b) follows from $\|P(A)\|_{\mathrm{op}}=\max_k|P(\lambda_k)|$
+and a Cauchy–Schwarz bound on $q^\top P(A)\mathbf 1$. (6″c) uses
+that $P(\lambda)=\prod_\ell(L^{c}_\ell+L^{m}_\ell\lambda)$ is
+increasing and positive on $[|\lambda_{\min}|,\lambda_{\max}]$,
+together with the Rayleigh bounds
+$\bar d=\mathbf 1^\top A\mathbf 1/n\le\lambda_{\max}(A)$ and
+$\lambda_{\max}(A)\le\Delta$. (6″d): under the cell margin a
+vertex disagrees with the cell-Bayes rule only if
+$L_\tau\,x^{(L)}_v>\gamma$; by Markov the flipped mass is at most
+$L_\tau\,\bar\delta_L/\gamma$. $\square$
+
+Lemma 6″ recovers the Lemma 6′ envelope when $\lambda_{\max}(A)$
+is replaced by its upper bound $\Delta$, and recovers Lemma 6 at
+$\delta_0=0$. The operative constant is the **adjacency Perron
+root**, not the maximum degree: for the near-regular degree
+profiles of real citation graphs $\lambda_{\max}(A)\ll\Delta$, so
+(6″c) is many orders tighter than (6′) on exactly the graphs
+where (6′) was vacuous. The aggregator dichotomy persists in
+sharpened form — sum amplifies by
+$\prod_\ell(L^{c}_\ell+L^{m}_\ell\lambda_{\max}(A))$, mean/sym-norm
+by $\prod_\ell(L^{c}_\ell+L^{m}_\ell)$ — and the residual gap to
+any empirically measured per-layer amplification is the
+vector-cancellation effect (non-aligned neighbour differences)
+that a Lipschitz argument cannot capture. The mass-average
+framing is honest: the sup-diameter $\max_v x^{(L)}_v$ is
+genuinely governed by $\Delta$ via high-degree vertices, so (6″c)
+is *not* a tighter sup bound; only the mass-weighted average
+that the risk lower bound (6″d) needs is improved. The
+cell-margin $\gamma$ is a labelled hypothesis rather than a
+silent one, because it is the substantive content of Step 4.
+
 **Corollary 7 (MPNN expressivity bracket).** Let $\mathcal A$ be
 admissible depth-$L$, $f:V\to\{0,1\}$ a binary vertex task,
 $\Pi_L := \mathrm{WL}_L(G)$. Every decision rule

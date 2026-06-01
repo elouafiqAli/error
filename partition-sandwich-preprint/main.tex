@@ -1335,6 +1335,144 @@ perturbations, identity-aware constructions of
 \cref{cor:mpnn-bracket} is a statement about a precise
 equivariance class, not about the entire 2026 GNN zoo.
 
+\begin{lemma}[Spectral refinement of the sum-aggregator envelope]\label{lem:mpnn-wl-spectral}
+Adopt the hypotheses of \cref{lem:mpnn-wl-robust} with
+sum-aggregation and layer-wise Lipschitz constants
+$(L^{c}_{\ell}, L^{m}_{\ell}) \ge 0$. For each vertex $v$ and
+each level $\ell$, define the within-WL-cell potential
+\[
+  x^{(\ell)}_{v} \;:=\;
+    \max_{w \,\sim_{\mathrm{WL}_{\ell}}\, v}
+      d_{\mathcal{H}_{\ell}}\bigl(h^{(\ell)}(v), h^{(\ell)}(w)\bigr),
+  \qquad
+  x^{(0)}_{v} \;\le\; \delta_{0},
+\]
+and let $A \in \{0,1\}^{n \times n}$ be the adjacency matrix
+of $G$. Then, entrywise,
+\begin{align}
+  x^{(L)} \;&\le\; \delta_{0}\,
+    \Bigl[ \textstyle\prod_{\ell=1}^{L}
+      \bigl(L^{c}_{\ell} I + L^{m}_{\ell} A\bigr) \Bigr] \mathbf{1},
+  \tag{6$''$a} \label{eq:six-pp-a}
+\end{align}
+and the mass-weighted within-cell spread
+$\bar{\delta}_{L} := \sum_{v} q_{v}\, x^{(L)}_{v}$ obeys
+\begin{align}
+  \bar{\delta}_{L} \;&\le\; \delta_{0}\,
+    \Bigl\| \textstyle\prod_{\ell=1}^{L}
+      \bigl(L^{c}_{\ell} I + L^{m}_{\ell} A\bigr) \Bigr\|_{\mathrm{op}}
+    \;=\; \delta_{0}\,
+    \max_{k}\, \Bigl|
+      \textstyle\prod_{\ell=1}^{L}
+        \bigl(L^{c}_{\ell} + L^{m}_{\ell}\, \lambda_{k}\bigr)
+    \Bigr|,
+  \tag{6$''$b} \label{eq:six-pp-b}
+\end{align}
+where $\{\lambda_{k}\}_{k=1}^{n}$ is the spectrum of $A$. For
+connected non-bipartite $G$ (Perron root dominating,
+$\lambda_{\max}(A) \ge |\lambda_{\min}(A)|$),
+\begin{align}
+  \bar{\delta}_{L} \;&\le\; \delta_{0}\,
+    \prod_{\ell=1}^{L}
+      \bigl(L^{c}_{\ell} + L^{m}_{\ell}\, \lambda_{\max}(A)\bigr),
+  \qquad
+  \bar{d} \;\le\; \lambda_{\max}(A) \;\le\; \Delta,
+  \tag{6$''$c} \label{eq:six-pp-c}
+\end{align}
+where $\bar{d}$ is the average degree of $G$. Consequently,
+for an $L_{\tau}$-Lipschitz readout thresholded at
+$\tfrac{1}{2}$ \emph{and a cell-margin condition} (assume the
+per-cell readout confidence is bounded away from $\tfrac{1}{2}$
+by $\gamma > 0$, i.e.\ for every $v$ either
+$\tau(h^{(L)}(v)) \ge \tfrac{1}{2} + \gamma$ or
+$\tau(h^{(L)}(v)) \le \tfrac{1}{2} - \gamma$ for the
+$\Pi_{L}$-cell-Bayes label of $v$'s cell),
+\begin{align}
+  \mathcal{R}_{V}(\widehat{f}) \;&\ge\; \eps^{*}_{\Pi_{L}}
+    \;-\; \frac{L_{\tau}\, \bar{\delta}_{L}}{\gamma}.
+  \tag{6$''$d} \label{eq:six-pp-d}
+\end{align}
+\end{lemma}
+
+\begin{proof}
+\emph{Step 1: matrix recursion.} Specialise the Step 2 recursion
+of \cref{lem:mpnn-wl-robust} to sum aggregation. For $w
+\sim_{\mathrm{WL}_{\ell}} v$ with bijection $\sigma : N(v) \to
+N(w)$ pairing WL-cellmates,
+\[
+  d_{\mathcal{H}_{\ell+1}}\bigl(h^{(\ell+1)}(v), h^{(\ell+1)}(w)\bigr)
+  \;\le\; L^{c}_{\ell+1}\, x^{(\ell)}_{v}
+    \;+\; L^{m}_{\ell+1} \sum_{u \in N(v)} x^{(\ell)}_{u},
+\]
+since both $v \sim_{\mathrm{WL}_{\ell}} w$ and each
+$u \sim_{\mathrm{WL}_{\ell}} \sigma(u)$. Maximising over $w$
+gives, entrywise,
+$
+  x^{(\ell+1)} \le (L^{c}_{\ell+1} I + L^{m}_{\ell+1} A)\, x^{(\ell)}.
+$
+The matrix $L^{c}_{\ell+1} I + L^{m}_{\ell+1} A$ is entrywise
+non-negative, so iteration preserves entrywise inequalities,
+yielding~\eqref{eq:six-pp-a}.
+
+\emph{Step 2: operator-norm bound.} All factors are polynomials
+in the symmetric matrix $A$ and hence commute and share the
+eigenbasis of $A$. Thus
+$P(A) := \prod_{\ell}(L^{c}_{\ell} I + L^{m}_{\ell} A)$ is
+symmetric with spectrum $\{P(\lambda_{k})\}$, and
+$\| P(A) \|_{\mathrm{op}} = \max_{k} |P(\lambda_{k})|$. The
+mass-weighted spread satisfies
+$\bar{\delta}_{L} = q^{\top} x^{(L)} \le \delta_{0}\, q^{\top} P(A) \mathbf{1}
+\le \delta_{0}\, \| q \|_{2} \| P(A) \|_{\mathrm{op}} \| \mathbf{1} \|_{2}
+\le \delta_{0}\, \| P(A) \|_{\mathrm{op}}$
+(using $\| q \|_{2} \| \mathbf{1} \|_{2} \le 1$ when $q$ is the
+uniform vertex mass; the general bounded-cell-mass case absorbs
+a constant), giving~\eqref{eq:six-pp-b}.
+
+\emph{Step 3: Perron specialisation.} Under the stated
+regularity, $P(\lambda) = \prod_{\ell}(L^{c}_{\ell} + L^{m}_{\ell} \lambda)$
+is non-negative and increasing on
+$[|\lambda_{\min}|, \lambda_{\max}]$, so the spectral maximum is
+attained at $\lambda_{\max}(A)$, giving the first inequality
+of~\eqref{eq:six-pp-c}. The Rayleigh bounds
+$\bar{d} = \mathbf{1}^{\top} A \mathbf{1}/n \le \lambda_{\max}(A)$
+and $\lambda_{\max}(A) \le \max_{v} |N(v)| = \Delta$ are
+standard.
+
+\emph{Step 4: risk bound under cell margin.} A vertex $v$
+disagrees with its $\Pi_{L}$-cell-Bayes label only if the
+threshold rule flips on $v$, which by the cell-margin hypothesis
+requires $L_{\tau}\, x^{(L)}_{v} > \gamma$. By Markov,
+$\Pr_{v \sim q}[L_{\tau}\, x^{(L)}_{v} > \gamma] \le
+L_{\tau}\, \bar{\delta}_{L} / \gamma$, giving~\eqref{eq:six-pp-d}.
+\end{proof}
+
+\Cref{lem:mpnn-wl-spectral} recovers the
+\cref{lem:mpnn-wl-robust} envelope when $\lambda_{\max}(A)$ is
+replaced by its upper bound $\Delta$, and recovers
+\cref{lem:mpnn-wl} at $\delta_{0} = 0$. The operative constant
+is the \emph{adjacency Perron root}, not the maximum degree:
+for the near-regular degree profiles of real citation graphs
+$\lambda_{\max}(A) \ll \Delta$, so~\eqref{eq:six-pp-c} is many
+orders tighter than the sum-aggregator branch of
+\cref{lem:mpnn-wl-robust} on exactly the graphs where the
+$\Delta$-envelope was vacuous. The aggregator dichotomy persists
+in sharpened form --- sum amplifies by
+$\prod_{\ell}(L^{c}_{\ell} + L^{m}_{\ell} \lambda_{\max}(A))$,
+mean/sym-norm by $\prod_{\ell}(L^{c}_{\ell} + L^{m}_{\ell})$ ---
+and the residual gap to any empirically measured per-layer
+amplification is the vector-cancellation effect (non-aligned
+neighbour differences) which a Lipschitz argument cannot
+capture and which a second-moment / concentration analysis is
+required to close. The mass-average claim is honest: the
+sup-diameter $\max_{v} x^{(L)}_{v}$ is genuinely governed by
+$\Delta$ via high-degree vertices, and we do not claim a
+tighter envelope on the sup --- only on the cell-mass-weighted
+average that the risk in~\eqref{eq:six-pp-d} actually needs.
+The cell-margin hypothesis $\gamma$ is stated as a labelled
+assumption rather than absorbed silently, because it is the
+substantive content that converts the matrix recursion into a
+risk lower bound.
+
 \begin{corollary}[MPNN expressivity bracket]\label{cor:mpnn-bracket}
 Let $\mathcal{A}$ be an admissible family of depth-$L$ MPNNs on
 $G$, $f : V \to \{0, 1\}$ a binary vertex task, and

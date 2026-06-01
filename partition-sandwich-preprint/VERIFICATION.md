@@ -514,3 +514,29 @@ random (Rhat, eps_WL, eps_Z) triples.
 Closes audit row A3 (HIGH); A4b moves from UNVERIFIED to HIGH
 via P0.4; A4 is restated as a fixed-cell-budget reading
 (MEDIUM, superseded by A4b for the expressivity claim).
+
+### r7 / 2026-06 — Phase 4a: Lemma 6″ spectral refinement (PATCH D theory)
+
+Phase 4a of `future-work/08-p1-patch-plan.md` lands the PATCH D
+theory block. Lemma 6″ (`lem:mpnn-wl-spectral` in `main.tex`,
+mirrored in `main.md`) sharpens the sum-aggregator branch of
+Lemma 6′ by replacing the worst-case degree $\Delta$ by the
+adjacency Perron root $\lambda_{\max}(A) \in [\bar d, \Delta]$.
+Four sub-statements:
+
+  (6″a) entrywise matrix recursion  x^{(L)} <= delta_0 * P(A) * 1
+  (6″b) operator-norm spectral form  ||P(A)||_op = max_k |P(lambda_k)|
+  (6″c) Perron specialisation         <= delta_0 * prod (Lc + Lm * lambda_max)
+  (6″d) risk lower bound under cell-margin gamma
+
+The cell-margin hypothesis gamma is stated as a labelled
+assumption (the silent step that Lemma 6′ Step 4 hand-waved).
+The mass-average framing is honest: the sup-diameter is
+genuinely governed by Delta, so (6″c) is *not* a tighter sup
+bound — only the cell-mass-weighted average that (6″d) needs.
+
+Empirical confirmation (D(L) vs lambda_max(A) envelope vs
+measured spread) is the Phase 4b experiment; not yet run.
+Audit row A5 moves from MEDIUM target HIGH to MEDIUM with
+the theory line committed; A5b (airtight C3) stays LOW
+pending Phase 4b.
