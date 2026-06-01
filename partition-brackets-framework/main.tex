@@ -1,0 +1,412 @@
+% =============================================================
+% Paper B — Partition Brackets: A Framework with Entropy,
+% Variance, and Noise-Robust Instances
+%
+% STATUS: skeleton (Phase 2a scaffold). All numbered statements
+% are placeholders; proofs are marked "skeleton" and will be
+% completed in Phase 2b (theory) and Phase 2c (instances).
+% Do NOT cite or distribute until Gate G2 closes.
+% =============================================================
+\documentclass[10pt]{article}
+\usepackage[preprint]{tmlr}
+
+% ---------- typography ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{xcolor}
+
+% ---------- math ----------
+\usepackage{amsmath,amssymb,amsthm,amsfonts}
+\usepackage{mathtools}
+
+% ---------- lists ----------
+\usepackage[shortlabels]{enumitem}
+
+% ---------- figures & tables ----------
+\usepackage{graphicx}
+\usepackage{booktabs}
+
+% ---------- references ----------
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks,
+  linkcolor={red!50!black},
+  citecolor={blue!60!black},
+  urlcolor={blue!80!black}
+}
+\usepackage[noabbrev,capitalize]{cleveref}
+
+% ----- theorem environments -----
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\crefname{theorem}{Theorem}{Theorems}
+\crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{Lemma}{Lemmas}
+\crefname{corollary}{Corollary}{Corollaries}
+\crefname{remark}{Remark}{Remarks}
+\crefname{definition}{Definition}{Definitions}
+\crefname{example}{Example}{Examples}
+\crefname{conjecture}{Conjecture}{Conjectures}
+\crefname{figure}{Figure}{Figures}
+\crefname{section}{\S}{\S\S}
+
+% ----- macros (shared with Paper A) -----
+\newcommand{\Hbin}{H_{\mathrm{bin}}}
+\newcommand{\Hinv}{H_{\mathrm{bin}}^{-1}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\epsP}{\eps^{\!*}_{\Pi}}
+\newcommand{\epsK}{\eps^{\!*}_{K}}      % soft / Markov-kernel risk
+% versions that take a loss superscript (avoids double-superscript)
+\newcommand{\epsPL}[1]{\eps^{*,#1}_{\Pi}}
+\newcommand{\epsKL}[1]{\eps^{*,#1}_{K}}
+\let\Pr\relax
+\DeclareMathOperator{\Pr}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\KL}{D_{\mathrm{KL}}}
+\newcommand{\TV}{\lVert\cdot\rVert_{\mathrm{TV}}}
+\newcommand{\bphi}{\bar{\varphi}}        % concave score functional
+\newcommand{\paperA}{Paper~A}
+
+% status macro for skeleton claims
+\newcommand{\status}[1]{\par\noindent\emph{Status:} #1}
+
+\title{Partition Brackets: A Framework with\\
+       Entropy, Variance, and Noise-Robust Instances}
+
+\author{\name Anonymous \email anonymous@anonymous \\
+        \addr Anonymous Institution}
+
+\begin{document}
+\defcitealias{paperA}{Paper~A}
+\maketitle
+
+\begin{abstract}
+The companion paper \citep{paperA} proves an elementary two-sided
+closed-form bracket between the partition-restricted Bayes risk
+$\epsP$ of a binary label $f$ under a partition $\Pi$ and its
+partition-conditional Shannon entropy $H(f\mid\Pi)$. The present
+paper argues that this bracket is one instance of a single
+\emph{recipe}: pick any concave \emph{score functional} $\bphi$ of
+a label distribution, take its partition-conditional expectation,
+and read off a two-sided bracket on the corresponding partition-
+restricted Bayes loss. We formalise the recipe as a $\bphi$-bracket
+\emph{meta-theorem}, instantiate it on three concrete score
+functionals (Shannon entropy, conditional variance, Pinsker /
+KL), and prove robustness extensions in three directions:
+(i) symmetric label noise via population correction, (ii) soft /
+Markov-kernel partitions where cell assignment is itself a
+distribution, and (iii) refinement chains where one partition
+refines another. The framework recovers \citetalias{paperA}'s
+binary-entropy result as the Shannon instance, recovers the
+classical Bayes--variance identity as the variance instance, and
+yields a new MAE / regression instance via Cauchy--Schwarz. We
+illustrate the framework on a quantised neural-network
+``partition-as-bottleneck'' demonstration and on a label-noise
+stress test, both of which rely on \emph{zero new training}
+beyond \citetalias{paperA}'s released model artefacts.
+\end{abstract}
+
+% ============================================================
+\section{Introduction}\label{sec:intro}
+% ============================================================
+
+\paragraph{Companion paper.} This paper is a direct sequel to
+\citet{paperA}. We assume the reader is familiar with the
+partition framework introduced there: a partition
+$\Pi=\{S_1,\dots,S_m\}$ of the input space $\mathcal{X}$, the
+\emph{partition-restricted Bayes risk}
+$\epsP := \min_{g\in G(\Pi)} \E[\mathbf{1}\{g(X)\ne f(X)\}]$
+where $G(\Pi)$ is the class of predictors constant on every
+cell, and the partition-conditional entropy
+$H(f\mid\Pi)=\sum_i p_i\,\Hbin(\eta_i)$ with cell mass
+$p_i=\Pr(\Pi(X)=S_i)$ and cell-conditional positive rate
+$\eta_i=\Pr(f(X)=1\mid \Pi(X)=S_i)$.
+
+\paragraph{Thesis.} \citetalias{paperA}'s two-sided bracket
+\[
+  \Hinv\!\bigl(H(f\mid\Pi)\bigr)
+  \;\le\; \epsP
+  \;\le\; \tfrac12\,H(f\mid\Pi)
+\]
+is not an isolated coincidence of binary entropy. We claim it is
+the Shannon instance of a one-line recipe that holds for every
+concave score functional $\bphi$ with $\bphi(0)=\bphi(1)=0$ and a
+matching pointwise loss $\ell_{\bphi}$. The recipe gives a
+two-sided bracket on $\epsPL{\ell_{\bphi}}$, the
+partition-restricted Bayes loss for $\ell_{\bphi}$, expressed
+through the partition-conditional functional
+$\bphi(f\mid\Pi):=\sum_i p_i\,\bphi(\eta_i)$.
+
+\paragraph{Contributions.}
+\begin{itemize}[leftmargin=*,nosep]
+  \item A $\bphi$-bracket \emph{meta-theorem}
+    (\cref{thm:phi-bracket}) generalising \citetalias{paperA}'s
+    main theorem.
+  \item Three named instances of the meta-theorem
+    (\cref{sec:instances}): Shannon entropy (recovers
+    \citetalias{paperA}), conditional variance (Bayes--variance
+    identity), and the Pinsker / KL instance.
+  \item A regression instance for MSE (identity) and MAE
+    (Cauchy--Schwarz upper bound), \cref{thm:regression}.
+  \item Population-exact correction for symmetric label noise,
+    \cref{thm:noise}, extending \citetalias{paperA}'s
+    \texttt{Proposition~7} to arbitrary $\bphi$.
+  \item Soft / Markov-kernel partitions, \cref{thm:soft}, with
+    explicit definition of $\epsK$ and bracket re-derivation.
+  \item Aggregator-typed Lipschitz constants for MPNN
+    Weisfeiler--Leman robustness (sum / mean / sym-norm),
+    \cref{lem:mpnn-typed}, in the $\bphi$-bracket form.
+  \item Two experiments using \citetalias{paperA}'s released
+    artefacts: E8 (variance vs.\ entropy bracket across all Paper
+    A partitions) and E9 (label-noise stress test, validates
+    \cref{thm:noise}). Both reuse model checkpoints; zero new
+    training.
+\end{itemize}
+
+\paragraph{Relation to \citetalias{paperA}.}
+\citetalias{paperA}'s purpose is to ship one elementary,
+training-free, closed-form diagnostic for ML practitioners. The
+present paper's purpose is to expose the structural reason
+\citetalias{paperA} works and to advertise the recipe. The two
+papers therefore have intentionally disjoint audiences and
+disjoint emphases: \citetalias{paperA} is a TMLR /
+\emph{methods} paper; the present paper is a COLT / TMLR-long
+\emph{theory} paper. We pay an explicit citation tax to
+\citetalias{paperA} for the binary-entropy bracket; we do not
+re-prove it.
+
+% ============================================================
+\section{The \texorpdfstring{$\bphi$}{phi}-bracket
+  meta-theorem}\label{sec:meta}
+% ============================================================
+
+\begin{definition}[Concave score functional]\label{def:score}
+A function $\bphi:[0,1]\to[0,\infty)$ is a \emph{concave score
+functional} if it is concave, continuous, and satisfies
+$\bphi(0)=\bphi(1)=0$. Its \emph{matched pointwise loss}
+$\ell_{\bphi}:\{0,1\}\times[0,1]\to[0,\infty)$ is the unique
+pointwise Bayes-consistent loss whose Bayes-optimal predictor on
+a Bernoulli$(\eta)$ label has expected loss $\bphi(\eta)$; for
+the three named cases this is:
+\begin{itemize}[leftmargin=*,nosep]
+  \item $\bphi=\Hbin$, $\ell_{\bphi}(y,\hat p)=-y\log\hat p
+        -(1-y)\log(1-\hat p)$ (log-loss).
+  \item $\bphi(\eta)=\eta(1-\eta)$,
+        $\ell_{\bphi}(y,\hat p)=(y-\hat p)^2$ (squared loss).
+  \item $\bphi(\eta)=\min(\eta,1-\eta)$, $\ell_{\bphi}=$
+        $0$--$1$ loss (the recipe collapses to
+        \citetalias{paperA}'s setting upon binarising).
+\end{itemize}
+\end{definition}
+
+\begin{theorem}[$\bphi$-bracket meta-theorem]\label{thm:phi-bracket}
+Let $\Pi$ be a partition of $\mathcal{X}$, let $f:\mathcal{X}\to
+\{0,1\}$ be measurable, and let $\bphi$ be a concave score
+functional (\cref{def:score}) with matched loss $\ell_{\bphi}$.
+Let
+$\bphi(f\mid\Pi):=\sum_i p_i\,\bphi(\eta_i)$
+denote the partition-conditional functional, and let
+$\epsPL{\ell_{\bphi}}:=\min_{g\in G(\Pi)}\E\,\ell_{\bphi}(f(X),g(X))$
+denote the partition-restricted Bayes loss for $\ell_{\bphi}$.
+Then
+\[
+  \underbrace{\bphi^{-1}\!\bigl(\bphi(f\mid\Pi)\bigr)}_{\text{Jensen lower}}
+  \;\le\;
+  \epsPL{\ell_{\bphi}}
+  \;\le\;
+  \underbrace{c_{\bphi}\,\bphi(f\mid\Pi)}_{\text{linear upper}},
+\]
+where $\bphi^{-1}$ is the restriction of $\bphi$ to
+$[0,\tfrac12]$ inverted, and the upper constant
+$c_{\bphi}:=\sup_{\eta\in[0,1]}
+\ell_{\bphi}^{*}(\eta)/\bphi(\eta)$ is finite for all three
+named instances. The Shannon instance recovers
+\citetalias{paperA}'s bracket with
+$c_{\Hbin}=\tfrac12$.
+\status{Skeleton. Full proof in Phase~2b; explicit hypothesis
+list and Jensen-sharp lower bound construction pending.}
+\end{theorem}
+
+% ============================================================
+\section{Three named instances}\label{sec:instances}
+% ============================================================
+
+\begin{corollary}[Shannon instance: \citetalias{paperA}]
+\label{cor:shannon}
+With $\bphi=\Hbin$ and $\ell_{\bphi}=$ log-loss, \cref{thm:phi-bracket}
+specialises to
+$\Hinv(H(f\mid\Pi))\le \epsP\le \tfrac12 H(f\mid\Pi)$
+(under the $0$--$1$ collapse of log-loss to its Bayes
+classifier). The upper constant $c_{\Hbin}=\tfrac12$ is sharp;
+see \citetalias{paperA}.
+\status{Reduction proof in Phase~2b.}
+\end{corollary}
+
+\begin{corollary}[Variance / squared-loss instance]
+\label{cor:variance}
+With $\bphi(\eta)=\eta(1-\eta)$ and $\ell_{\bphi}=$ squared
+loss, \cref{thm:phi-bracket} recovers the classical
+Bayes--variance identity:
+\[
+  \epsPL{\mathrm{MSE}} \;=\; \E[\,\Var(f\mid\Pi(X))\,]
+  \;=\; \bphi(f\mid\Pi),
+\]
+so the bracket collapses to equality on both sides.
+\status{Identity well known; serves as the meta-theorem's
+sanity check.}
+\end{corollary}
+
+\begin{corollary}[Pinsker / KL instance]\label{cor:pinsker}
+With $\bphi(\eta)=\KL(\eta\,\|\,\tfrac12)$ and log-loss,
+\cref{thm:phi-bracket} yields a non-trivial bracket sharper
+than Shannon when cell purities concentrate near
+$0$ or $1$; the upper constant is
+$c_{\KL}\le 1/(2\ln 2)$ via Pinsker's inequality.
+\status{Hypothesis-checking pending Phase~2b.}
+\end{corollary}
+
+\begin{theorem}[Regression instance]\label{thm:regression}
+Let $f:\mathcal{X}\to\mathbb{R}$ be square-integrable. With
+$\bphi(\eta)=\Var(f\mid\eta)$ (cell-conditional variance), the
+meta-theorem yields:
+\begin{itemize}[leftmargin=*,nosep]
+  \item \emph{MSE identity:} $\epsPL{\mathrm{MSE}}=\E[\Var(f\mid\Pi(X))]$.
+  \item \emph{MAE upper bound via Cauchy--Schwarz:}
+        $\epsPL{\mathrm{MAE}}\le \sqrt{\,\E[\Var(f\mid\Pi(X))]\,}$.
+\end{itemize}
+\status{MSE identity is folklore. MAE direction reformulated
+from \citetalias{paperA}'s T7 audit; matching lower bound
+(Hotelling 1932 path) is an open problem flagged in Phase~2.2.}
+\end{theorem}
+
+% ============================================================
+\section{Robustness: noise, soft partitions, refinement}
+\label{sec:robust}
+% ============================================================
+
+\begin{theorem}[Symmetric label-noise correction]\label{thm:noise}
+Let $\tilde f$ be the label $f$ corrupted by symmetric
+flip-noise of rate $\eta_{\mathrm{noise}}<\tfrac12$. Then for
+every concave score functional $\bphi$ admitting a noise-corrected
+analogue $\bphi_{\eta_{\mathrm{noise}}}$,
+\[
+  \bphi^{-1}\!\bigl(\bphi_{\eta_{\mathrm{noise}}}(\tilde f\mid\Pi)\bigr)
+  \;\le\;
+  \epsPL{\ell_{\bphi}}(f)
+  \;\le\;
+  c_{\bphi}\,\bphi_{\eta_{\mathrm{noise}}}(\tilde f\mid\Pi).
+\]
+The Shannon instance recovers \citetalias{paperA}'s
+population-exact correction. The variance instance gives the
+classical noise-corrected Bayes--variance identity.
+\status{Skeleton; full proof in Phase~2b. Sharpness witness
+TBD.}
+\end{theorem}
+
+\begin{definition}[Markov-kernel partition]\label{def:markov}
+A \emph{Markov-kernel partition} is a stochastic kernel
+$K:\mathcal{X}\to\Delta(\{1,\dots,m\})$ whose cell-assignment
+is itself a probability distribution over $m$ soft cells. The
+\emph{soft partition-restricted Bayes loss} $\epsKL{\ell_{\bphi}}$
+is the loss of the best predictor that is a function of $K(X)$
+only.
+\end{definition}
+
+\begin{theorem}[Soft / Markov-kernel bracket]\label{thm:soft}
+Under \cref{def:markov}, the $\bphi$-bracket
+\cref{thm:phi-bracket} holds with $\Pi$ replaced by $K$ and the
+cell-conditional functional
+$\bphi(f\mid K):=\E_{X}\,\bphi(\Pr(f=1\mid K(X)))$. The hard
+partition is the deterministic-kernel special case.
+\status{Skeleton; full proof in Phase~2b. Instantiation on
+attention soft-routing in Phase~2c.}
+\end{theorem}
+
+\begin{proposition}[Refinement consistency, $\bphi$-version]
+\label{prop:refine-phi}
+If $\Pi'$ refines $\Pi$, then $\bphi(f\mid\Pi')\le\bphi(f\mid\Pi)$
+and consequently both sides of the $\bphi$-bracket are
+monotone in refinement. The discrete limit
+($\Pi'=\{\{x\}:x\in\mathcal{X}\}$) pinches the bracket to the
+true Bayes loss whenever $\bphi$ is non-degenerate.
+\status{Mirrors \citetalias{paperA}'s Proposition~4.5;
+specialise its proof to general $\bphi$ in Phase~2b.}
+\end{proposition}
+
+% ============================================================
+\section{Aggregator-typed MPNN Lipschitz, $\bphi$-form}
+\label{sec:mpnn}
+% ============================================================
+
+\begin{lemma}[Aggregator-typed Lipschitz, $\bphi$-version]
+\label{lem:mpnn-typed}
+Let an MPNN of depth $L$ have per-layer combine-Lipschitz $L_\ell^c$
+and message-Lipschitz $L_\ell^m$. With aggregator-dependent
+amplification factor $r_T\in\{\Delta,1,1\}$ for
+sum / mean / sym-norm respectively, the $\bphi$-bracket
+\cref{thm:phi-bracket} for the WL-induced partition $\Pi_{\mathrm{WL}}^L$
+holds with $\bphi$-slack at most
+$\delta_L=\delta_0\,\prod_{\ell=1}^L(L_\ell^c+r_T L_\ell^m)$.
+\status{Direct $\bphi$-lift of \citetalias{paperA}'s
+Lemma~6$'$; proof to be transcribed in Phase~2b.}
+\end{lemma}
+
+% ============================================================
+\section{Experiments}\label{sec:exp}
+% ============================================================
+
+We describe two experiments that reuse \citetalias{paperA}'s
+released artefacts and require \emph{zero} new training.
+\begin{itemize}[leftmargin=*,nosep]
+  \item \textbf{E8.} For every partition in \citetalias{paperA}'s
+    Experiments E1--E6, compute the variance bracket and overlay
+    against the entropy bracket. Validates
+    \cref{cor:variance,thm:regression}. Expected output:
+    \texttt{experiments/results/e8.json}.
+  \item \textbf{E9.} Label-noise stress test on UCI Adult with
+    $\eta_{\mathrm{noise}}\in\{0.05,0.10,0.20\}$. Compute both
+    naive bracket on $\tilde f$ and the noise-corrected
+    bracket per \cref{thm:noise}. Expected output:
+    \texttt{experiments/results/e9.json}.
+\end{itemize}
+\status{Experiments deferred to Phase~3 of the master plan.
+Skeletons live under \texttt{experiments/} with TODO headers.}
+
+% ============================================================
+\section{Discussion}\label{sec:disc}
+% ============================================================
+
+The $\bphi$-bracket meta-theorem clarifies that
+\citetalias{paperA}'s elementary bracket is one face of a
+larger object: every concave score functional with matching
+loss gives a two-sided bracket on the partition-restricted
+Bayes loss. The variance instance recovers the classical
+Bayes--variance identity at equality; the Pinsker instance
+sharpens it near boundary purities; the Shannon instance ships
+to ML practitioners. Robustness extensions to label noise and
+soft partitions show that the bracket is not an artefact of
+deterministic, clean-label assumptions.
+
+Open problems: (i) matching MAE lower bound for the regression
+instance (\cref{thm:regression}); (ii) bracket consistency
+under partition perturbation (Rand / VI stability, T5 in
+\citetalias{paperA}'s audit); (iii) extending the meta-theorem
+to multiclass with general concave score functionals on the
+probability simplex.
+
+% ============================================================
+\bibliographystyle{tmlr}
+\bibliography{main}
+
+\end{document}
