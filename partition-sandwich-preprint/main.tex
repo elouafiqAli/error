@@ -1660,9 +1660,18 @@ and, except for E1's CART fits and E2's logistic-regression
 comparators, no training of any kind.
 
 \paragraph{E1 --- Decision-tree refinement funnel (UCI Adult,
-$n=45{,}222$).} Materialises \cref{prop:refine} (refinement
-monotonicity) and the (E1) practitioner claim. For depth
-$d \in \{1, \ldots, 15\}$ we report the bracket
+$n=45{,}222$).} CART leaves vote per-cell majority, so a fitted
+CART \emph{is} the plug-in achiever of \cref{thm:sandwich} on
+$\Pi_{d}$: the four-decimal agreement between CART training
+error and $\eps^{*}_{\Pi_{d}}$ reported below is an
+\emph{identity}, not an empirical finding. E1 is therefore a
+consistency check --- it confirms the implementation and shows
+the bracket is an \emph{a-priori} statement about a classifier
+that is only later trained --- and the substantive content is the
+monotone tightening of the bracket with depth
+(\cref{prop:refine}) and that the realised width stays below
+$w^{*}$ (\cref{cor:slack}) at every depth.
+For depth $d \in \{1, \ldots, 15\}$ we report the bracket
 $[\Hinv(H(f\mid\Pi_d)),\, \tfrac{1}{2}H(f\mid\Pi_d)]$ together
 with the realised CART training error. \emph{Status: completed.}
 
@@ -1710,24 +1719,25 @@ endpoint to four decimals.}
 \label{fig:e1}
 \end{figure}
 
-\paragraph{E2 --- VQ zero-shot proxy (UCI Adult).} Tests the
-(E2) practitioner claim on $k$-means partitions with
-$k \in \{2, 4, 8, 16, 32, 64, 128, 256, 512, 1000\}$. For each
-$k$ we compute the bracket and \emph{also} train a downstream
-logistic regression on one-hot cell membership; if the bracket
-is a real proxy for trained behaviour rather than a vacuous
-upper bound, the trained error should match $\eps^{*}_{\Pi_k}$
-to within numerical noise. The match is exact for $k \le 256$
-(both numbers agree to all digits printed by
+\paragraph{E2 --- VQ zero-shot proxy (UCI Adult).} Logistic
+regression on one-hot cell membership, at convergence,
+reproduces the per-cell majority vote, so the exact match between
+trained LR error and $\eps^{*}_{\Pi_{k}}$ for $k \le 256$ is
+again \emph{definitional} rather than evidential; the two
+largest budgets differ only by LBFGS sub-optimality on a
+$1{,}000$-dimensional design. E2 confirms that the bracket
+endpoints are realised by a genuine (if trivial) trained
+classifier and that nothing in the optimisation escapes the
+sandwich. We sweep $k \in \{2, 4, 8, 16, 32, 64, 128, 256, 512,
+1000\}$ and report the bracket and the trained LR error per cell
+budget. The match is exact for $k \le 256$ (both numbers agree to
+all digits printed by
 \texttt{sklearn.metrics.zero\_one\_loss}) and falls within one
 LBFGS sub-optimality unit ($\Delta \le 10^{-3}$) for the two
 largest budgets, where the LR solver runs against a
 $1{,}000$-dimensional one-hot design. \emph{Status: completed;
-rebuts the ``training-free is misleading'' critique by exhibiting
-a real classifier (LR-on-cells) whose trained error is bracketed
-from below by $\Hinv(H(f \mid \Pi_k))$ and matched from above by
-$\tfrac{1}{2} H(f \mid \Pi_k)$. As in E1 the bracket is the
-empirical $\eps^{*}_{\Pi_{k}}$; its population reading via
+identity check. As in E1 the bracket is the empirical
+$\eps^{*}_{\Pi_{k}}$; its population reading via
 \cref{prop:pop} is the object exercised at varying $n$ in E7.}
 
 \begin{table}[h]\centering\small

@@ -883,10 +883,18 @@ comparators, no training of any kind.
 
 #### E1 — Decision-tree refinement funnel (UCI Adult, $n=45{,}222$)
 
-Materialises Proposition 4 (refinement monotonicity) and the
-(E1) practitioner claim. For depth $d\in\{1,\dots,15\}$ we report
-the bracket together with the realised CART training error.
-*Status: completed.*
+CART leaves vote per-cell majority, so a fitted CART **is** the
+plug-in achiever of Theorem 1 on $\Pi_d$: the four-decimal
+agreement between CART training error and $\varepsilon^*_{\Pi_d}$
+reported below is an *identity*, not an empirical finding. E1 is
+therefore a consistency check — it confirms the implementation
+and shows the bracket is an *a-priori* statement about a
+classifier that is only later trained — and the substantive
+content is the monotone tightening of the bracket with depth
+(Proposition 4) and that the realised width stays below $w^*$
+(Corollary 2) at every depth. For depth $d\in\{1,\dots,15\}$ we
+report the bracket together with the realised CART training
+error. *Status: completed.*
 
 | $d$ | $m$ | $H(f\mid\Pi_d)$ | lower | $\varepsilon^*_{\Pi_d}$ | upper | CART train err |
 |---|---|---|---|---|---|---|
@@ -896,14 +904,12 @@ the bracket together with the realised CART training error.
 | 15 | 1 347 | 0.3284 | 0.0603 | 0.1082 | 0.1642 | 0.1082 |
 
 CART's training error matches $\varepsilon^*_{\Pi_d}$ to four
-decimal places at every depth: CART leaves vote majority, so the
-fitted CART **literally implements** the plug-in achiever of
-Theorem 1, and the bracket is therefore an *a-priori* statement
-about a classifier that is later trained. Bracket width drops
-from 0.159 at $d=1$ to 0.104 at $d=15$, staying everywhere below
-the universal $w^*$ of Corollary 2; $\varepsilon^*$ shrinks
-monotonically as required by Proposition 4. Full table
-$d = 1, \dots, 15$ in `experiments/results/e1.json`.
+decimal places at every depth, by the identity above. Bracket
+width drops from 0.159 at $d=1$ to 0.104 at $d=15$, staying
+everywhere below the universal $w^*$ of Corollary 2;
+$\varepsilon^*$ shrinks monotonically as required by
+Proposition 4. Full table $d = 1, \dots, 15$ in
+`experiments/results/e1.json`.
 
 Figure: `experiments/figures/e1_refinement_funnel.pdf`.
 
@@ -917,21 +923,20 @@ the lower endpoint to four decimals.
 
 #### E2 — VQ zero-shot proxy (UCI Adult)
 
-Tests the (E2) practitioner claim on $k$-means partitions with
-$k\in\{2,4,8,16,32,64,128,256,512,1000\}$. For each $k$ we
-compute the bracket and *also* train a downstream logistic
-regression on one-hot cell membership; if the bracket is a real
-proxy for trained behaviour rather than a vacuous upper bound,
-the trained error should match $\varepsilon^*_{\Pi_k}$ to within
-numerical noise. The match is exact for $k \le 256$ (both numbers
-agree to all digits) and within one LBFGS sub-optimality unit
-($\Delta \le 10^{-3}$) for the two largest budgets, where the LR
-solver runs against a 1 000-dimensional one-hot design.
-*Status: completed; rebuts the "training-free is misleading"
-critique by exhibiting a real classifier (LR-on-cells) whose
-trained error is bracketed from below by
-$H_{\rm bin}^{-1}(H(f\mid\Pi_k))$ and matched from above by
-$\tfrac{1}{2} H(f\mid\Pi_k)$.*
+Logistic regression on one-hot cell membership, at convergence,
+reproduces the per-cell majority vote, so the exact match between
+trained LR error and $\varepsilon^*_{\Pi_k}$ for $k \le 256$ is
+again *definitional* rather than evidential; the two largest
+budgets differ only by LBFGS sub-optimality on a 1 000-dimensional
+design. E2 confirms that the bracket endpoints are realised by a
+genuine (if trivial) trained classifier and that nothing in the
+optimisation escapes the sandwich. We sweep
+$k\in\{2,4,8,16,32,64,128,256,512,1000\}$ and report the bracket
+and the trained LR error per cell budget. The match is exact for
+$k \le 256$ (both numbers agree to all digits) and within one
+LBFGS sub-optimality unit ($\Delta \le 10^{-3}$) for the two
+largest budgets, where the LR solver runs against a 1 000-dimensional
+one-hot design. *Status: completed; identity check.*
 
 | $k$ | $H(f\mid\Pi_k)$ | lower | $\varepsilon^*_{\Pi_k}$ | LR err | $|\mathrm{LR}-\varepsilon^*|$ |
 |---|---|---|---|---|---|
