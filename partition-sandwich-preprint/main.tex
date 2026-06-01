@@ -1054,26 +1054,81 @@ bracket on the architectures GNN practitioners actually
 deploy in 2026 we replace \cref{lem:mpnn-wl} by an
 $\varepsilon$-robust quantitative version. Equip the hidden
 space $\mathcal{H}_{\ell}$ with a metric
-$d_{\mathcal{H}_{\ell}}$, and call an MPNN family
-\emph{$\delta_{0}$-quasi-admissible} if its layer maps
-$\phi_{\ell}$ are $L_{\ell}$-Lipschitz under
-$d_{\mathcal{H}_{\ell-1}} \to d_{\mathcal{H}_{\ell}}$
-(jointly in the central argument and in the Wasserstein-$1$
-lift of the neighbour multiset, with a fixed permutation-
-invariant aggregator) and the initial feature map satisfies
-$d_{\mathcal{H}_{0}}(h^{(0)}(v), h^{(0)}(w)) \le \delta_{0}$
-whenever $v, w$ share a cell of the \emph{ideal}
-(constant-feature) $1$-WL partition.
+$d_{\mathcal{H}_{\ell}}$. Following the standard decomposition,
+write the layer map as
+\[
+  \phi_{\ell+1}(x, \mu)
+  \;=\; \psi_{\ell+1}\!\bigl(x,\; A_{\ell+1}(\mu)\bigr),
+\]
+where $A_{\ell+1}$ is a permutation-invariant
+\emph{aggregator} acting on the neighbour multiset $\mu$ and
+$\psi_{\ell+1}$ is the post-aggregation combine map.
+
+\begin{definition}[$\delta_{0}$-quasi-admissible family]\label{def:quasi-admissible}
+A family $\mathcal{A}$ of depth-$L$ MPNNs with layer maps
+$\phi_{\ell} = \psi_{\ell} \circ (\mathrm{id}, A_{\ell})$ is
+\emph{$\delta_{0}$-quasi-admissible with constants
+$(L_{\ell}^{c}, L_{\ell}^{m})_{\ell=1}^{L}$ relative to
+aggregator type $\mathsf{T} \in \{\mathrm{sum}, \mathrm{mean},
+\mathrm{sym\text{-}norm}\}$} if:
+\begin{enumerate}[(i)]
+  \item $d_{\mathcal{H}_{0}}(h^{(0)}(v), h^{(0)}(w)) \le \delta_{0}$
+    whenever $v, w$ share a cell of the ideal (constant-feature)
+    $1$-WL partition;
+  \item the combine map $\psi_{\ell}$ is jointly Lipschitz: for
+    all $x, x' \in \mathcal{H}_{\ell-1}$ and $a, a' \in \mathcal{A}_{\ell}$
+    (the aggregator output space),
+    \(
+      d_{\mathcal{H}_{\ell}}(\psi_{\ell}(x, a), \psi_{\ell}(x', a'))
+      \le L_{\ell}^{c}\, d_{\mathcal{H}_{\ell-1}}(x, x')
+        + L_{\ell}^{m}\, d_{\mathcal{A}_{\ell}}(a, a');
+    \)
+  \item $A_{\ell}$ is $1$-Lipschitz with respect to the
+    aggregator-specific transport cost:
+    \begin{itemize}
+      \item $\mathsf{T} = \mathrm{sum}$: unnormalised $W_{1}$,
+        i.e.\ $W_{1}^{\mathrm{u}}(\mu, \nu) =
+          \min_{\sigma} \sum_{i} d_{\mathcal{H}_{\ell-1}}
+            (x_{i}, y_{\sigma(i)})$ on equal-cardinality
+        multisets;
+      \item $\mathsf{T} = \mathrm{mean}$: normalised $W_{1}$,
+        $W_{1}^{\mathrm{n}}(\mu, \nu) = \tfrac{1}{|\mu|}
+          W_{1}^{\mathrm{u}}(\mu, \nu)$;
+      \item $\mathsf{T} = \mathrm{sym\text{-}norm}$: any
+        $1$-Lipschitz symmetric function of normalised $W_{1}$
+        (e.g.\ max-pool, sorted-norm pooling).
+    \end{itemize}
+\end{enumerate}
+\end{definition}
+
+The split into central-argument constant $L_{\ell}^{c}$ and
+multiset-aggregator constant $L_{\ell}^{m}$ is the standard
+decomposition of MPNN expressivity into ``self'' and ``message''
+channels \citep{xu2019gin, corso2020pna}. The aggregator-type
+distinction (iii) is essential: it isolates exactly where the
+maximum degree $\Delta$ does or does not enter the depth-$L$
+slack.
 
 \begin{lemma}[$\varepsilon$-robust MPNN--WL constancy]\label{lem:mpnn-wl-robust}
 Let $\mathcal{A}$ be a $\delta_{0}$-quasi-admissible family of
-depth-$L$ MPNNs with maximum degree $\Delta := \max_{v} |N(v)|$.
-For every member of $\mathcal{A}$ and every $v, w \in V$
-sharing a cell of the ideal $\mathrm{WL}_{L}(G)$,
+depth-$L$ MPNNs with maximum degree $\Delta := \max_{v} |N(v)|$,
+aggregator type $\mathsf{T}$, and constants
+$(L_{\ell}^{c}, L_{\ell}^{m})_{\ell=1}^{L}$ as in
+\cref{def:quasi-admissible}. For every member of $\mathcal{A}$
+and every $v, w \in V$ sharing a cell of the ideal
+$\mathrm{WL}_{L}(G)$,
 \[
   d_{\mathcal{H}_{L}}(h^{(L)}(v), h^{(L)}(w))
   \;\le\;
-  \delta_{L} \;:=\; \delta_{0}\, \prod_{\ell=1}^{L} L_{\ell}\,(1 + \Delta).
+  \delta_{L} \;:=\; \delta_{0}\, \prod_{\ell=1}^{L}
+    \bigl(L_{\ell}^{c} + r_{\mathsf{T}}\, L_{\ell}^{m}\bigr),
+  \qquad
+  r_{\mathsf{T}} \;=\;
+  \begin{cases}
+    \Delta & \mathsf{T} = \mathrm{sum},\\
+    1 & \mathsf{T} = \mathrm{mean},\\
+    1 & \mathsf{T} = \mathrm{sym\text{-}norm}.
+  \end{cases}
 \]
 For any $L_{\tau}$-Lipschitz readout
 $\tau : \mathcal{H}_{L} \to [0, 1]$ composed with
@@ -1087,16 +1142,83 @@ on $V$ satisfies
 \end{lemma}
 
 \begin{proof}
-The distance bound is a one-line induction on $\ell$ using the
-joint Lipschitz hypothesis on $\phi_{\ell}$ and the
-Wasserstein-$1$ bound on the multiset of neighbour states
-(triangle inequality across $|N(v)| \le \Delta$ terms gives the
-$(1 + \Delta)$ factor). The risk bound then follows because
-$\tau$ collapses $\mathcal{H}_{L}$-balls of radius $\delta_{L}$
-to $[0,1]$-intervals of length $\le L_{\tau} \delta_{L}$, and a
-threshold rule on such an interval can flip at most
-$L_{\tau} \delta_{L}$ mass per cell relative to the partition-
-constant optimum.
+\emph{Step 1: induction setup.} For $\ell \ge 0$, define
+\[
+  \delta_{\ell}
+  \;:=\; \sup\bigl\{ d_{\mathcal{H}_{\ell}}(h^{(\ell)}(v), h^{(\ell)}(w))
+    : v, w \text{ share a cell of } \mathrm{WL}_{\ell}^{*}(G) \bigr\},
+\]
+where $\mathrm{WL}_{\ell}^{*}(G)$ is the ideal (constant-feature)
+$\ell$-WL partition. The base case $\delta_{0}$ is the
+hypothesis~(i) of \cref{def:quasi-admissible}. Note that
+$\mathrm{WL}_{L}(G) = \mathrm{WL}_{L}^{*}(G)$ since the ideal
+partition refines the depth-$L$ orbit partition; if vertices
+share a cell of the ideal $\mathrm{WL}_{L}$ they share one of
+the deployed $\mathrm{WL}_{L}$ a fortiori.
+
+\emph{Step 2: per-layer recursion.} Fix $v, w$ sharing a cell
+of $\mathrm{WL}_{\ell+1}^{*}(G)$. By the ideal-WL construction,
+they share a cell of $\mathrm{WL}_{\ell}^{*}(G)$ (so
+$d_{\mathcal{H}_{\ell}}(h^{(\ell)}(v), h^{(\ell)}(w)) \le \delta_{\ell}$),
+and there is a bijection $\sigma : N(v) \to N(w)$ with the
+property that each pair $(u, \sigma(u))$ lies in the same cell
+of $\mathrm{WL}_{\ell}^{*}(G)$. By induction,
+\(
+  d_{\mathcal{H}_{\ell}}(h^{(\ell)}(u), h^{(\ell)}(\sigma(u))) \le \delta_{\ell}
+\)
+for every $u \in N(v)$.
+
+Let $\mu_{v}, \mu_{w}$ denote the multisets of neighbour states
+at level $\ell$. The bijection $\sigma$ certifies that
+\[
+  W_{1}^{\mathrm{u}}(\mu_{v}, \mu_{w})
+  \;\le\; \sum_{u \in N(v)}
+    d_{\mathcal{H}_{\ell}}(h^{(\ell)}(u), h^{(\ell)}(\sigma(u)))
+  \;\le\; |N(v)|\, \delta_{\ell}
+  \;\le\; \Delta\, \delta_{\ell}.
+\]
+Hence the aggregator output satisfies
+\[
+  d_{\mathcal{A}_{\ell+1}}(A_{\ell+1}(\mu_{v}), A_{\ell+1}(\mu_{w}))
+  \;\le\;
+  \begin{cases}
+    W_{1}^{\mathrm{u}}(\mu_{v}, \mu_{w}) \le \Delta\, \delta_{\ell}
+      & \mathsf{T} = \mathrm{sum},\\
+    W_{1}^{\mathrm{n}}(\mu_{v}, \mu_{w}) \le \delta_{\ell}
+      & \mathsf{T} = \mathrm{mean},\\
+    \text{(1-Lip sym function of $W_{1}^{\mathrm{n}}$)} \le \delta_{\ell}
+      & \mathsf{T} = \mathrm{sym\text{-}norm}.
+  \end{cases}
+\]
+The mean and sym-norm bounds use the fact that
+$|N(v)| = |N(w)|$ on every WL cell, so the normalised
+transport cost is exactly $W_{1}^{\mathrm{u}} / |N(v)|$ and the
+per-neighbour pairing certifies the bound is at most
+$\delta_{\ell}$ regardless of $\Delta$.
+
+Combining with hypothesis~(ii) of \cref{def:quasi-admissible},
+\[
+  d_{\mathcal{H}_{\ell+1}}(h^{(\ell+1)}(v), h^{(\ell+1)}(w))
+  \;\le\; L_{\ell+1}^{c}\, \delta_{\ell}
+    + L_{\ell+1}^{m}\, r_{\mathsf{T}}\, \delta_{\ell}
+  \;=\; \bigl(L_{\ell+1}^{c} + r_{\mathsf{T}}\, L_{\ell+1}^{m}\bigr) \delta_{\ell}.
+\]
+Taking the supremum over such $(v, w)$ gives the recursion
+$\delta_{\ell+1} \le (L_{\ell+1}^{c} + r_{\mathsf{T}} L_{\ell+1}^{m}) \delta_{\ell}$,
+and unrolling yields the stated product formula.
+
+\emph{Step 3: risk bound.} Let
+$\widehat{f}^{*} = \mathbf{1}[\tau \circ h^{(L)} \ge \tfrac{1}{2}]$
+and let $\widetilde{f}$ be the $\Pi_{L}$-constant Bayes
+predictor with empirical risk $\eps^{*}_{\Pi_{L}}$. On any cell
+$C$ of $\Pi_{L}$, $\tau \circ h^{(L)}$ ranges over an interval
+of length $\le L_{\tau} \delta_{L}$, so the threshold rule
+$\widehat{f}$ disagrees with the cell-constant rule
+$\widetilde{f}$ on at most a fraction
+$L_{\tau} \delta_{L}$ of $C$ (the mass within an
+$L_{\tau} \delta_{L}$-band of $\tfrac{1}{2}$). Summing over
+cells, $\mathcal{R}_{V}(\widehat{f}) \ge \mathcal{R}_{V}(\widetilde{f})
+- L_{\tau} \delta_{L} = \eps^{*}_{\Pi_{L}} - L_{\tau} \delta_{L}$.
 \end{proof}
 
 \Cref{lem:mpnn-wl} is recovered as the $\delta_{0} = 0$,
@@ -1104,8 +1226,20 @@ $L_{\tau} = \infty$ corner; \cref{lem:mpnn-wl-robust} extends
 the bracket to families that perturb the initial features by a
 controlled amount (positional encodings of bounded magnitude,
 Lipschitz attention, DropEdge with bounded influence) at the
-cost of a slack term $L_{\tau} \delta_{L}$ that grows
-exponentially in $L$. The interpretation is intentionally
+cost of a slack term $L_{\tau} \delta_{L}$. The aggregator-type
+dependence of $\delta_{L}$ is itself informative: for the
+\emph{sum} aggregator, $\delta_{L} = \delta_{0}
+\prod_{\ell}(L_{\ell}^{c} + \Delta\, L_{\ell}^{m})$ can grow as
+$\Theta((1 + \Delta)^{L})$ when the central and message
+constants are comparable, recovering the well-known
+degree-driven blow-up of sum-pooled MPNNs; for the
+\emph{mean} or \emph{sym-norm} aggregators the factor reduces
+to $\prod_{\ell}(L_{\ell}^{c} + L_{\ell}^{m})$ and is
+degree-independent. This matches the empirical observation
+that mean-aggregator MPNNs (GCN, GAT, GraphSAGE-mean) are
+generically more robust to maximum-degree perturbations than
+sum-aggregator MPNNs (GIN, PNA), at the cost of weaker
+multiset distinguishability \citep{xu2019gin,corso2020pna}. The interpretation is intentionally
 conservative: the bracket continues to bound the empirical
 risk of every $\delta_{0}$-quasi-admissible family with a
 \emph{quantitatively certified} additive slack, and
