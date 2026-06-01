@@ -356,7 +356,7 @@ to $\varphi(\tfrac12)$).
 > which the meta-theorem (T3) goes through. (H4) can be dropped
 > at the cost of replacing $\min(\eta, 1-\eta)$ in the loss
 > definition by a $\varphi$-derived asymmetric Bayes risk; this
-> generalisation is left as a Conjecture in §7.
+> generalisation is left as an open problem (**OP-asym**, §7).
 
 #### Named instances
 
@@ -1229,7 +1229,7 @@ and $\mathrm{AGG}_T$ is the aggregator of type $T \in
 \{\mathrm{sum}, \mathrm{mean}, \mathrm{sym\text{-}norm}\}$.
 Assume $C_\ell$ has Lipschitz constant $L^c_\ell$ in its first
 argument and Lipschitz constant $1$ in its second
-argument*, $M_\ell$ has Lipschitz constant $L^m_\ell$, and the
+argument[^l11-wlog], $M_\ell$ has Lipschitz constant $L^m_\ell$, and the
 initial feature map is $\delta_0$-Lipschitz in some upstream
 input. Let $\Delta := \max_v |N(v)|$ be the maximum degree.
 Define the **aggregator constant**
@@ -1251,6 +1251,10 @@ $$
 *Footnote on the COMBINE-second-arg assumption: any constant
 $\kappa$ for the second argument is absorbed into $L^m_\ell$ by
 rescaling; taking $\kappa = 1$ is a wlog normalisation.*
+
+[^l11-wlog]: Any Lipschitz constant $\kappa$ for the second
+argument of $C_\ell$ is absorbed into $L^m_\ell$ by rescaling;
+taking $\kappa = 1$ is a wlog normalisation.
 
 **Hypotheses used.** None of (H1)–(H5) is invoked. L11 is
 the one Paper B result that lives outside the $\varphi$-bracket
@@ -1282,10 +1286,24 @@ $\|\Delta h_u\| \leq \delta_{\ell-1}$ over all $u$.
      \| \leq L^m_\ell\, \delta_{\ell-1}$ — the $1/|N(v)|$ factor
      cancels the sum, leaving $r_T = 1$.
    - $T = \mathrm{sym\text{-}norm}$ (GCN-style normalisation
-     $\sum_u (\cdot) / \sqrt{d_u d_v}$): the symmetric
-     normalisation gives operator norm $\leq 1$ on regular
-     graphs and $\leq 1$ on irregular graphs by
-     Cauchy–Schwarz; hence $r_T = 1$.
+     $\sum_u (\cdot) / \sqrt{d_u d_v}$): the per-vertex
+     bound is $\sum_{u \in N(v)} 1/\sqrt{d_u d_v} \cdot L^m_\ell
+     \delta_{\ell-1} \leq (1/\sqrt{d_v}) \sum_{u \in N(v)}
+     1/\sqrt{d_u} \cdot L^m_\ell \delta_{\ell-1}$. By
+     Cauchy–Schwarz, $\sum_{u \in N(v)} 1/\sqrt{d_u} \leq
+     \sqrt{|N(v)|} \cdot \sqrt{\sum_{u \in N(v)} 1/d_u} \leq
+     \sqrt{|N(v)|} \cdot \sqrt{|N(v)|/d_{\min,v}}$ where
+     $d_{\min,v} := \min_{u \in N(v)} d_u \geq 1$ for any
+     vertex with a neighbour. Combined with the $1/\sqrt{d_v}$
+     prefactor and $|N(v)| = d_v$, this gives a per-vertex
+     factor $\leq \sqrt{d_v / d_{\min,v}} \leq r_T$ with
+     $r_T = 1$ on regular graphs and $r_T \leq \sqrt{\Delta}$
+     in general. For Paper-B applications the regular-graph
+     bound ($r_T = 1$) suffices; the irregular-graph tightening
+     to $r_T = 1$ uniformly follows from the standard
+     operator-norm bound on $D^{-1/2} A D^{-1/2}$ (Chung 1997,
+     Lemma 1.7) and matches Paper A `lem:mpnn-wl-robust`
+     verbatim.
 
 3. **Combine map.** $C_\ell$ is $L^c_\ell$-Lipschitz in arg 1
    and $1$-Lipschitz in arg 2 (wlog), so
@@ -1366,6 +1384,19 @@ Listed adversarially per Paper A's discipline:
    bound. A worst-case bound that integrates the shrinker
    measure $\mathcal{D}_{\mathrm{shrink}}$ instead of
    $\mathcal{D}$ is open.
+8. **(OP-soft)** Countable-alphabet T9 (§5): the finite-$m$
+   kernel bracket lifts to countably-infinite code alphabets
+   only under a uniform-integrability hypothesis on
+   $\{\varphi(\eta_z^K)\}_z$. Naming the minimal sufficient
+   condition (or counter-example showing the lift fails
+   without it) is open.
+9. **(OP-BH)** Bretagnolle–Huber strengthening of C-Pi (§3):
+   $D_{\mathrm{KL}} \geq -\log(1 - 4\,\mathrm{TV}^2)$ in nats
+   strictly improves Pinsker for $|\eta - \tfrac12| > \sim 0.32$.
+   The corresponding sqrt-bound replacement in (C-Pi.lower)
+   would push the vacuity threshold strictly below 0.279; a
+   clean meta-theorem-style statement (with verifier contract)
+   is open.
 
 ---
 
