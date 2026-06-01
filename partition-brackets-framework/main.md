@@ -175,21 +175,34 @@ is $\rho_{\mathcal{M}} = 1$ (no silent mutants).
 Let $\mathcal{C} = (\mathcal{D}, n, \tau, P, \sigma)$ be a
 property contract and let $V := \{x \in \mathcal{I} :
 P(x) = 0\}$ be the *violation set* (the points on which
-the claim, modulo slack $\tau$, fails). Suppose the
-deterministic seed policy $\sigma$ realises $n$ *exchangeable*
-draws from $\mathcal{D}$ (in the Hypothesis-derandomized
-setting this is the formal status of the pseudo-random
-stream). Then under the *measure-$\mu$ violation hypothesis*
+the claim, modulo slack $\tau$, fails). Model the seeded
+pseudo-random stream as $n$ **IID** draws $x_1, \dots, x_n$
+from $\mathcal{D}$ (the standard cryptographic idealisation:
+under a uniformly random master seed, the derandomized
+Hypothesis stream is computationally indistinguishable from
+IID for any polynomial-time pass predicate $P$; we record
+this modelling assumption as **A-PRNG** in §7). Then under
+the *measure-$\mu$ violation hypothesis*
 $\mathbb{P}_{x \sim \mathcal{D}}[x \in V] \geq \mu$,
 $$
 \mathbb{P}\bigl[\text{contract passes}\bigr]
 \;=\; \mathbb{P}\!\Bigl[\bigwedge_{t=1}^{n} P(x_t) = 1\Bigr]
 \;\leq\; (1 - \mu)^{n}.
 $$
-*Proof.* Independence/exchangeability of the draws gives
+*Proof.* By IID,
 $\mathbb{P}[\bigwedge_t P(x_t) = 1] =
 \prod_t \mathbb{P}[x_t \notin V] = (1 - \mathbb{P}_{\mathcal{D}}
-[V])^n \leq (1 - \mu)^n$. $\square$
+[V])^n \leq (1 - \mu)^n$, the last step from $\mathbb{P}_{\mathcal{D}}[V] \geq \mu$. $\square$
+
+> *Adversarial note on Hypothesis shrinking.* Hypothesis biases
+> the search towards edge cases via shrinking and example
+> databases, which is *not* literally IID under $\mathcal{D}$.
+> The bound above is conservative in the typical case where
+> edge-coverage *strengthens* discovery (a biased sampler with
+> heavier mass on $V$ catches counterexamples faster than IID).
+> A pathological $V$ that is systematically *under-represented*
+> by the shrinker would break the bound; we record this
+> caveat as **A-SHRINK** in §7.
 
 *Numerical instantiation.* For Paper B's B-T1 default
 $n = 200$ and a hypothetical violation manifold of measure
@@ -209,35 +222,67 @@ B-T1 at any $n$. This is the structural limit of random-
 search testing and the reason Lean / Mathlib certification
 (Phase 3) is on the roadmap.
 
-### Proposition 0.4 (B-T2 Monte-Carlo concentration)
+### Proposition 0.4 (B-T2 Monte-Carlo concentration, McDiarmid form)
 
-Let $\theta(x) \in [0, 1]$ be a bounded statistic of an
-input $x \sim \mathcal{D}$, let $\hat\theta_N := N^{-1}
-\sum_{t=1}^{N} \theta(X_t)$ be its empirical mean over $N$
-IID draws, and let $\theta^{*} := \mathbb{E}_{\mathcal{D}}
-[\theta(X)]$ be the population truth. For Paper B's B-T2
-contracts the tolerance is set to
-$\tau = 4 \cdot h$ with the Hoeffding 95%-halfwidth
+Let $T : \mathcal{I}^N \to [a, b]$ be a real-valued
+statistic of $N$ IID draws $X_1, \dots, X_N \sim
+\mathcal{D}$, and assume $T$ has the **bounded-differences**
+property with per-coordinate constants $c_i \leq (b-a)/N$:
+for every $i$ and every $x_1, \dots, x_N, x_i'$,
 $$
-h \;:=\; \sqrt{\tfrac{\ln(2/\alpha)}{2N}}, \qquad
+|T(x_1, \dots, x_i, \dots, x_N) - T(x_1, \dots, x_i', \dots, x_N)|
+\;\leq\; c_i.
+$$
+Write $T^{*} := \mathbb{E}\,T$ for the population truth. The
+class covers (i) sample means of $[0,1]$-valued statistics
+(with $c_i = 1/N$, $b - a = 1$), (ii) plug-in estimators
+like $\hat\varepsilon^{*}_{\Pi} = \sum_i \hat p_i
+\min(\hat\eta_i, 1 - \hat\eta_i)$ which are $1/N$-Lipschitz
+in each coordinate by a single-swap argument, and (iii) the
+$[-1, 1]$-valued T7 noise-correction statistic with
+$c_i = 2/N$. For Paper B's B-T2 contracts the tolerance is
+$\tau = 4 \cdot h$ with the Hoeffding/McDiarmid 95%-halfwidth
+$$
+h \;:=\; (b - a)\,\sqrt{\tfrac{\ln(2/\alpha)}{2N}}, \qquad
 \alpha = 0.05.
 $$
-Then by Hoeffding's inequality,
+Then by McDiarmid's bounded-differences inequality
+(McDiarmid 1989; Hoeffding 1963 in the sample-mean case),
 $$
-\mathbb{P}\bigl[|\hat\theta_N - \theta^{*}| > 4h\bigr]
-\;\leq\; 2 \exp\!\bigl(- 2 N (4h)^2\bigr)
-\;=\; 2 \exp\!\bigl(- 16 \ln(2/\alpha)\bigr)
-\;=\; 2 (\alpha/2)^{16}.
+\mathbb{P}\bigl[|T - T^{*}| > 4h\bigr]
+\;\leq\; 2 \exp\!\Bigl(- \tfrac{2 (4h)^2}{\sum_i c_i^2}\Bigr)
+\;\leq\; 2 \exp\!\bigl(- 16 \ln(2/\alpha)\bigr)
+\;=\; 2 (\alpha/2)^{16},
 $$
+where the second inequality uses $\sum_i c_i^2 \leq (b-a)^2/N$.
 For $\alpha = 0.05$ this is $\leq 2 \cdot (0.025)^{16}
-\approx 4.6 \times 10^{-26}$ per contract evaluation.
+\approx 4.6 \times 10^{-26}$ per contract evaluation,
+*independent of the range $[a, b]$* once $h$ absorbs $(b-a)$.
 
-*Numerical instantiation.* For $N = 50{,}000$ (B-T2
-default), $h \approx 6.07 \times 10^{-3}$ and $\tau =
-4h \approx 0.0243$. With $T = 500$ independent trials
-per contract (B-T2 default `--trials`), the per-contract
-expected number of false rejections is $\leq T \cdot
-2 (\alpha/2)^{16} \approx 2.3 \times 10^{-23}$.
+> *Why McDiarmid, not Hoeffding alone.* The B-T2 verifiers in
+> `verify_b_t2_mc.py` compare *plug-in estimators*
+> $\hat\varepsilon^{*}_{\Pi} = \sum_i \hat p_i \min(\hat\eta_i,
+> 1 - \hat\eta_i)$, not raw sample means. McDiarmid's inequality
+> applies to any $1/N$-bounded-difference statistic, which
+> covers all Paper-B estimators. Hoeffding is the special case
+> $T = N^{-1} \sum_t \theta(X_t)$ with $\theta \in [0, 1]$.
+
+*Numerical instantiation.* All Paper-B B-T2 estimators are
+$[0,1]$-bounded ($b - a = 1$); the verifier helper
+`_hoeffding_halfwidth(n, alpha=0.05)` in `verify_b_t2_mc.py`
+returns $h = \sqrt{\ln(2/\alpha)/(2N)}$ accordingly. At
+$N = 50{,}000$ (B-T2 default), $h \approx 6.07 \times 10^{-3}$
+and $\tau = 4h \approx 0.0243$. With $R = 500$ independent
+trial repetitions per contract (B-T2 default `--trials`), the
+per-contract expected number of false rejections is $\leq
+R \cdot 2 (\alpha/2)^{16} \approx 2.3 \times 10^{-23}$. The
+T7 noise-correction estimator, although a *residual* of two
+$[0,1]$-bounded plug-ins, combines $\leq 4$ such plug-ins
+inside the identity ($\hat\varepsilon^*_\Pi(f)$,
+$\hat\varepsilon^*_\Pi(\tilde f)$, and two cell means); the
+$4\times$ inflation of $h$ is precisely the union-bound budget
+for those four McDiarmid coordinates (`verify_b_t2_mc.py`
+in-line comment, ll. 304–306).
 
 *Adversarial caveat.* Proposition 0.4 controls *false
 rejections* (Type I): a true population identity being
@@ -252,29 +297,37 @@ gap requires either (a) larger $N$ to shrink $h$, or
 
 Every per-claim *Verifier contract* block downstream in this
 paper is now interpreted as carrying the 5-tuple of
-Definition 0.1. Where the prose says, e.g., *"$\geq 200$
+Definition 0.1, *indexed by* the choice of score functional
+$\varphi$ (so T3 instances yield a family
+$\{\mathcal{C}_{\mathrm{T3-lower}}^{(\varphi)}\}_{\varphi}$,
+one contract per $\varphi \in \{H_{\mathrm{bin}},
+\eta(1-\eta), 2\eta(1-\eta)\}$ — the $\varphi$-loop lives
+*outside* the Hypothesis `@given` envelope in the reference
+implementation). Where the prose says, e.g., *"$\geq 200$
 random partitions, masses Dirichlet(1), rates Uniform[0,1],
 tolerance $10^{-9}$, seed 0 with derandomize=True"*, the
-4-tuple is
+5-tuple for the Shannon row is
 
 $$
-\mathcal{C}_{\mathrm{T3-lower}}
+\mathcal{C}_{\mathrm{T3-lower}}^{(H_{\mathrm{bin}})}
 \;=\;
 \bigl(
    \mathcal{D}_{\Pi}^{(2,16)},\;
    n = 200,\;
    \tau = 10^{-9},\;
-   P_{\mathrm{T3-lower}},\;
+   P_{\mathrm{T3-lower}}^{(H_{\mathrm{bin}})},\;
    \sigma = (\text{seed}=0,\, \mathrm{derandomize})
 \bigr),
 $$
 
 with the sampler $\mathcal{D}_{\Pi}^{(2,16)}$ as in
 Definition 0.1, and the pass predicate
-$P_{\mathrm{T3-lower}}(\Pi, \eta, \varphi) := \mathbf{1}\bigl[
+$P_{\mathrm{T3-lower}}^{(\varphi)}(\Pi, \eta) := \mathbf{1}\bigl[
 \varepsilon^{*}_{\Pi} \geq \varphi^{-1}(\varphi(f \mid \Pi))
-- \tau \bigr]$. Falsification guarantees follow from
-Propositions 0.3 / 0.4 with no further bookkeeping.
+- \tau \bigr]$ ($\varphi$ fixed per contract; $f$ enters
+implicitly via the rate vector $\eta$). Falsification
+guarantees follow from Propositions 0.3 / 0.4 with no
+further bookkeeping.
 
 ---
 
@@ -1252,6 +1305,22 @@ Listed adversarially per Paper A's discipline:
    `verify_b_t1.py` + `verify_b_t2_mc.py` would upgrade the
    discovery-rate claim from "3/3 caught" to a quantitative
    line-coverage statement.
+6. **(A-PRNG)** Modelling assumption underlying Proposition 0.3:
+   the derandomized Hypothesis stream is treated as IID from
+   $\mathcal{D}$ under a uniformly random master seed. A formal
+   reduction to a standard PRG hardness assumption (e.g.\
+   PRG-secure against polynomial-time distinguishers $P$) is
+   open; in practice the seed sweep $\sigma \in \{0, \dots, 14\}$
+   in `audit/stress.py` empirically amortises against any single
+   seed pathology.
+7. **(A-SHRINK)** Hypothesis biases the search via shrinking
+   towards edge cases. Proposition 0.3 is conservative in the
+   typical case (edge-bias *strengthens* counterexample
+   discovery) but a pathological violation set systematically
+   *avoided* by the shrinker would break the $(1 - \mu)^n$
+   bound. A worst-case bound that integrates the shrinker
+   measure $\mathcal{D}_{\mathrm{shrink}}$ instead of
+   $\mathcal{D}$ is open.
 
 ---
 
