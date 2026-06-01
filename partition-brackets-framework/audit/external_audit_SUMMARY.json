@@ -1,0 +1,42 @@
+{
+  "sha": "7666a76",
+  "date_utc": "2026-06-01T14:09:03Z",
+  "tiers": {
+    "T0": {
+      "rc": 0,
+      "wall_s": 0
+    },
+    "T1": {
+      "rc": 0,
+      "wall_s": 2
+    },
+    "T2": {
+      "rc": 0,
+      "wall_s": 21
+    },
+    "T3": {
+      "rc": 0,
+      "wall_s": 1165
+    },
+    "T4": {
+      "rc": 0,
+      "wall_s": 10
+    },
+    "T5": {
+      "rc": 0,
+      "wall_s": 14
+    }
+  },
+  "all_pass": true,
+  "notes": {
+    "T3": "run separately (audit/external_audit/T3_stress.json); 15 seeds x 14 contracts, 0 failures; 3/3 mutations caught (T7_wrong_sign, T3_wrong_c_phi, CVa_wrong_identity); 13/13 boundary checks pass.",
+    "T4_rows": 20,
+    "T4_datasets": [
+      "cora",
+      "citeseer",
+      "pubmed",
+      "twitch_en",
+      "ogbn_arxiv"
+    ]
+  }
+}
