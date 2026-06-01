@@ -443,3 +443,44 @@ P0.3 + P0.4 of `future-work/08-p1-patch-plan.md` land jointly:
    Closes audit row A15 in C2's strong form on Cora and
    CiteSeer (PubMed and ogbn-arxiv `k<<n` sweep remain open
    under P1).
+
+### r5 / 2026-06 — P0.2 (Prop 6 verifier) + P0.5 (E3 pop/emp callback)
+
+P0.2 + P0.5 of `future-work/08-p1-patch-plan.md` land jointly:
+
+1. **P0.2 (Prop 6 verifier).** Proposition 6 (`prop:marginal`)
+   was already stated and proved closed-form
+   (`eq:marginal-slack`) before Phase 0, but no automated check
+   tied the formula to the E2b column or to the tab:marginal
+   grid. New verifier `verify_prop6_marginal.py` cross-checks
+   three independent levels:
+   - L1: `tab:marginal` grid (8 rows) reproduced from
+     `eq:marginal-slack` to 4 decimals.
+   - L2: every `w_marg` entry of
+     `experiments/results/e2b.json` (UCI Adult, breast cancer,
+     wine, digits-bin) reproduced from `eq:marginal-slack` to
+     4 decimals.
+   - L3: closed form matches a dense brute-force argmax of
+     `phi(H) := min(H/2, pi*) - H_bin_inv(H)` to `<= 1e-4` on a
+     13-point `pi*`-grid that brackets the threshold
+     `(1/2) H_bin(1/5) ~ 0.3610` from both sides; threshold
+     continuity (`pi* = threshold` evaluates to `W_STAR`)
+     also PASS.
+
+   All four checks PASS. Report at
+   `verify_prop6_marginal.json`. Citation added to the
+   Prop 6 prose in `main.tex` and in the E2b section of
+   `main.md`. Closes audit row A13.
+
+2. **P0.5 (E3 population/empirical callback).** Caption of
+   `tab:e3` in `main.tex` and the corresponding markdown table
+   in `main.md` now spell out that all endpoints are the
+   empirical `eps*_{Pi_L, mu_hat_n}` on the labelled training
+   set, that the population reading
+   `eps*_{Pi_L, mu} = sum_C mu(C) min(P_bar_C, 1 - P_bar_C)`
+   of `rem:emp-pop` differs by `O(1/sqrt n)` through Prop 7,
+   and that this is what makes the ogbn-arxiv pinch
+   unsurprising. Closes audit row A16 (which was MEDIUM after
+   r4 pending exactly this E3 callback).
+
+After r5, all five P0 audit rows (A12 - A16) are HIGH / closed.

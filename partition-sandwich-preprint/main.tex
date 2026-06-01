@@ -660,7 +660,18 @@ $w^{*} \approx 0.1610$ at $\pi_{*} = 1/2$ and shrinks it
 substantially for unbalanced tasks; \cref{tab:marginal} reports
 the closed form on a grid. A symbolic verification of
 \eqref{eq:marginal-slack} and the table is included in the
-extended T3 script (\cref{sec:apps:verify}).
+extended T3 script (\cref{sec:apps:verify}). The closed form is
+additionally cross-validated by the standalone P0.2 verifier
+\path{verify_prop6_marginal.py}, which checks three independent
+levels: (L1) \cref{tab:marginal} reproduced to 4 decimals from
+\eqref{eq:marginal-slack}; (L2) the \path{w_marg} column of
+E2b (\path{experiments/results/e2b.json}) reproduced to 4
+decimals on all four datasets; (L3) the closed form matches a
+dense brute-force argmax of $\phi(H) := \min(H/2, \pi_{*}) -
+\Hinv(H)$ to $\le 10^{-4}$ on a 13-point $\pi_{*}$-grid that
+brackets the threshold $\tfrac{1}{2}\Hbin(1/5) \approx 0.3610$
+from both sides; report at
+\path{verify_prop6_marginal.json} (overall PASS, audit row A13).
 
 \begin{table}[h]
 \centering
@@ -1584,7 +1595,14 @@ and PubMed the partition is still genuinely coarse and the
 bracket is a non-tautological certificate. Full funnels
 $L = 0, \ldots, L_{\max}$ in
 \texttt{experiments/results/e3.json}; per-dataset funnel
-figures in \texttt{experiments/figures/e3\_*\_funnel.pdf}.}
+figures in \texttt{experiments/figures/e3\_*\_funnel.pdf}.
+All endpoints in this table are the empirical
+$\eps^{*}_{\Pi_{L},\hat\mu_{n}}$ on the labelled training set;
+the corresponding population reading
+$\eps^{*}_{\Pi_{L},\mu}$ differs from each row by $O(1/\sqrt n)$
+through \cref{prop:pop}, with the marginal-weighted form
+$\eps^{*}_{\Pi_{L},\mu} = \sum_{C \in \Pi_{L}}
+\mu(C)\min(\bar P_{C}, 1-\bar P_{C})$ of \cref{rem:emp-pop}.}
 \label{tab:e3}
 \end{table}
 

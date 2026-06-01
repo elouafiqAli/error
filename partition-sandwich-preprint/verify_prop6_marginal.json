@@ -1,0 +1,206 @@
+{
+  "name": "verify_prop6_marginal",
+  "W_STAR": 0.16096404744368115,
+  "THRESHOLD": 0.36096404744368116,
+  "threshold_continuity": {
+    "boundary_value": 0.16096405,
+    "W_STAR": 0.16096405,
+    "diff": 0.0,
+    "pass": true
+  },
+  "L1_tab_marginal": {
+    "pass": true,
+    "rows": [
+      {
+        "pi_star": 0.05,
+        "tab_marginal_value": 0.037,
+        "closed_form": 0.037013,
+        "abs_diff": 1.3e-05,
+        "pass_4decimals": true
+      },
+      {
+        "pi_star": 0.1,
+        "tab_marginal_value": 0.0689,
+        "closed_form": 0.068876,
+        "abs_diff": 2.4e-05,
+        "pass_4decimals": true
+      },
+      {
+        "pi_star": 0.15,
+        "tab_marginal_value": 0.0968,
+        "closed_form": 0.096761,
+        "abs_diff": 3.9e-05,
+        "pass_4decimals": true
+      },
+      {
+        "pi_star": 0.2,
+        "tab_marginal_value": 0.1206,
+        "closed_form": 0.120617,
+        "abs_diff": 1.7e-05,
+        "pass_4decimals": true
+      },
+      {
+        "pi_star": 0.25,
+        "tab_marginal_value": 0.14,
+        "closed_form": 0.139972,
+        "abs_diff": 2.8e-05,
+        "pass_4decimals": true
+      },
+      {
+        "pi_star": 0.3,
+        "tab_marginal_value": 0.1539,
+        "closed_form": 0.153898,
+        "abs_diff": 2e-06,
+        "pass_4decimals": true
+      },
+      {
+        "pi_star": 0.35,
+        "tab_marginal_value": 0.1607,
+        "closed_form": 0.160702,
+        "abs_diff": 2e-06,
+        "pass_4decimals": true
+      },
+      {
+        "pi_star": 0.5,
+        "tab_marginal_value": 0.161,
+        "closed_form": 0.160964,
+        "abs_diff": 3.6e-05,
+        "pass_4decimals": true
+      }
+    ]
+  },
+  "L2_e2b_w_marg": {
+    "pass": true,
+    "rows": [
+      {
+        "dataset": "adult",
+        "pi_star": 0.2478439697492371,
+        "e2b_w_marg": 0.1392409076735183,
+        "closed_form": 0.139241,
+        "abs_diff": 0.0,
+        "pass_4decimals": true
+      },
+      {
+        "dataset": "breast_cancer",
+        "pi_star": 0.37258347978910367,
+        "e2b_w_marg": 0.16096404744368115,
+        "closed_form": 0.160964,
+        "abs_diff": 0.0,
+        "pass_4decimals": true
+      },
+      {
+        "dataset": "wine",
+        "pi_star": 0.33146067415730335,
+        "e2b_w_marg": 0.15916858359262837,
+        "closed_form": 0.159169,
+        "abs_diff": 0.0,
+        "pass_4decimals": true
+      },
+      {
+        "dataset": "digits_bin",
+        "pi_star": 0.4986087924318308,
+        "e2b_w_marg": 0.16096404744368115,
+        "closed_form": 0.160964,
+        "abs_diff": 0.0,
+        "pass_4decimals": true
+      }
+    ]
+  },
+  "L3_brute_argmax": {
+    "pass": true,
+    "rows": [
+      {
+        "pi_star": 0.05,
+        "closed_form": 0.037013,
+        "brute_force_argmax": 0.037013,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.1,
+        "closed_form": 0.068876,
+        "brute_force_argmax": 0.068876,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.15,
+        "closed_form": 0.096761,
+        "brute_force_argmax": 0.096761,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.2,
+        "closed_form": 0.120617,
+        "brute_force_argmax": 0.120617,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.248,
+        "closed_form": 0.139294,
+        "brute_force_argmax": 0.139294,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.25,
+        "closed_form": 0.139972,
+        "brute_force_argmax": 0.139972,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.3,
+        "closed_form": 0.153898,
+        "brute_force_argmax": 0.153898,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.331,
+        "closed_form": 0.159114,
+        "brute_force_argmax": 0.159114,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.35,
+        "closed_form": 0.160702,
+        "brute_force_argmax": 0.160702,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.361,
+        "closed_form": 0.160964,
+        "brute_force_argmax": 0.160964,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.373,
+        "closed_form": 0.160964,
+        "brute_force_argmax": 0.160964,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.499,
+        "closed_form": 0.160964,
+        "brute_force_argmax": 0.160964,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      },
+      {
+        "pi_star": 0.5,
+        "closed_form": 0.160964,
+        "brute_force_argmax": 0.160964,
+        "abs_diff": 0.0,
+        "pass_1em4": true
+      }
+    ]
+  },
+  "overall_pass": true
+}

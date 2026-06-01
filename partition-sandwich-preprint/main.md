@@ -801,6 +801,17 @@ slack is always strictly inside both ceilings — the worst-case
 constant $w^*$ is rarely the operative bound for any particular
 partition.
 
+The Prop 6 closed form $w^*(\pi_*) = w^*$ for $\pi_* \ge
+\tfrac{1}{2} H_{\mathrm{bin}}(1/5) \approx 0.3610$ and $w^*(\pi_*)
+= \pi_* - H_{\mathrm{bin}}^{-1}(2\pi_*)$ otherwise is
+independently cross-validated by `verify_prop6_marginal.py` at
+three levels: (L1) the analytic table grid to 4 decimals, (L2)
+every `w_marg` entry of `experiments/results/e2b.json` to 4
+decimals, and (L3) a dense brute-force argmax of $\phi(H) :=
+\min(H/2, \pi_*) - H_{\mathrm{bin}}^{-1}(H)$ on a 13-point
+$\pi_*$-grid bracketing the threshold from both sides. Report at
+`verify_prop6_marginal.json` (overall PASS, audit row A13).
+
 #### E3 — MPNN / WL bracket on real graphs
 
 **The architectural picture.** Xu et al.\ (GIN, 2019) prove that
@@ -849,6 +860,16 @@ ogbn-arxiv (169 343 vertices, ≈ 1.16 M undirected edges) takes
 | CiteSeer   | 3 327    | 3 |   2 044  | 0.614 | 0.0400 | 0.0775 | 0.1212 |
 | PubMed     | 19 717   | 3 |  12 990  | 0.659 | 0.0205 | 0.0511 | 0.0722 |
 | ogbn-arxiv | 169 343  | 3 | 161 943  | **0.956** | 0.0005 | 0.0021 | 0.0029 |
+
+All endpoints in this table are the *empirical*
+$\varepsilon^*_{\Pi_L,\hat\mu_n}$ on the labelled training set;
+the population reading $\varepsilon^*_{\Pi_L,\mu} = \sum_{C \in
+\Pi_L} \mu(C)\min(\bar P_C, 1-\bar P_C)$ of the *empirical vs
+population* remark differs from each row by $O(1/\sqrt n)$
+through Proposition 7. This is what makes the ogbn-arxiv pinch
+unsurprising: at $m_3/|V| = 0.956$ the empirical reading is
+exactly per-vertex memorisation, and the population reading is
+shifted by the same $O(1/\sqrt n)$ slack.
 
 The $m_L/|V|$ column is the *singleton-cell fraction* and is the
 essential interpretive lens: rows where it is $\gtrsim 0.85$ are

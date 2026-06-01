@@ -138,10 +138,10 @@ concurrently with P0.1–P0.5.
 | A10 | ogbn-arxiv bracket tightness is due to Prop 4.5 cardinality collapse, NOT $w^{*}=0$     | HIGH (r2: $0.0008$ realised slack refutes $w^{*}=0$) | HIGH | Phase 0 attribution fix                |
 | A11 | At fixed $k$, $\hat R$ retains architecture dependence (PubMed; falsifies pure-regime reading) | HIGH (r2: PubMed at $k{=}4096$) | HIGH       | 5/5 sweep, already observed                          |
 | A12 | Prop 7 explicit $O(1/\sqrt n)$ constant matches E7 $p_{95}$ within stated slack         | HIGH (P0.1 closed: $\kappa$-free bound covers $p_{95}$ on every row; proved $\kappa\!\approx\!194$ explained by $\eta_{\min}\!\to\!0$, not a mis-stated constant) | HIGH | `verify_prop7_constant.py` |
-| A13 | Prop 6 closed form for $w^{*}(\pi_{*})$ matches E2b column to 4 decimals                | UNVERIFIED           | HIGH              | P0.2 proof + E2b re-derivation                       |
+| A13 | Prop 6 closed form for $w^{*}(\pi_{*})$ matches E2b column to 4 decimals                | HIGH (P0.2 closed: `verify_prop6_marginal.py` PASS on L1 tab:marginal grid 4dp, L2 e2b.json `w_marg` 4dp on all 4 datasets, L3 brute-force argmax vs closed form $\le 10^{-4}$, threshold continuity) | HIGH | P0.2 verifier (closed) |
 | A14 | E3d-arch `head_sig` sign/definition agree with prose and $\Delta_{\mathrm{head}}$       | HIGH (P0.3 closed: `head_sig := Rhat - eps*_tr`, all 9 + 20 cells flipped, prose rewritten) | HIGH | P0.3 sign fix (closed) |
 | A15 | F1/F2/F3/F2′ survive E3d-arch redo at $k\ll n$ on Cora/CiteSeer                         | HIGH (P0.4 closed: F1″ closes C2 — GAT/GIN/SAGE on Cora and **all 4** archs on CiteSeer reach eps_tr ≤ eps_WL at $k=64$, $k/n\le 0.024$; F2″ GCN<GAT<GIN ordering preserved; F3″ head-slack $k$-dependent — F3′ confined to matched-$k$. Table `tab:e3d-arch-kll-n`.) | HIGH | P0.4 sweep (closed) |
-| A16 | $\varepsilon^{*}_{\Pi}$ in E1–E3 disambiguated as empirical vs population              | MEDIUM (P0.5 partial: `rem:emp-pop` defines $\varepsilon^{*}_{\Pi,\mu}$, E1+E2 captions cite Prop 7; E3 callback still pending) | HIGH | P0.5 notation rewrite (E3 pending) |
+| A16 | $\varepsilon^{*}_{\Pi}$ in E1–E3 disambiguated as empirical vs population              | HIGH (P0.5 closed: `rem:emp-pop` defines $\varepsilon^{*}_{\Pi,\mu}$, E1+E2+E3 captions all cite Prop 7 with the $O(1/\sqrt n)$ shift and the marginal-weighted form) | HIGH | P0.5 notation rewrite (closed) |
 
 ---
 
