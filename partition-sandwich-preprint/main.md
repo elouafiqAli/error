@@ -1360,8 +1360,55 @@ L^m_\ell = 314$ (Cora) / $186$ (CiteSeer) (here $L^c \approx
 \|W_\ell\|_{\rm op}$, GIN $\varepsilon \approx 0$ at init): an
 average-degree refinement of Lemma 6′ would tighten the bound by
 roughly $((L^c + \Delta_{\max} L^m)/\gamma_{\text{eff}})^L
-\approx 10^6$ on Cora at $L = 3$. We leave the mean-Lipschitz refinement to
-future work; raw outputs in `experiments/results/e3e.json`.
+\approx 10^6$ on Cora at $L = 3$. Lemma 6″
+(`lem:mpnn-wl-spectral`) formalises a spectral refinement
+(replacing $\Delta$ by $\lambda_{\max}(A)$); E3g below closes the
+loop empirically.
+Raw outputs in `experiments/results/e3e.json`.
+
+#### E3g — Spectral envelope vs degree envelope (Lemma 6″ stress test, Cora/CiteSeer/PubMed, $L \in \{1,\dots,4\}$)
+
+For each Planetoid graph and each depth $L$ we measure the
+adjacency Perron root $\lambda_{\max}(A)$ (via
+`scipy.sparse.linalg.eigsh`), the worst-case degree $\Delta$,
+and the empirical within-WL-cell sup-spread $D(L)$ of a
+fixed-init numpy GIN under the same $\delta_0$ sweep as E3d.
+We then compare the closed-form (6′) degree envelope
+$\delta_0 \prod_\ell \|W_\ell\|(1+\Delta)^L$ against the (6″c)
+Perron envelope $\delta_0 \prod_\ell \|W_\ell\|(1+\lambda_{\max}(A))^L$.
+The Perron-over-degree ratio
+$((1+\lambda_{\max}(A))/(1+\Delta))^L$ is independent of
+$\delta_0$ and of the random weights and quantifies the
+tightening from Lemma 6″ (6″c) relative to Lemma 6′:
+
+| Graph    | $n$    | $\Delta$ | $\bar d$ | $\lambda_{\max}(A)$ | $L$ | $\text{bound}_{(6')}/\text{bound}_{(6''\!c)}$ | $\text{bound}_{(6''\!c)}/D(L)$ |
+|----------|--------|----------|----------|---------------------|-----|----------------------------------------------:|-------------------------------:|
+| Cora     | 2 708  | 168      | 3.90     | 14.39               | 1   | $11.0\times$                                  | $2.0\!\times\!10^{1}$          |
+|          |        |          |          |                     | 2   | $1.21\!\times\!10^{2}$                        | $2.6\!\times\!10^{2}$          |
+|          |        |          |          |                     | 3   | $1.32\!\times\!10^{3}$                        | $3.3\!\times\!10^{3}$          |
+|          |        |          |          |                     | 4   | $1.45\!\times\!10^{4}$                        | $4.1\!\times\!10^{4}$          |
+| CiteSeer | 3 327  | 99       | 2.74     | 13.74               | 1   | $6.8\times$                                   | $1.8\!\times\!10^{1}$          |
+|          |        |          |          |                     | 2   | $4.6\!\times\!10^{1}$                         | $2.5\!\times\!10^{2}$          |
+|          |        |          |          |                     | 3   | $3.12\!\times\!10^{2}$                        | $3.2\!\times\!10^{3}$          |
+|          |        |          |          |                     | 4   | $2.12\!\times\!10^{3}$                        | $5.9\!\times\!10^{4}$          |
+| PubMed   | 19 717 | 171      | 4.50     | 23.24               | 1   | $7.1\times$                                   | $2.2\!\times\!10^{1}$          |
+|          |        |          |          |                     | 2   | $5.0\!\times\!10^{1}$                         | $1.1\!\times\!10^{3}$          |
+|          |        |          |          |                     | 3   | $3.57\!\times\!10^{2}$                        | $3.8\!\times\!10^{4}$          |
+|          |        |          |          |                     | 4   | $2.54\!\times\!10^{3}$                        | $7.2\!\times\!10^{5}$          |
+
+On every (graph, $L$) pair the (6″c) Perron envelope is strictly
+tighter than the (6′) degree envelope, and the gap widens
+multiplicatively in $L$ as $((1+\lambda_{\max}(A))/(1+\Delta))^L$
+— four orders of magnitude on Cora at $L=4$. The Perron bound
+remains loose against the realised sup-spread $D(L)$ (rightmost
+column) because the operator-norm step in Lemma 6″ (6″b) is a
+worst-case bookkeeping over all eigenmodes; the residual gap is
+the natural target for a concentration / typical-mode refinement
+in future work. The independent-of-$\delta_0$, independent-of-init
+quantity $((1+\lambda_{\max}(A))/(1+\Delta))^L$ in column 7 is
+the precise empirical content of the spectral refinement claim
+of Lemma 6″ (6″c). Raw outputs in `experiments/results/e3g.json`;
+reproducible with `modal run experiments/modal_e3g.py`.
 
 #### E3d-arch — Post-hoc architecture-vs-WL audit (GCN/GAT/GIN × Cora/CiteSeer/PubMed)
 

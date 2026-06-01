@@ -581,3 +581,35 @@ these references) is the Phase 5 audit gate that remains open.
   8.1/8.2 commits land.
 - Build: 34 pp, 850 516 B; only pre-existing
   `sec:experiments` / `sec:slack` undefined-ref warnings.
+
+### r10 (Phase 4b — E3g spectral-envelope vs degree-envelope, Lemma 6″c)
+
+- New experiment `experiments/e3g_spectral_envelope.py` + Modal
+  wrapper `experiments/modal_e3g.py`. Computed per-graph
+  $\lambda_{\max}(A)$ (scipy `eigsh`, sym adjacency) for
+  Cora / CiteSeer / PubMed, fixed-init GIN ($d{=}32$), depths
+  $L \in \{1,2,3,4\}$, noise sweep
+  $\delta_0 \in \{10^{-3}, 10^{-2}, 10^{-1}, 1\}$.
+- Headline (independent of $\delta_0$, independent of random
+  weights): bound$_{(6')}/$bound$_{(6''\!c)}$ at $L=4$ is
+  $1.45{\times}10^{4}$ on Cora, $2.12{\times}10^{3}$ on CiteSeer,
+  $2.54{\times}10^{3}$ on PubMed --- the (6″c) Perron envelope is
+  $10^{3}$--$10^{4}\times$ tighter than the (6′) degree envelope
+  at depth 4. The closed-form ratio
+  $((1{+}\lambda_{\max}(A))/(1{+}\Delta))^{L}$ is the precise
+  empirical content of `lem:mpnn-wl-spectral` (6″c).
+- Failure mode (logged for honesty): even the Perron envelope is
+  $10^{1}$--$10^{6}\times$ looser than the realised sup-spread
+  $D(L)$, because the operator-norm step in (6″b) is
+  worst-case over all eigenmodes. Concentration / typical-mode
+  refinement is named open work.
+- Phase 4b ran on Modal CPU (`modal run experiments/modal_e3g.py`,
+  ~30 s wall-clock, $<\$0.01$ cost). Output JSON committed at
+  `experiments/results/e3g.json`.
+- Manuscript: new `\paragraph{E3g}` block + Table `tab:e3g`
+  inserted in §8.5 right after `tab:e3d`; E3d caption updated to
+  point forward to `lem:mpnn-wl-spectral` rather than naming
+  mean-Lipschitz refinement as open work. Markdown twin mirrored
+  with the same data.
+- Build: 35 pp, 854 932 B; only pre-existing
+  `sec:experiments` / `sec:slack` undefined-ref warnings.

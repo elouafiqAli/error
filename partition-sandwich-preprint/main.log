@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.28)  1 JUN 2026 22:36
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.28)  1 JUN 2026 23:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -735,75 +735,96 @@ Underfull \vbox (badness 5756) has occurred while \output is active []
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [22]
+Underfull \hbox (badness 4001) in paragraph at lines 2348--2348
+[]\T1/lmr/m/n/10 (+20) Table 9: []E3g: spec-tral re-fine-ment pay-off. Per-grap
+h ad-ja-cency spec-trum (com-puted via
+ []
+
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[23] [24]
-Overfull \hbox (176.43633pt too wide) in paragraph at lines 2536--2600
+[23]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \vbox (badness 6995) has occurred while \output is active []
+
+ [24]
+[25]
+Overfull \hbox (176.43633pt too wide) in paragraph at lines 2603--2667
  [][] 
  []
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[25] [26]
-Overfull \hbox (24.21454pt too wide) in paragraph at lines 2662--2685
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Overfull \hbox (24.21454pt too wide) in paragraph at lines 2729--2752
  [][] 
  []
 
-<experiments/figures/e6_nas_v2_scatter.pdf, id=952, 607.068pt x 303.534pt>
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<experiments/figures/e6_nas_v2_scatter.pdf, id=960, 607.068pt x 303.534pt>
 File: experiments/figures/e6_nas_v2_scatter.pdf Graphic file (type pdf)
 <use experiments/figures/e6_nas_v2_scatter.pdf>
 Package pdftex.def Info: experiments/figures/e6_nas_v2_scatter.pdf  used on inp
-ut line 2690.
+ut line 2757.
 (pdftex.def)             Requested size: 225.48038pt x 112.73654pt.
-<experiments/figures/e6_nas_v2_kendall.pdf, id=953, 448.07399pt x 289.08pt>
+<experiments/figures/e6_nas_v2_kendall.pdf, id=961, 448.07399pt x 289.08pt>
 File: experiments/figures/e6_nas_v2_kendall.pdf Graphic file (type pdf)
 <use experiments/figures/e6_nas_v2_kendall.pdf>
 Package pdftex.def Info: experiments/figures/e6_nas_v2_kendall.pdf  used on inp
-ut line 2691.
+ut line 2758.
 (pdftex.def)             Requested size: 225.48038pt x 145.47035pt.
-[27 <./experiments/figures/e6_nas_v2_scatter.pdf> <./experiments/figures/e6_nas
-_v2_kendall.pdf>]
-<experiments/figures/e7_concentration.pdf, id=1093, 462.52798pt x 303.534pt>
-File: experiments/figures/e7_concentration.pdf Graphic file (type pdf)
-<use experiments/figures/e7_concentration.pdf>
-Package pdftex.def Info: experiments/figures/e7_concentration.pdf  used on inpu
-t line 2829.
-(pdftex.def)             Requested size: 291.24579pt x 191.13942pt.
-
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[28] [29 <./experiments/figures/e7_concentration.pdf>]
+[26] [27] [28 <./experiments/figures/e6_nas_v2_scatter.pdf> <./experiments/figu
+res/e6_nas_v2_kendall.pdf>]
+<experiments/figures/e7_concentration.pdf, id=1114, 462.52798pt x 303.534pt>
+File: experiments/figures/e7_concentration.pdf Graphic file (type pdf)
+<use experiments/figures/e7_concentration.pdf>
+Package pdftex.def Info: experiments/figures/e7_concentration.pdf  used on inpu
+t line 2896.
+(pdftex.def)             Requested size: 291.24579pt x 191.13942pt.
+ [29 <./experiments/figures/e7_concentration.pdf>]
+Underfull \vbox (badness 2057) has occurred while \output is active []
+
+ [30]
 pdfTeX warning (ext4): destination with the same identifier (name{equation.6}) 
 has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.2983 \begin{equation}
+l.3050 \begin{equation}
                        \label{eq:pop-concentration}
 pdfTeX warning (ext4): destination with the same identifier (name{equation.6}) 
 has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.2983 \begin{equation}
+l.3050 \begin{equation}
                        \label{eq:pop-concentration}
 pdfTeX warning (ext4): destination with the same identifier (name{equation.6}) 
 has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.2983 \begin{equation}
+l.3050 \begin{equation}
                        \label{eq:pop-concentration}
 pdfTeX warning (ext4): destination with the same identifier (name{equation.6}) 
 has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.2983 \begin{equation}
-                       \label{eq:pop-concentration} [30] [31] (./main.bbl
-[32] [33]) [34] (./main.aux)
+l.3050 \begin{equation}
+                       \label{eq:pop-concentration} [31] [32] (./main.bbl
+[33] [34]) [35] (./main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
@@ -816,10 +837,10 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: F948D7D82423F05A31786469734DE183;3105.
  ) 
 Here is how much of TeX's memory you used:
- 17085 strings out of 469006
- 280999 string characters out of 5454813
- 767504 words of memory out of 5000000
- 44903 multiletter control sequences out of 15000+600000
+ 17090 strings out of 469006
+ 281048 string characters out of 5454813
+ 779078 words of memory out of 5000000
+ 44905 multiletter control sequences out of 15000+600000
  767462 words of font info for 309 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
  75i,13n,90p,2620b,745s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -851,10 +872,10 @@ sy9.pfb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/lm/lmtt10.p
 fb></usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/lm/lmtti10.pfb><
 /usr/local/texlive/2026basic/texmf-dist/fonts/type1/public/amsfonts/symbols/msb
 m10.pfb>
-Output written on main.pdf (34 pages, 850516 bytes).
+Output written on main.pdf (35 pages, 854932 bytes).
 PDF statistics:
- 1496 PDF objects out of 1728 (max. 8388607)
- 1009 compressed objects within 11 object streams
- 219 named destinations out of 1000 (max. 500000)
+ 1516 PDF objects out of 1728 (max. 8388607)
+ 1023 compressed objects within 11 object streams
+ 222 named destinations out of 1000 (max. 500000)
  78004 words of extra memory for PDF output out of 89155 (max. 10000000)
 
