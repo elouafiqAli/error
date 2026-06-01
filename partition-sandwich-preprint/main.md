@@ -1268,8 +1268,12 @@ relative to the six contributions C1–C6, organised by
 ##### S1. The regime taxonomy ($k$ vs $k_{\mathrm{WL}}$)
 
 Across the five datasets the cell budget $k$ falls into two
-regimes, and **the sign of feat\_gap is regime-determined, not
-architecture-determined**:
+regimes, and **the *sign* of `feat_gap` is dominated by the
+$(k, k_{\mathrm{WL}})$ regime** — the *magnitude*, however,
+retains architecture dependence at fixed $k$ (PubMed at
+$k = 4096$ shows non-trivial spread across GCN/GAT/GIN/SAGE),
+so this section neither subsumes nor falsifies F2′
+(architecture comparison at fixed budget):
 
 | Regime | Datasets | feat\_gap (16 cells) |
 |---|---|---|
@@ -1286,12 +1290,19 @@ experimental anchor* of this confound: with $k_{\mathrm{WL}} =
 161\,943$ and $k = 4096$, the budget gap is two orders of
 magnitude, and the negative feat\_gap of $-0.045$ to $-0.130$
 reproduces deterministically across all 4 architectures and 5
-seeds. **The honest restatement of C2 is therefore: trained
-features beat the 1-WL ceiling whenever the evaluation budget
-allows them to.** The original strong form ("features beat WL
-across all 5 datasets") is **falsified by this sweep**; the
-regime-conditional form is **verified** and is the form that
-appears in the abstract (C2 paragraph) and in §11.
+seeds. **Honest restatement of C2.** The matched-$k$ rows here
+(Cora $k/n = 0.87$, CiteSeer $k/n = 0.61$) sit inside the
+partition-cardinality-collapse regime of Proposition 4.5:
+*both* partitions in the comparison are near-memorisation, so
+"matched $k$" tests *fixed cell budget*, not *expressivity*. We
+therefore state C2 conservatively as a **fixed-cell-budget**
+claim on this sweep; the expressivity reading ("trained
+features carry label structure that 1-WL structure alone
+lacks") is **deferred** to the planned $k \ll n$ redo on
+Cora/CiteSeer (`future-work/08-p1-patch-plan.md`, Phase 3b /
+P0.4). The original strong form ("features beat WL across all
+5 datasets") is falsified by this sweep; the fixed-budget form
+is what survives until the $k \ll n$ redo lands.
 
 ##### S2. The aggregator trichotomy (Lemma 6′, gnn.md Ch 18) — quantitatively confirmed
 
@@ -1326,10 +1337,19 @@ Across all 100 runs the empirical $\hat R$ lies inside the
 analytical bracket $[H_b^{-1}(H), \tfrac12 H]$ at every $(k, k_{\mathrm{WL}})$
 budget tested. This is the cleanest possible confirmation of
 **C1** (Theorem 1) on the largest sweep in the paper. The
-ogbn-arxiv anchor is particularly informative: with
-$\pi_{\mathrm{ogbn}} = 0.161$, the marginal-aware
-slack constant $w^*(0.161) = 0$ (Proposition 6); the bracket on
-ogbn-arxiv is therefore not just unviolated, it is *tight*.
+ogbn-arxiv anchor is particularly informative: the realised
+slack is $\tfrac12 H - H_b^{-1}(H) = 0.0029 - 0.0021 = 0.0008$,
+essentially zero. **The mechanism is partition-cardinality
+collapse (Proposition 4.5):** with $k_{\mathrm{WL}} = 161\,943$
+on $n = 169\,343$ vertices, $|\Pi|/|V| \to 1$ and
+$H(f \mid \Pi) \to 0$ by construction, which forces both
+endpoints of the bracket to $0$. The tightness is *not* a
+consequence of a marginal-aware ceiling at $\pi = 0.161$ (a
+marginal-aware $w^{*}(\pi_{*})$ statement is reserved for the
+planned Proposition 6 and is not invoked here); on the closest
+E2b row ($\pi_{*} = 0.248$) the empirical $w^{*}(\pi_{*})$ is
+$0.1392$, well above zero, which directly rules out a
+$w^{*}(0.161) = 0$ reading.
 
 ##### S4. Refinement monotonicity (C4) — confirmed on every (dataset, arch, seed)
 
@@ -1394,10 +1414,10 @@ To pre-empt over-claiming:
 
 | Contribution | Verdict on this sweep | Anchor |
 |---|---|---|
-| C1 — bracket holds | **Verified** ($100/100$, including ogbn-arxiv at $n = 169\,343$) | every row |
-| C2 — features beat WL | **Verified at matched $k$, falsified at $k \ll k_{\mathrm{WL}}$** | $8/8$ on Cora+CiteSeer; regime-flip on the three coarser sets |
-| C3 — Lemma 6′ aggregator trichotomy | **Quantitatively verified** (10.7$\times$ $\sigma$ ratio on ogbn-arxiv) | ogbn-arxiv block |
-| C4 — refinement monotonicity | **Verified** ($100/100$) | per-$k$ sweep |
+| C1 — bracket holds | **Verified at scale** ($100/100$ on $n \in [2{,}708,\,169{,}343]$); a robustness demonstration of Theorem 1, not new evidence | every row |
+| C2 — features beat WL | **Fixed-cell-budget only** ($8/8$ on Cora+CiteSeer *at $k/n \in [0.61, 0.87]$*, i.e. inside the cardinality-collapse regime); the expressivity form is **pending P0.4** ($k \ll n$ redo) | Cora, CiteSeer |
+| C3 — Lemma 6′ aggregator trichotomy | **Suggestive, consistent with theory** via the $\sigma_{\hat R}$ proxy ($10.7\times$ on ogbn-arxiv); $\sigma_{\hat R}$ is *not* the within-cell diameter $\delta_L$ that Lemma 6′ actually bounds, so the airtight confirmation is **pending Phase 4b** (direct $D(L)$ vs $\lambda_{\max}(A)$ envelope) | ogbn-arxiv block |
+| C4 — refinement monotonicity | **Verified at scale** ($100/100$); robustness of the Corollary C-$\Pi$ theorem, not new evidence | per-$k$ sweep |
 | C5 — population/sample slack (Prop 7) | **Not stressed by this sweep** ($n \ge 2708$ everywhere; the gating regime is $n < 2000$, see E6-NAS) | n/a |
 | C6 — bracket as NAS surrogate | **Out of scope** for E3d-arch-full | see E6-NAS |
 

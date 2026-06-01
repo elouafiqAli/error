@@ -2077,36 +2077,58 @@ structure --- demonstrating that the framework is a
 \paragraph{E3d-arch-full --- Synthesis on the 5/5 closure (regime, trichotomy, verdict).}
 The five-dataset closure ($100$ runs total) admits a clean
 adversarial reading along three axes. \emph{(i) Regime.} The
-sign of \texttt{feat\_gap} is determined by the
+\emph{sign} of \texttt{feat\_gap} is dominated by the
 $(k, k_{\mathrm{WL}})$ pair, not by the architecture: on
 matched-budget rows (Cora, CiteSeer; $k = k_{\mathrm{WL}}$) all
 $8/8$ cells have \texttt{feat\_gap} $> 0$ (mean $+0.043$);
 on coarsened-budget rows (PubMed, Twitch-EN, ogbn-arxiv) the
 $\varepsilon^{*}_{\Pi^{\mathrm{tr}}_{k}}$ proxy lives on a
 strictly coarser partition than $\Pi^{\mathrm{WL}}$ and the sign
-flips by construction. The honest restatement of C2 is
-therefore regime-conditional, and the ogbn-arxiv anchor
-($k_{\mathrm{WL}}/k = 39$, $n = 169\,343$) reproduces this
-deterministically across all $20$ runs.
+flips by construction. The \emph{magnitude} at fixed $k$,
+however, retains architecture dependence (PubMed at $k = 4096$
+shows non-trivial cross-architecture spread), so this section
+neither subsumes nor falsifies the architecture-comparison
+finding F2$'$. The matched-$k$ rows here (Cora $k/n = 0.87$,
+CiteSeer $k/n = 0.61$) sit inside the partition-cardinality-
+collapse regime of \Cref{prop:refine-discrete}: ``matched
+$k$'' tests \emph{fixed cell budget}, not \emph{expressivity}.
+We therefore state C2 conservatively as a fixed-cell-budget
+claim on this sweep; the expressivity reading is deferred to
+the planned $k \ll n$ redo on Cora/CiteSeer (P0.4 in the
+patch plan).
 \emph{(ii) Trichotomy.} Lemma~6$'$ predicts that GIN's sum
 aggregator has per-layer Lipschitz constant $\Delta_{\max}$
 while GCN / GAT / SAGE have constant $1$. On ogbn-arxiv this
 predicts a noisier $\hat R$ for GIN; observed
 $\sigma(\mathrm{GIN}) = 0.0365$ vs $\sigma(\mathrm{GCN/GAT/SAGE}) \le 0.0034$,
 a $10.7\times$ ratio, with the mean $\hat R$ also $3\times$ higher.
-This is the most quantitatively clean confirmation of the
-aggregator-typed lemma in the paper.
+The seed-variance $\sigma_{\hat R}$ is, however, an
+\emph{indirect} proxy for the within-cell embedding diameter
+$\delta_L$ that Lemma 6$'$ actually bounds; the airtight
+confirmation (direct $D(L)$ measurement against the
+$\lambda_{\max}(A)$ envelope of the planned Lemma~6$''$) is
+deferred to Phase~4b.
 \emph{(iii) Verdict on contributions.} C1 (bracket holds):
-verified on $100/100$ runs. C2 (features beat WL): verified at
-matched $k$, falsified at $k \ll k_{\mathrm{WL}}$, regime-
-conditional form holds. C3 (Lemma 6$'$ trichotomy):
-quantitatively verified. C4 (refinement monotonicity): verified
-on $100/100$ runs. C5/C6 are out of scope for this sweep. The
-Twitch-EN block ($\hat R \approx 0.41$ against trivial
-$1 - \pi = 0.454$) is correctly flagged by the bracket as
-near-trivial learning, not as a bracket pathology --- evidence
-of the bracket's diagnostic role. The full per-row machine-
-readable summary lives at
+verified at scale on $100/100$ runs --- a robustness
+demonstration of Theorem~1, not new evidence. C2 (features beat
+WL): fixed-cell-budget only on this sweep; the expressivity
+form is pending P0.4. C3 (Lemma 6$'$ trichotomy): suggestive
+and consistent with theory via the $\sigma_{\hat R}$ proxy;
+airtight confirmation pending Phase~4b. C4 (refinement
+monotonicity): verified at scale on $100/100$ runs --- a
+robustness demonstration, not new evidence. C5/C6 are out of
+scope for this sweep. The Twitch-EN block ($\hat R \approx 0.41$
+against trivial $1 - \pi = 0.454$) is correctly flagged by the
+bracket as near-trivial learning, not as a bracket pathology
+--- evidence of the bracket's diagnostic role. The bracket on
+ogbn-arxiv is essentially tight (realised slack $0.0029 -
+0.0021 = 0.0008$); the mechanism is partition-cardinality
+collapse ($k_{\mathrm{WL}}/n \to 1$ forces $H(f \mid \Pi)
+\to 0$), \emph{not} a marginal-aware $w^{*}(\pi_{*}) = 0$ at
+$\pi = 0.161$ (a marginal-aware statement is reserved for the
+planned Proposition~6 and is not invoked here; the closest E2b
+row at $\pi_{*} = 0.248$ has $w^{*}(\pi_{*}) = 0.1392 \gg 0$).
+The full per-row machine-readable summary lives at
 \texttt{experiments/results/e3d\_arch\_full.5of5.summary.md}.
 
 \paragraph{E4 --- Cross-architecture duel at fixed cell budget

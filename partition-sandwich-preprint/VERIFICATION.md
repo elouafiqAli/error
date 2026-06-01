@@ -360,3 +360,46 @@ The point of having T1–T4 sealed first is that each future tier
 inherits a battery of sanity checks: T5 must reproduce T3’s closed
 forms and T4’s coverage, T6 must reproduce all three. The ladder
 is upward-compatible.
+
+---
+
+## Errata
+
+### r3 / 2026-06 — E3d-arch-full Synthesis (commit `3212fdf`) corrections
+
+The Synthesis subsection appended in commit `3212fdf` over-stated
+three findings. Phase 0 of `future-work/08-p1-patch-plan.md`
+corrects all three in lock-step in both `main.tex` and `main.md`:
+
+1. **S3 (bracket tightness on ogbn-arxiv).** Original prose attributed
+   the near-zero realised slack (`0.0029 - 0.0021 = 0.0008`) to a
+   marginal-aware ceiling `w*(pi=0.161) = 0` invoking a not-yet-stated
+   Proposition 6. The realised slack is *positive*, directly refuting
+   `w*(0.161) = 0`; E2b also reports `w*(pi=0.248) = 0.1392`, well above
+   zero in the same range. The correct attribution is
+   **partition-cardinality collapse** (Proposition refine-discrete):
+   `k_WL / n -> 1` on ogbn-arxiv forces `H(f | Pi) -> 0`, which forces
+   both bracket endpoints to 0.
+2. **S1 (regime determinism).** Original prose stated the sign of
+   `feat_gap` is "regime-determined, not architecture-determined" —
+   too strong. PubMed at `k = 4096` shows non-trivial cross-
+   architecture spread; only the *sign* is regime-dominated, the
+   *magnitude* at fixed `k` retains architecture dependence. This
+   preserves F2' (architecture comparison at fixed budget).
+3. **S7 verdict (C2, C3, C1/C4).** Re-labelled:
+   - **C2** "Verified at matched k" -> **fixed-cell-budget only**;
+     matched-`k` rows (Cora `k/n=0.87`, CiteSeer 0.61) sit inside
+     the cardinality-collapse regime, so "matched `k`" tests fixed
+     cell budget, not expressivity. The expressivity reading is
+     **pending P0.4** (`k << n` redo on Cora/CiteSeer).
+   - **C3** "Quantitatively verified" -> **suggestive, consistent
+     with theory** via the `sigma_Rhat` proxy (10.7x headline kept).
+     `sigma_Rhat` is not the within-cell diameter `delta_L` that
+     Lemma 6' actually bounds; the airtight test is **pending
+     Phase 4b** (direct `D(L)` vs `lambda_max(A)` envelope).
+   - **C1, C4** Re-labelled as **robustness-at-scale**
+     demonstrations of existing theorems, not new evidence.
+
+The substantive E3 reassessment (re-reading F1/F2/F3/F2' against
+fresh data) lives in P0.3 (head_sig sign fix) + P0.4 (`k << n`
+redo); Phase 0 is a stopgap.
