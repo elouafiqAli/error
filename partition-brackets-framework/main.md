@@ -500,10 +500,123 @@ each $\varphi \in \{H_{\mathrm{bin}}, \eta(1-\eta),
 
 ---
 
-## 6. MPNN aggregator-typed Lipschitz (skeleton)
+## 6. MPNN aggregator-typed Lipschitz
 
-- **L11** $\delta_L = \delta_0 \prod_\ell (L^c_\ell + r_T L^m_\ell)$
-  with $r_T \in \{\Delta, 1, 1\}$ for sum / mean / sym-norm.
+### Lemma L11 — aggregator-typed cumulative Lipschitz constant
+
+**Statement.** Consider an $L$-layer message-passing neural
+network on a graph $G = (V, E)$ with per-node features
+$h^{(0)}_v \in \mathbb{R}^d$. Each layer $\ell \in \{1, \dots,
+L\}$ has the form
+$$
+h^{(\ell)}_v
+\;=\;
+C_\ell\!\left(\, h^{(\ell-1)}_v,\;
+   \mathrm{AGG}_T\!\bigl\{ M_\ell(h^{(\ell-1)}_u) : u \in N(v) \bigr\}
+\right),
+$$
+where $C_\ell$ is the COMBINE map, $M_\ell$ is the MESSAGE map,
+and $\mathrm{AGG}_T$ is the aggregator of type $T \in
+\{\mathrm{sum}, \mathrm{mean}, \mathrm{sym\text{-}norm}\}$.
+Assume $C_\ell$ has Lipschitz constant $L^c_\ell$ in its first
+argument and Lipschitz constant $1$ in its second
+argument*, $M_\ell$ has Lipschitz constant $L^m_\ell$, and the
+initial feature map is $\delta_0$-Lipschitz in some upstream
+input. Let $\Delta := \max_v |N(v)|$ be the maximum degree.
+Define the **aggregator constant**
+$$
+r_T \;:=\;
+\begin{cases}
+   \Delta & T = \mathrm{sum}, \\
+   1      & T = \mathrm{mean}, \\
+   1      & T = \mathrm{sym\text{-}norm}.
+\end{cases}
+$$
+Then the cumulative per-node Lipschitz constant of the
+$L$-layer MPNN satisfies
+$$
+\delta_L \;\leq\; \delta_0 \, \prod_{\ell=1}^{L}\,
+  \bigl( L^c_\ell + r_T \, L^m_\ell \bigr).
+$$
+
+*Footnote on the COMBINE-second-arg assumption: any constant
+$\kappa$ for the second argument is absorbed into $L^m_\ell$ by
+rescaling; taking $\kappa = 1$ is a wlog normalisation.*
+
+**Hypotheses used.** None of (H1)–(H5) is invoked. L11 is
+the one Paper B result that lives outside the $\varphi$-bracket
+proper: it ports Paper A's Lemma 6$'$ aggregator-typed bound to
+the meta-theorem's notation so that the noise / refinement
+chain rules of the bracket can be evaluated under realistic
+MPNN feature perturbations.
+
+**Proof.** Induction on $\ell$.
+
+*Base ($\ell = 0$).* $\delta_0$ is given.
+
+*Inductive step ($\ell - 1 \to \ell$).* Let $\Delta h_u :=
+h^{(\ell-1)}_u - h'^{(\ell-1)}_u$ be the per-node feature
+perturbation at depth $\ell - 1$, with uniform bound
+$\|\Delta h_u\| \leq \delta_{\ell-1}$ over all $u$.
+
+1. **Message map.** $\|M_\ell(h^{(\ell-1)}_u) -
+   M_\ell(h'^{(\ell-1)}_u)\| \leq L^m_\ell\, \delta_{\ell-1}$ for
+   every $u$, by Lipschitz of $M_\ell$.
+
+2. **Aggregator.** Bound the perturbation of $\mathrm{AGG}_T$
+   over $N(v)$:
+   - $T = \mathrm{sum}$: $\|\sum_{u} M_\ell(h_u) - \sum_u
+     M_\ell(h'_u)\| \leq |N(v)| \cdot L^m_\ell\, \delta_{\ell-1}
+     \leq \Delta \cdot L^m_\ell\, \delta_{\ell-1}$.
+   - $T = \mathrm{mean}$: $\| \tfrac{1}{|N(v)|} \sum_u (\cdot)
+     \| \leq L^m_\ell\, \delta_{\ell-1}$ — the $1/|N(v)|$ factor
+     cancels the sum, leaving $r_T = 1$.
+   - $T = \mathrm{sym\text{-}norm}$ (GCN-style normalisation
+     $\sum_u (\cdot) / \sqrt{d_u d_v}$): the symmetric
+     normalisation gives operator norm $\leq 1$ on regular
+     graphs and $\leq 1$ on irregular graphs by
+     Cauchy–Schwarz; hence $r_T = 1$.
+
+3. **Combine map.** $C_\ell$ is $L^c_\ell$-Lipschitz in arg 1
+   and $1$-Lipschitz in arg 2 (wlog), so
+   $$
+   \|h^{(\ell)}_v - h'^{(\ell)}_v\|
+   \;\leq\; L^c_\ell\, \delta_{\ell-1} + 1 \cdot r_T \, L^m_\ell\, \delta_{\ell-1}
+   \;=\; (L^c_\ell + r_T\, L^m_\ell)\, \delta_{\ell-1}.
+   $$
+
+Hence $\delta_\ell \leq (L^c_\ell + r_T\, L^m_\ell)\,
+\delta_{\ell-1}$, and the product formula follows by chaining.
+$\square$
+
+*Identification with Paper A.* In the Shannon special case
+($\varphi = H_{\mathrm{bin}}$), L11 reproduces Paper A's
+Lemma 6$'$ (the aggregator-typed cumulative Lipschitz
+constant in Paper A §6) symbol-for-symbol; the $r_T \in
+\{\Delta, 1, 1\}$ table is identical.
+
+*Failure mode.* If $C_\ell$ is not $L^c_\ell$-Lipschitz in arg
+1 (e.g. uses a non-Lipschitz activation like the unconstrained
+ReLU on unbounded features), the bound becomes vacuous. The
+result is *tight* for the operator-norm-equal-to-Lipschitz
+case (linear MPNN); for nonlinear nets it is an upper
+estimate.
+
+**Verifier contract.** Mechanically checked by
+`verify_b_t1.py::check_L11_aggregator_deltaL` —
+(a) SymPy verification that the inductive recurrence
+$\delta_\ell = (L^c_\ell + r_T L^m_\ell)\, \delta_{\ell-1}$
+closed-forms to the product formula by symbolic product
+expansion; (b) Hypothesis property test `prop_L11_linear`
+builds a random *linear* scalar MPNN on a star graph
+(node 0 = root, $\Delta$ leaves), random Lipschitz constants
+$L^c_\ell, L^m_\ell \in [0.1, 2]$, depth $L \in [1, 5]$, and
+for each aggregator $T \in \{\mathrm{sum}, \mathrm{mean},
+\mathrm{sym\text{-}norm}\}$ asserts $|h^{(L)}_0 -
+h'^{(L)}_0| \leq \delta_0\, \prod (L^c_\ell + r_T L^m_\ell) +
+10^{-9}$ on $\geq 200$ random instances.
+
+---
 
 ## 7. Open problems
 

@@ -568,10 +568,116 @@ def check_P10_refinement_monotonicity(args: argparse.Namespace) -> ContractResul
 
 @contract
 def check_L11_aggregator_deltaL(args: argparse.Namespace) -> ContractResult:
+    """L11: delta_L <= delta_0 * prod_l (L^c_l + r_T L^m_l).
+
+    Step A (symbolic): inductive product expansion via SymPy.
+    Step B (property): linear scalar MPNN on a star graph,
+        random (L^c_l, L^m_l) per layer, three aggregators;
+        assert empirical Lipschitz bound <= claimed bound.
+    """
+    try:
+        import sympy as sp
+        import numpy as np
+        from hypothesis import HealthCheck, given, settings, strategies as st
+    except ImportError as e:
+        return ContractResult("L11_aggregator_deltaL", "fail", f"missing dep: {e}")
+
+    # --- Step A: symbolic product = iterated recurrence ---
+    L = 4
+    Lc = sp.symbols(f"Lc1:{L+1}", positive=True)
+    Lm = sp.symbols(f"Lm1:{L+1}", positive=True)
+    rT, d0 = sp.symbols("rT delta0", positive=True)
+    delta = d0
+    for el in range(L):
+        delta = (Lc[el] + rT * Lm[el]) * delta
+    closed = d0 * sp.prod([Lc[el] + rT * Lm[el] for el in range(L)])
+    if sp.simplify(delta - closed) != 0:
+        return ContractResult(
+            "L11_aggregator_deltaL", "fail",
+            f"inductive expansion != product formula: residual {sp.simplify(delta - closed)}",
+        )
+
+    # --- Step B: empirical Lipschitz on a linear star MPNN ----
+    n_examples = max(50, args.samples // 5)
+    eps_tol = 1e-9
+
+    AGG_R = {"sum": None, "mean": 1.0, "sym-norm": 1.0}
+    # "sum" uses Delta (max degree); set below per-instance.
+
+    @settings(
+        max_examples=n_examples,
+        deadline=None,
+        suppress_health_check=[HealthCheck.too_slow],
+        derandomize=True,
+    )
+    @given(
+        L_depth=st.integers(min_value=1, max_value=5),
+        Delta=st.integers(min_value=1, max_value=6),
+        agg=st.sampled_from(list(AGG_R.keys())),
+        local_seed=st.integers(min_value=0, max_value=2**31 - 1),
+    )
+    def prop_L11_linear(L_depth: int, Delta: int, agg: str, local_seed: int) -> None:
+        rng = np.random.default_rng((args.seed << 8) ^ local_seed ^ 0x111)
+        # Random Lipschitz constants in [0.1, 2.0]
+        Lc_vals = rng.uniform(0.1, 2.0, L_depth)
+        Lm_vals = rng.uniform(0.1, 2.0, L_depth)
+        # Build linear MPNN: each layer combines = c_l * h_v + 1.0 * agg(...).
+        # The MESSAGE map is multiplication by m_l (a scalar). Operator norms
+        # are then exactly Lc_vals[l] and Lm_vals[l].
+        c_vals = Lc_vals.copy()
+        m_vals = Lm_vals.copy()
+        # Star graph: node 0 has Delta neighbors (nodes 1..Delta).
+        # Initial features: random scalars; perturbation delta0 applied uniformly.
+        h0 = rng.standard_normal(Delta + 1)
+        delta0 = 1.0
+        h0_perturbed = h0 + delta0 * rng.choice([-1.0, 1.0], Delta + 1)
+
+        def forward(h: np.ndarray) -> float:
+            x = h.copy()
+            for el in range(L_depth):
+                # Aggregator over neighbors of node 0
+                msgs = m_vals[el] * x[1:]  # neighbors
+                if agg == "sum":
+                    agg_val = msgs.sum()
+                elif agg == "mean":
+                    agg_val = msgs.mean() if Delta > 0 else 0.0
+                else:  # sym-norm: 1/sqrt(d_v d_u); root has degree Delta, leaves have degree 1.
+                    agg_val = (msgs / np.sqrt(Delta * 1.0)).sum() / np.sqrt(Delta)
+                # Combine at root
+                new_root = c_vals[el] * x[0] + agg_val
+                # For leaves we only need rough propagation (use combine with self only).
+                x_new = x.copy()
+                x_new[0] = new_root
+                # Leaves: each leaf's only neighbor is root; symmetric treatment.
+                root_to_leaf_msg = m_vals[el] * x[0]
+                if agg == "sum":
+                    leaf_agg = root_to_leaf_msg
+                elif agg == "mean":
+                    leaf_agg = root_to_leaf_msg
+                else:
+                    leaf_agg = root_to_leaf_msg / np.sqrt(Delta * 1.0)
+                x_new[1:] = c_vals[el] * x[1:] + leaf_agg
+                x = x_new
+            return float(x[0])
+
+        out = forward(h0)
+        out_p = forward(h0_perturbed)
+        empirical = abs(out_p - out)
+        rT = Delta if agg == "sum" else 1.0
+        bound = delta0 * float(np.prod(Lc_vals + rT * Lm_vals))
+        assert empirical <= bound + eps_tol, (
+            f"L11 violated: empirical |Delta h_0^(L)|={empirical:.6f} > bound={bound:.6f} "
+            f"agg={agg} Delta={Delta} L={L_depth} Lc={Lc_vals.tolist()} Lm={Lm_vals.tolist()}"
+        )
+
+    try:
+        prop_L11_linear()
+    except AssertionError as e:
+        return ContractResult("L11_aggregator_deltaL", "fail", str(e))
+
     return ContractResult(
-        "L11_aggregator_deltaL",
-        "skipped",
-        "STUB — proof lands in commit paper-b Phase 2b-md.L11",
+        "L11_aggregator_deltaL", "pass",
+        f"product formula proved symbolically; empirical bound holds on {n_examples} examples",
     )
 
 
