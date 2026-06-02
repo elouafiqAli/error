@@ -1,0 +1,30 @@
+{"notebook": "hw1", "concept": "Q1_hbin", "claim": "Hbin satisfies the four basic properties; hbin(0.1)=0.4689955935...", "level": "HIGH", "timestamp": 1780441023.328035}
+{"notebook": "hw1", "concept": "Q2_bayes", "claim": "Bayes error of Bernoulli(p) is min(p,1-p); symmetric and bounded by 1/2", "level": "HIGH", "timestamp": 1780441023.3756218}
+{"notebook": "hw1", "concept": "Q1_hbin", "claim": "Hbin satisfies the four basic properties; hbin(0.1)=0.4689955935...", "level": "HIGH", "timestamp": 1780441038.849241}
+{"notebook": "hw1", "concept": "Q2_bayes", "claim": "Bayes error of Bernoulli(p) is min(p,1-p); symmetric and bounded by 1/2", "level": "HIGH", "timestamp": 1780441038.896589}
+{"notebook": "hw1", "concept": "Q1_hbin", "claim": "Hbin satisfies the four basic properties; hbin(0.1)=0.4689955935...", "level": "HIGH", "timestamp": 1780441061.9308429}
+{"notebook": "hw1", "concept": "Q2_bayes", "claim": "Bayes error of Bernoulli(p) is min(p,1-p); symmetric and bounded by 1/2", "level": "HIGH", "timestamp": 1780441061.978256}
+{"notebook": "hw1", "concept": "Q3_hr_grid", "claim": "HR holds on a 10001-point grid; max_slack=0.1610 at p=0.800", "level": "HIGH", "timestamp": 1780441062.118363}
+{"notebook": "hw1", "concept": "Q4_mutate", "claim": "Mutations A (factor) and B (\u03b5\u00b2) falsify HR; C (LHS=RHS) is held by the verifier as designed.", "level": "HIGH", "timestamp": 1780441062.157546}
+{"notebook": "hw1", "concept": "Q5_writeup", "claim": "Writeup \u00a7Q1-\u00a7Q4 mirrors the four assertion gates above; calibrations recorded.", "level": "MEDIUM", "timestamp": 1780441062.1610749}
+{"notebook": "hw2", "concept": "Q2.hw2.Q1_hand", "claim": "H(Y|Pi) on 6-node toy \u2248 0.4591", "level": "HIGH", "timestamp": 1780441171.469117}
+{"notebook": "hw2", "concept": "Q2.hw2.Q2_cond_entropy", "claim": "cond_entropy correct on singleton, trivial, toy", "level": "HIGH", "timestamp": 1780441171.489333}
+{"notebook": "hw2", "concept": "Q2.hw2.Q3Q4_wl_blindspot", "claim": "C6 vs 2K3 share stable-colour multiset (6,) under 1-WL; P3 separates endpoints from middle", "level": "HIGH", "timestamp": 1780441171.528191}
+{"notebook": "hw2", "concept": "Q2.hw2.Q5_writeup", "claim": "Writeup mirrors hand-comp, cond_entropy, wl_step, blind-spot demonstration", "level": "MEDIUM", "timestamp": 1780441171.5332322}
+{"notebook": "hw3", "concept": "Q3.Q1_hbin_inverse", "claim": "bisection inverse round-trips \u22641e-9", "level": "HIGH", "timestamp": 1780441271.85153}
+{"notebook": "hw3", "concept": "Q3.Q2_bracket", "claim": "lower \u2264 upper; widest near h\u22480.72", "level": "HIGH", "timestamp": 1780441272.0703008}
+{"notebook": "hw3", "concept": "Q3.Q3_verifier", "claim": "bracket holds on 2000 random multinomial+uniform partitions", "level": "HIGH", "timestamp": 1780441272.189057}
+{"notebook": "hw3", "concept": "Q3.Q4_wstar", "claim": "eps*=0.2000, w*=0.1610", "level": "HIGH", "timestamp": 1780441272.207943}
+{"notebook": "hw3", "concept": "Q3.Q5_writeup", "claim": "four sections + five calibration entries; bracket holds end-to-end", "level": "MEDIUM", "timestamp": 1780441272.211682}
+{"notebook": "hw4", "concept": "Q4.Q1_aggregators", "claim": "sum/mean/max partitions implemented; collapse on K2/constant", "level": "HIGH", "timestamp": 1780441276.246578}
+{"notebook": "hw4", "concept": "Q4.Q2_constant_collapse", "claim": "all 6 (agg\u00d7graph) cases collapse to 1\u00d76", "level": "HIGH", "timestamp": 1780441276.259277}
+{"notebook": "hw4", "concept": "Q4.Q3_degree_blind", "claim": "degree feature equal to constant on 2-regular graphs", "level": "HIGH", "timestamp": 1780441276.271779}
+{"notebook": "hw4", "concept": "Q4.Q4_triangles", "claim": "triangle-count separates C6 from 2K3 globally; constant within each", "level": "HIGH", "timestamp": 1780441276.287345}
+{"notebook": "hw4", "concept": "Q4.Q5_writeup", "claim": "no permutation-invariant node-local aggregator separates C6 from 2K3", "level": "HIGH", "timestamp": 1780441276.290825}
+{"notebook": "m1", "concept": "M1.partitions", "claim": "label=7\u00d70; wl(L=2) has 1589 cells, max e_C=0.778", "level": "HIGH", "timestamp": 1780441831.472916}
+{"notebook": "m2", "concept": "M2.bracket", "claim": "Cora label and 1-WL(L=2) partitions both in-bracket; plotted", "level": "HIGH", "timestamp": 1780441839.161002}
+{"notebook": "m3", "concept": "M3.gcn_audit", "claim": "GCN test acc=0.810; bracket upper(H)=0.198 on wl(L=2)", "level": "HIGH", "timestamp": 1780441856.426364}
+{"notebook": "m3", "concept": "M3.modal_gpu", "claim": "T4 trained GCN reached test_acc=0.805 on Cora", "level": "HIGH", "timestamp": 1780441875.677957}
+{"notebook": "m4", "concept": "M4.nas_sweep", "claim": "GCN=0.807 > MLP=0.576; SAGE=0.806; GIN=0.754", "level": "HIGH", "timestamp": 1780441902.562736}
+{"notebook": "m4", "concept": "M4.modal_nas", "claim": "T4 NAS sweep ran on Cora; keys=['device', 'results']", "level": "HIGH", "timestamp": 1780441919.212457}
+{"notebook": "m6", "concept": "M6.advanced_sweep", "claim": "12 (dataset, arch) cells trained; best structural=0.810", "level": "HIGH", "timestamp": 1780442010.593622}
