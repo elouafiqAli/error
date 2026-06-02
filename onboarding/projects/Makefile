@@ -16,10 +16,10 @@ HW_NBS := psets/hw1/hw1.ipynb psets/hw2/hw2.ipynb psets/hw3/hw3.ipynb psets/hw4/
 M_CPU_NBS := capstone/milestone1/m1.ipynb capstone/milestone2/m2.ipynb
 M_GPU_NBS := capstone/milestone3/m3.ipynb capstone/milestone4/m4.ipynb capstone/milestone6/m6_advanced.ipynb
 
-.PHONY: all setup unit grade grade-hw1 grade-hw2 grade-hw3 grade-hw4 hw1 hw2 hw3 hw4 m1 m2 m3 m4 m5 m6 modal-verify clean help
+.PHONY: all setup unit grade grade-hw1 grade-hw2 grade-hw3 grade-hw4 hw1 hw2 hw3 hw4 m1 m2 m3 m4 m5 m6 modal-verify modal-deploy clean help
 
 help:
-	@echo "Targets: setup unit hw1..hw4 m1..m6 all modal-verify"
+	@echo "Targets: setup unit hw1..hw4 m1..m6 all modal-verify modal-deploy"
 	@echo "         grade-hw1..hw4 grade  (run student-facing tests; GRADE=1)"
 
 setup:
@@ -58,6 +58,15 @@ all: unit hw1 hw2 hw3 hw4 m1 m2 m5
 # GPU lane: actually invokes Modal (requires `modal token new` first)
 modal-verify: m3 m4 m6
 	@echo "[OK] Modal GPU lane green"
+
+# Deploy modal_app.py as a long-lived Modal App so that browser-hosted
+# Modal Notebooks (https://modal.com/notebooks) can call our T4 functions
+# via the `%modal` cell magic — i.e. without ever opening `app.run()`
+# locally. One-time per branch; redeploy after editing modal_app.py.
+modal-deploy:
+	modal deploy modal_app.py
+	@echo "[OK] Deployed gnn-express-capstone — Modal Notebooks can now do"
+	@echo "      %modal from gnn-express-capstone import train_gcn, nas_sweep"
 
 clean:
 	rm -rf .pytest_cache

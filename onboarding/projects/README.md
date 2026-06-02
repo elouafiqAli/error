@@ -187,3 +187,39 @@ Bonus capped at +5 if a student goes there.
 python -m onboarding.projects.scaffold.hw1          # writes psets/hw1/hw{,_solution}.ipynb
 python -m onboarding.projects.scaffold.milestones   # writes capstone/milestone{1..6}/m*.ipynb
 ```
+
+---
+
+## 8. Advanced track — run notebooks *inside* Modal (no laptop)
+
+Modal Notebooks ([modal.com/notebooks](https://modal.com/notebooks))
+are browser-hosted Jupyter kernels with GPU access. The advanced
+flow skips the local `nbclient` round-trip entirely:
+
+```bash
+make modal-deploy   # one-time: modal deploy modal_app.py
+```
+
+This registers the `gnn-express-capstone` Modal App
+(`ping`, `train_gcn`, `nas_sweep`). Then in your browser:
+
+1. Open [modal.com/notebooks](https://modal.com/notebooks) and
+   upload `capstone/milestone3/m3.ipynb` (or any `m*.ipynb`).
+2. Pick a T4 kernel from the sidebar — the notebook will run on
+   Modal's CPUs/GPUs with no local install.
+3. Replace the in-notebook `with modal_app.app.run():` block with
+   the `%modal` cell magic:
+
+   ```python
+   %modal from gnn-express-capstone import train_gcn
+   result = train_gcn.remote(epochs=200)
+   ```
+
+   The `%modal` magic calls the *deployed* function — no local
+   `app.run()` context needed; cold-start is shared with anyone
+   else using the same deployment.
+
+> **Status: Modal Notebooks is in Beta** (per their docs). The
+> local `nbclient` lane (`make modal-verify`) remains the
+> verified-reference path; the browser flow is for students who
+> want zero local GPU setup.
