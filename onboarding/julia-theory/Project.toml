@@ -1,0 +1,29 @@
+name = "JuliaTheory"
+uuid = "00000000-0000-0000-0000-000000000001"
+authors = ["partition-bracket-onboarding"]
+version = "0.1.0"
+
+[deps]
+Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+IntervalArithmetic = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
+Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+
+[compat]
+julia = "1.10"
+Pluto = "0.20"
+PlutoUI = "0.7"
+Plots = "1"
+Symbolics = "6"
+IntervalArithmetic = "0.22"
+Optim = "1"
+Enzyme = "0.13"
