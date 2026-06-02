@@ -84,14 +84,14 @@ We compute everything in **bits** (so $\log = \log_2$). Convention
 $0 \log 0 = 0$ is enforced by the helper `xlog2x`. Definitions
 (written here so the code below is a transparent transcription):
 
-\$\$
+$$
 H(X) = -\sum_x P_X(x) \log_2 P_X(x), \quad
 H(Y\mid X) = \sum_x P_X(x)\, H(Y\mid X=x),
-\$\$
-\$\$
+$$
+$$
 H(X,Y) = -\sum_{x,y} P(x,y)\log_2 P(x,y), \quad
 I(X;Y) = H(X) + H(Y) - H(X,Y).
-\$\$
+$$
 """
 
 # ╔═╡ 15f6552e-5ec6-11f1-a3bd-c97e3a2d104e
@@ -111,7 +111,13 @@ begin
 
     # Conditional H(Y | X): per row entropy, weighted by P_X(x).
     # Guard rows with PX[i] == 0 (then conditional row is undefined → contributes 0).
-    HY_given_X = sum(PX[i] > 0 ? PX[i] * H(P[i, :] ./ PX[i]) : 0.0 for i in 1:2)
+    HY_given_X = 0.0
+    for i in 1:2
+        if PX[i] > 0
+            row = P[i, :] ./ PX[i]
+            HY_given_X += PX[i] * H(row)
+        end
+    end
 
     HX_given_Y = HXY - HY  # cross-check via chain rule
     MI = HX + HY - HXY
