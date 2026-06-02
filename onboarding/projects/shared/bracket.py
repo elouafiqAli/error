@@ -37,7 +37,7 @@ from typing import Union
 
 import numpy as np
 
-from onboarding.projects.capstone.milestone1.partition import Partition
+from onboarding.projects.shared.partition import Partition
 
 
 # --------------------------------------------------------------------------- #

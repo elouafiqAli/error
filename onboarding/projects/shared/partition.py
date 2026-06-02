@@ -1,8 +1,9 @@
-"""Capstone M1 — Data + partition harness.
+"""Shared — Partition dataclass + canonical 1-WL builders.
 
-Fill in the TODOs. Do not change public signatures — the test suite
-depends on them. The skeleton runs (raising NotImplementedError)
-before you start.
+This module is the *reference implementation* used by the test
+suite and by capstone milestones. The HW notebooks re-derive these
+builders themselves; nothing in `shared/` is meant to be a TODO for
+the student.
 
 Convention throughout this capstone:
   - Nodes are indexed 0..n-1.
@@ -60,18 +61,31 @@ class Partition:
     _labels: np.ndarray | None = None  # set by builders; used to compute e
 
     def __post_init__(self) -> None:
-        # TODO(student): validate cells.
-        #   1) Each cell is a 1-D int array.
-        #   2) Cells are pairwise disjoint.
-        #   3) Union covers {0..n-1} exactly once.
-        #   On failure, raise ValueError with a useful message.
-        #
-        # Then set:
-        #   self.q = np.array([len(c) / self.n for c in self.cells])
-        #   self.e = np.array([self._bayes_error_of(c) for c in self.cells])
-        #
-        # Hint: use np.concatenate + np.sort + np.unique.
-        raise NotImplementedError("Partition.__post_init__ is not implemented")
+        # Validate: each cell a 1-D int array; pairwise disjoint; covers {0..n-1}.
+        flat_parts = []
+        for i, c in enumerate(self.cells):
+            arr = np.asarray(c, dtype=int)
+            if arr.ndim != 1:
+                raise ValueError(f"cell {i} is not 1-D")
+            flat_parts.append(arr)
+        if flat_parts:
+            flat = np.concatenate(flat_parts)
+        else:
+            flat = np.empty(0, dtype=int)
+        if flat.size != self.n:
+            raise ValueError(
+                f"cells cover {flat.size} nodes; expected n={self.n}"
+            )
+        uniq = np.unique(flat)
+        if uniq.size != self.n or uniq.min() != 0 or uniq.max() != self.n - 1:
+            raise ValueError(
+                "cells must form a partition of {0..n-1}"
+            )
+        self.q = np.array([len(c) / self.n for c in self.cells], dtype=float)
+        self.e = np.array(
+            [self._bayes_error_of(np.asarray(c, dtype=int)) for c in self.cells],
+            dtype=float,
+        )
 
     def _bayes_error_of(self, cell: np.ndarray) -> float:
         """Per-cell Bayes error 1 - max_y P(Y = y | C).
@@ -102,23 +116,17 @@ def load_cora(root: str = "./data/cora") -> Data:
     return Planetoid(root=root, name="Cora")[0]
 
 
-def label_partition(data: Data) -> Partition:
+def label_partition(data) -> Partition:
     """Build the label partition: one cell per class.
 
     Each cell C_y = {nodes with label y}. By construction every cell
     has e_C = 0 (because P(Y = y | C_y) = 1).
-
-    Returns a Partition with self._labels set to data.y.numpy().
     """
-    # TODO(student): ~5 lines.
-    #   1) y = data.y.numpy()
-    #   2) cells = [np.where(y == k)[0] for k in range(y.max() + 1)]
-    #   3) p = Partition(cells=cells, n=len(y), _labels=y)
-    #   4) return p
-    #
-    # Note: __post_init__ runs after __init__, so set _labels via the
-    # constructor (it is a keyword-only arg above).
-    raise NotImplementedError("label_partition is not implemented")
+    y = data.y.numpy() if hasattr(data.y, "numpy") else np.asarray(data.y)
+    K = int(y.max()) + 1
+    cells = [np.where(y == k)[0] for k in range(K)]
+    cells = [c for c in cells if len(c) > 0]
+    return Partition(cells=cells, n=len(y), _labels=y)
 
 
 def wl_refine(
@@ -142,27 +150,38 @@ def wl_refine(
         node -> (old_color, sorted_multiset_of_neighbor_colors)
         is rehashed to a dense integer range [0, K_new).
     """
-    # TODO(student): ~10 lines.
-    #   1) For each node u, collect sorted tuple of neighbor colors.
-    #   2) Build signature[u] = (colors[u], tuple_of_neighbor_colors).
-    #   3) Map distinct signatures to dense ints (use a dict).
-    #   4) Return the new color array.
-    raise NotImplementedError("wl_refine is not implemented")
+    nbrs: list[list[int]] = [[] for _ in range(n)]
+    for u, v in zip(edge_index[0], edge_index[1]):
+        nbrs[int(u)].append(int(v))
+    sigs: list[tuple] = []
+    for u in range(n):
+        nb = tuple(sorted(int(colors[v]) for v in nbrs[u]))
+        sigs.append((int(colors[u]), nb))
+    table: dict[tuple, int] = {}
+    out = np.empty(n, dtype=int)
+    for u, s in enumerate(sigs):
+        if s not in table:
+            table[s] = len(table)
+        out[u] = table[s]
+    return out
 
 
-def wl_partition(data: Data, depth: int) -> Partition:
+def wl_partition(data, depth: int) -> Partition:
     """1-WL partition at refinement depth `depth` (>= 0).
 
-    depth=0 means "all nodes one color" — the trivial partition with
-    one cell. depth=L means L rounds of wl_refine.
+    depth=0 means "all nodes one color" — the trivial 1-cell partition.
+    depth=L means L rounds of `wl_refine`.
     """
     if depth < 0:
         raise ValueError("depth must be >= 0")
-    # TODO(student): ~10 lines.
-    #   1) n = data.num_nodes; y = data.y.numpy()
-    #   2) edge_index = data.edge_index.numpy()
-    #   3) colors = np.zeros(n, dtype=int)
-    #   4) for _ in range(depth): colors = wl_refine(edge_index, n, colors)
-    #   5) cells = [np.where(colors == c)[0] for c in np.unique(colors)]
-    #   6) return Partition(cells=cells, n=n, _labels=y)
-    raise NotImplementedError("wl_partition is not implemented")
+    n = int(data.num_nodes)
+    y = data.y.numpy() if hasattr(data.y, "numpy") else np.asarray(data.y)
+    edge_index = (
+        data.edge_index.numpy() if hasattr(data.edge_index, "numpy")
+        else np.asarray(data.edge_index)
+    )
+    colors = np.zeros(n, dtype=int)
+    for _ in range(depth):
+        colors = wl_refine(edge_index, n, colors)
+    cells = [np.where(colors == c)[0] for c in np.unique(colors)]
+    return Partition(cells=cells, n=n, _labels=y)

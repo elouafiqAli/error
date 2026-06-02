@@ -11,7 +11,7 @@ from math import log2
 import numpy as np
 import pytest
 
-from onboarding.projects.capstone.milestone2.bracket import (
+from onboarding.projects.shared.bracket import (
     bracket_of,
     hbin,
     hbin_inverse,
@@ -93,7 +93,7 @@ def test_bracket_of_partition_uses_q_and_e():
     """Build a Partition by hand without going through __post_init__'s
     validation; bracket_of should return numbers consistent with q.e."""
     pytest.importorskip("torch_geometric")
-    from onboarding.projects.capstone.milestone1.partition import Partition
+    from onboarding.projects.shared.partition import Partition
 
     cells = [np.array([0, 1, 2]), np.array([3, 4])]
     labels = np.array([0, 0, 1, 1, 1])

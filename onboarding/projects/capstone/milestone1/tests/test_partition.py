@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from onboarding.projects.capstone.milestone1.partition import (
+from onboarding.projects.shared.partition import (
     Partition,
     label_partition,
     wl_partition,

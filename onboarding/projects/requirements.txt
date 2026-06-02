@@ -1,0 +1,22 @@
+# --- core numerics (CPU-only is enough for HW1-HW4 + M1 + M2) ---
+numpy>=1.24
+scipy>=1.10
+matplotlib>=3.7
+pandas>=2.0
+
+# --- notebooks + CI harness ---
+jupyter>=1.0
+ipykernel>=6.0
+nbformat>=5.9
+nbclient>=0.9
+pytest>=7.4
+
+# --- GNN stack (capstone M3/M4/M6 — optional for HW1-HW4) ---
+torch>=2.2
+torch-geometric>=2.5
+
+# --- Modal (optional; only needed for capstone M3/M4 GPU runs) ---
+modal>=0.62
+
+# --- extras for the advanced section (M6) ---
+ogb>=1.3
