@@ -14,3 +14,11 @@ __pycache__/
 
 # Large local-only experiment caches
 partition-sandwich-preprint/experiments/data/
+
+# Cached datasets (Planetoid Cora/Citeseer/Pubmed, ~tens of MB)
+data/
+onboarding/projects/data/
+
+# Generated reflection log + plots
+onboarding/projects/.reflection.jsonl
+onboarding/projects/**/plots/
