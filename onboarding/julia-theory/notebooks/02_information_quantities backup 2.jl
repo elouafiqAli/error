@@ -2,8 +2,8 @@
 # v0.20.28
 
 #> [frontmatter]
-#> title = "The bracket envelope — centrepiece"
-#> tags = ["bracket", "unit-2", "centrepiece"]
+#> title = "Information quantities — H(X), H(Y|X), I(X;Y)"
+#> tags = ["information-theory", "primitives", "unit-1"]
 
 using Markdown
 using InteractiveUtils
@@ -20,360 +20,401 @@ macro bind(def, element)
     #! format: on
 end
 
-# ╔═╡ a0000005-0000-0000-0000-000000000001
-using PlutoUI, Plots, LaTeXStrings, IntervalArithmetic
+# ╔═╡ 15f63d58-5ec6-11f1-b6ad-dfac1467cdd2
+using PlutoUI, Plots, LaTeXStrings, Symbolics, LinearAlgebra
 
-# ╔═╡ a0000005-0000-0000-0000-000000000002
+# ╔═╡ 15f65072-5ec6-11f1-a6d6-cd37b112dc9d
 md"""
-# Notebook 05 — The bracket envelope (Theorem 1, centrepiece)
+# Notebook 02 — Information quantities
 
-> **Unit II, centrepiece.** This is the notebook the rest of the
-> curriculum points at. We *demonstrate* Theorem 1 inline:
+> **Unit I, primitive 2.** Joint distributions $P(X,Y)$ on a 2×2
+> table. We build entropy, conditional entropy, mutual information
+> from scratch, in code, with reactive sliders. The chain rule and
+> non-negativity of MI are observed live, not assumed.
 >
-> $$
-> H_{\mathrm{bin}}^{-1}\!\bigl(H(Y\mid\Pi)\bigr) \;\le\; \varepsilon(\Pi) \;\le\; \tfrac{1}{2}\, H(Y\mid\Pi)
-> $$
+> **Punchline.** $H(X,Y) = H(X) + H(Y\mid X) = H(Y) + H(X\mid Y)$
+> and $I(X;Y) = H(Y) - H(Y\mid X) \ge 0$ with equality iff $X \perp Y$.
 >
-> where $H(Y\mid\Pi) = \sum_C q_C H_{\mathrm{bin}}(e_C)$ and
-> $\varepsilon(\Pi) = \sum_C q_C e_C$.
->
-> **Pedagogy.** Everything in §1–§5 is shown live. The §Exercises
-> at the end **replicate** the same demonstration with different
-> $m$, different prior, different units — no new theory.
+> **Pedagogy.** This notebook *demonstrates* every quantity inline.
+> The §Exercises at the end ask you to **replicate** what was
+> shown in a slightly different form (3×3 table, log base swap,
+> symmetric variant) — not to derive new material.
 """
 
-# ╔═╡ a0000005-0000-0000-0000-000000000003
+# ╔═╡ 15f65310-5ec6-11f1-afad-43ff92f08200
 md"""
-## 1. Binary entropy and its inverse — interval-arithmetic safe
+## 1. Joint distribution on a 2×2 table
 
-We bisect $H_{\mathrm{bin}}$ on the increasing branch $[0, 1/2]$.
-The classical bisection returns the midpoint of a guaranteed
-enclosing interval — `IntervalArithmetic` is loaded so the §Exercises
-can swap the float midpoint for a verified interval when desired.
+We slide three entries $P_{00}, P_{01}, P_{10}$ of a $2 \times 2$
+joint distribution. The fourth entry is fixed by the sum-to-one
+constraint: $P_{11} = 1 - P_{00} - P_{01} - P_{10}$. We display the
+matrix in a Plots heatmap so the reader *sees* the distribution.
 """
 
-# ╔═╡ a0000005-0000-0000-0000-000000000004
+# ╔═╡ 15f65356-5ec6-11f1-bcd4-c10c285658b0
+md"""
+**Slide three sliders; the fourth entry is implied.**
+$P_{00}$:
+"""
+
+# ╔═╡ 15f653f4-5ec6-11f1-b760-177c348779ba
+@bind p00 Slider(0.0:0.01:1.0, default=0.40, show_value=true)
+
+# ╔═╡ 15f65432-5ec6-11f1-8eb0-41569a9cec54
+@bind p01 Slider(0.0:0.01:1.0, default=0.10, show_value=true)
+
+# ╔═╡ 15f65464-5ec6-11f1-9bfe-1d7ba3a2d7d3
+@bind p10 Slider(0.0:0.01:1.0, default=0.10, show_value=true)
+
+# ╔═╡ 15f6548c-5ec6-11f1-b60f-b5781e059434
 begin
-    Hbin(p::Real) = (p ≤ 0 || p ≥ 1) ? 0.0 : -p*log2(p) - (1-p)*log2(1-p)
+    # Build the 2×2 joint distribution. The fourth entry is forced.
+    p11 = 1.0 - p00 - p01 - p10
+    P = [p00 p01;
+         p10 p11]
+    valid = all(>=(0), P)
+    (P, valid, p11)
+end
 
-    function Hbin_inverse(h::Real; tol::Real = 1e-12)
-        h ≤ 0 && return 0.0
-        h ≥ 1 && return 0.5
-        lo, hi = 0.0, 0.5
-        while hi - lo > tol
-            mid = 0.5*(lo + hi)
-            Hbin(mid) < h ? (lo = mid) : (hi = mid)
+# ╔═╡ 15f654fc-5ec6-11f1-b28c-1169f2111a80
+md"""
+## 2. Marginals, conditionals, and the IT primitives
+
+We compute everything in **bits** (so $\log = \log_2$). Convention
+$0 \log 0 = 0$ is enforced by the helper `xlog2x`. Definitions
+(written here so the code below is a transparent transcription):
+
+$$
+H(X) = -\sum_x P_X(x) \log_2 P_X(x), \quad
+H(Y\mid X) = \sum_x P_X(x)\, H(Y\mid X=x),
+$$
+$$
+H(X,Y) = -\sum_{x,y} P(x,y)\log_2 P(x,y), \quad
+I(X;Y) = H(X) + H(Y) - H(X,Y).
+$$
+"""
+
+# ╔═╡ 15f6552e-5ec6-11f1-a3bd-c97e3a2d104e
+begin
+    # Convention: 0 log 0 = 0.
+    xlog2x(p) = p > 0 ? p * log2(p) : 0.0
+    H(p::AbstractArray) = -sum(xlog2x, p)
+
+    # Marginals.
+    PX = vec(sum(P; dims=2))
+    PY = vec(sum(P; dims=1))
+
+    # H(X), H(Y), H(X,Y).
+    HX  = H(PX)
+    HY  = H(PY)
+    HXY = H(P)
+
+    # Conditional H(Y | X): per row entropy, weighted by P_X(x).
+    # Guard rows with PX[i] == 0 (then conditional row is undefined → contributes 0).
+    HY_given_X = 0.0
+    for i in 1:2
+        if PX[i] > 0
+            row = P[i, :] ./ PX[i]
+            HY_given_X += PX[i] * H(row)
         end
-        return 0.5*(lo + hi)
     end
 
-    grid = 0.0:0.005:1.0
-    max_round_trip_err = maximum(abs(Hbin(Hbin_inverse(h)) - h) for h in grid)
-    (Hbin_inverse_at_half = Hbin_inverse(0.5),
-     Hbin_inverse_at_one  = Hbin_inverse(1.0),
-     max_round_trip_err   = max_round_trip_err)
+    HX_given_Y = HXY - HY  # cross-check via chain rule
+    MI = HX + HY - HXY
+
+    (; HX, HY, HXY, HY_given_X, HX_given_Y, MI)
 end
 
-# ╔═╡ a0000005-0000-0000-0000-000000000005
+# ╔═╡ 15f65632-5ec6-11f1-8b8d-0bc33627f209
 md"""
-## 2. The bracket on a 5-cell uniform-mass family
+## 3. Verify the chain rule
 
-Fix $m = 5$ cells with equal masses $q_C = 1/5$ and slide a single
-$\varepsilon$ slider. Set every per-cell error to the same value,
-$e_C \equiv \varepsilon$ — the *worst case* for the lower bound
-(the lower bound is tight at $\varepsilon$ precisely when $e_C$ is
-constant).
+The chain rule says $H(X,Y) = H(X) + H(Y\mid X)$. We **assert it
+holds to floating-point precision** below; if the assertion fires
+the notebook turns red, which is the point: this is a live
+mathematical identity, not a textbook claim.
 """
 
-# ╔═╡ a0000005-0000-0000-0000-000000000006
-@bind ε Slider(0.001:0.001:0.499, default=0.200, show_value=true)
-
-# ╔═╡ a0000005-0000-0000-0000-000000000007
-begin
-    m    = 5
-    q    = fill(1/m, m)
-    e    = fill(ε, m)
-    Hpi  = sum(q .* Hbin.(e))             # H(Y | Π)
-    epsΠ = sum(q .* e)                    # ε(Π) = ε here, since e ≡ ε
-    lo   = Hbin_inverse(Hpi)              # Theorem 1, lower side
-    hi   = Hpi / 2                        # Theorem 1, upper side
-    slk  = hi - lo                        # bracket slack
-    md"""
-    | quantity | value |
-    |---|---|
-    | $H(Y\mid \Pi)$ | $(round(Hpi; digits=6)) |
-    | $\varepsilon(\Pi)$ | $(round(epsΠ; digits=6)) |
-    | lower $= H_{\mathrm{bin}}^{-1}(H)$ | $(round(lo; digits=6)) |
-    | upper $= H/2$ | $(round(hi; digits=6)) |
-    | slack | $(round(slk; digits=6)) |
-    | bracket holds? | $(lo - 1e-9 ≤ epsΠ ≤ hi + 1e-9) |
-    """
-end
-
-# ╔═╡ a0000005-0000-0000-0000-000000000008
-md"""
-## 3. Plot upper, lower, slack across ε
-
-Sweep $\varepsilon$ across the full range and overlay the three
-curves. The slider's current $\varepsilon$ is marked with a vertical
-red line; the slider value is also marked with a star on the slack
-curve.
-"""
-
-# ╔═╡ a0000005-0000-0000-0000-000000000009
-begin
-    εs   = 0.001:0.001:0.499
-    H_e  = [Hbin(εi) for εi in εs]
-    lo_e = [Hbin_inverse(h) for h in H_e]    # = εi exactly, since e ≡ ε
-    hi_e = H_e ./ 2
-    slk_e = hi_e .- lo_e
-
-    p1 = plot(εs, hi_e;  label=L"\mathrm{upper}=H/2",                lw=2)
-    plot!(p1, εs, lo_e;  label=L"\mathrm{lower}=H_{\mathrm{bin}}^{-1}(H)", lw=2)
-    plot!(p1, εs, slk_e; label=L"\mathrm{slack}=H/2-H_{\mathrm{bin}}^{-1}(H)",
-          lw=2, ls=:dash)
-    vline!(p1, [ε]; label=L"\mathrm{slider}\;\varepsilon", c=:red, ls=:dot)
-    scatter!(p1, [ε], [slk]; label="slack here", ms=6, c=:red)
-    xlabel!(L"\varepsilon = \varepsilon(\Pi)\;(=e_C\;\mathrm{here})")
-    ylabel!(L"\mathrm{bits\ or\ error}")
-    p1
-end
-
-# ╔═╡ a0000005-0000-0000-0000-00000000000a
-md"""
-## 4. Find $w^*$ with the slider — and verify numerically
-
-Move the slider toward the visual maximum of the dashed slack
-curve. You should land near $\varepsilon^* = 0.20$ with
-$w^* \approx 0.1610$. The cell below **verifies** independently of
-the slider by a 5000-point grid scan — the same fact HW3 Q4 derives
-in Python.
-"""
-
-# ╔═╡ a0000005-0000-0000-0000-00000000000b
+# ╔═╡ 15f6569e-5ec6-11f1-bc8c-dbdb69563398
 let
-    g = 5000
-    εg = range(1/g, 0.5 - 1/g; length=g)
-    sg = [Hbin(εi)/2 - εi for εi in εg]
-    i  = argmax(sg)
-    eps_star, w_star = εg[i], sg[i]
-    @assert 0.199 < eps_star < 0.201
-    @assert 0.160 < w_star   < 0.162
+    lhs = HXY
+    rhs1 = HX + HY_given_X
+    rhs2 = HY + HX_given_Y
+    @assert abs(lhs - rhs1) < 1e-12  "chain rule LHS=$(lhs) RHS=$(rhs1)"
+    @assert abs(lhs - rhs2) < 1e-12  "symmetric chain rule violated"
+    @assert MI ≥ -1e-12              "I(X;Y) ≥ 0 (Jensen / KL)"
     md"""
-    Grid scan (5000 points) finds:
-    - $\varepsilon^* \approx $(round(eps_star; digits=6))$ (≈ $1/5$)
-    - $w^* \approx $(round(w_star; digits=6))$ (the 'irreducible
-      bracket slack' Cor 2 of the paper names)
-
-    Notebook **06** automates this with `Optim.brent` and reproduces
-    the symbolic closed form using `Symbolics.jl` + `Enzyme`.
+    | quantity | value (bits) |
+    |---|---|
+    | $H(X)$ | $(round(HX; digits=4)) |
+    | $H(Y)$ | $(round(HY; digits=4)) |
+    | $H(X,Y)$ | $(round(HXY; digits=4)) |
+    | $H(Y\mid X)$ | $(round(HY_given_X; digits=4)) |
+    | $H(X\mid Y)$ | $(round(HX_given_Y; digits=4)) |
+    | $I(X;Y)$ | $(round(MI; digits=4)) |
+    | $H(X)+H(Y\mid X)$ | $(round(HX + HY_given_X; digits=4)) (== $H(X,Y)$) |
     """
 end
 
-# ╔═╡ a0000005-0000-0000-0000-00000000000c
+# ╔═╡ 15f656e4-5ec6-11f1-a0b0-a9a88bf8c3eb
 md"""
-## 5. Falsify — break the lower bound by misusing the inverse
+## 4. Slide to independence; watch $I(X;Y) \to 0$
 
-A common student bug: writing `lower = Hbin_inverse(ε)` instead of
-`lower = Hbin_inverse(H)` — confusing the **argument** of the
-inverse (the *entropy*, not the *error*). We show both side-by-side;
-the wrong version *crosses above ε* and so does **not** lower-bound
-the error. The plot is the entire moral.
+Independence means $P(X,Y) = P_X \cdot P_Y^\top$ (outer product).
+We **construct** the closest independent distribution to $P$ and
+overlay its MI against the current $P$'s MI on a sweeping plot.
+Move the sliders so $P_{00}$ is close to $P_X(0) \cdot P_Y(0)$; MI
+drops toward 0.
 """
 
-# ╔═╡ a0000005-0000-0000-0000-00000000000d
+# ╔═╡ 15f65716-5ec6-11f1-a949-5fdda7118379
 begin
-    εs2     = 0.001:0.001:0.499
-    H_e2    = [Hbin(εi) for εi in εs2]
-    lo_ok   = [Hbin_inverse(h) for h in H_e2]   # correct: argument is H
-    lo_bad  = [Hbin_inverse(εi) for εi in εs2]  # WRONG: argument is ε
-    plot(εs2, εs2;     label=L"\varepsilon (\mathrm{truth})", lw=2, c=:black)
-    plot!(εs2, lo_ok;  label=L"H_{\mathrm{bin}}^{-1}(H)\;\mathrm{(correct)}", lw=2)
-    plot!(εs2, lo_bad; label=L"H_{\mathrm{bin}}^{-1}(\varepsilon)\;\mathrm{(wrong)}",
-          lw=2, ls=:dash)
-    xlabel!(L"\varepsilon"); ylabel!("lower-bound candidate")
-    title!("the wrong inverse crosses above ε — not a lower bound")
+    # Construct the independent product distribution with same marginals.
+    P_indep = PX * PY'
+    HX_i  = H(vec(sum(P_indep; dims=2)))
+    HY_i  = H(vec(sum(P_indep; dims=1)))
+    HXY_i = H(P_indep)
+    MI_indep = HX_i + HY_i - HXY_i
+
+    # Sweep a 'mixing' parameter α from 0 (independent) to 1 (current P)
+    # and plot MI as a function of α.
+    αs = 0.0:0.01:1.0
+    MIs = map(αs) do α
+        Pα = (1 - α) * P_indep + α * P
+        Hxa = H(vec(sum(Pα; dims=2)))
+        Hya = H(vec(sum(Pα; dims=1)))
+        Hxya = H(Pα)
+        Hxa + Hya - Hxya
+    end
+    plot(αs, MIs;
+         xlabel = L"\alpha\;(0 = \mathrm{independent},\;1 = P)",
+         ylabel = L"I(X;Y)\;[\mathrm{bits}]",
+         label = L"\mathrm{MI\ along\ } (1-\alpha)P_X P_Y^\top + \alpha P",
+         lw = 2, legend = :topleft)
 end
 
-# ╔═╡ a0000005-0000-0000-0000-00000000000e
+# ╔═╡ 15f657d4-5ec6-11f1-a099-87878746d563
+md"""
+## 5. Falsify — what if $P$ has a negative entry?
+
+We **deliberately violate** non-negativity by subtracting a small
+constant from $P_{00}$, and watch which IT quantities break. The
+output is shown live; this teaches that "probabilities are
+non-negative" is the load-bearing precondition for every identity
+above. If you don't see anything weird with $\delta = 0$, increase it.
+"""
+
+# ╔═╡ 15f65806-5ec6-11f1-947b-192d030fada2
+begin
+    δ = 0.05  # try 0.0, 0.05, 0.20; 'play here'
+    P_bad = copy(P)
+    P_bad[1, 1] -= δ
+    P_bad[2, 2] += δ  # keep sum = 1
+
+    # The helper xlog2x silently skips negative entries (treats them as 0).
+    H_bad = -sum(xlog2x, P_bad)
+    has_negative = any(<(0), P_bad)
+    md"""
+    With $\delta = $(δ)$:
+    | check | value |
+    |---|---|
+    | any $P_{ij} < 0$? | $(has_negative) |
+    | $H(\widetilde{P})$ (broken) | $(round(H_bad; digits=4)) |
+    | $H(\widetilde{P})$ minus original $H(X,Y)$ | $(round(H_bad - HXY; digits=4)) |
+
+    A negative entry breaks the *interpretation* (entropy of a
+    distribution requires a distribution) even though the
+    *formula* `-sum(p log p)` still evaluates to a real number.
+    """
+end
+
+# ╔═╡ 15f6585e-5ec6-11f1-83c3-73e567d1350b
 md"""
 ## 6. Take-aways (demonstrated above)
 
-- **Bracket holds** for any slider position (§2 table's
-  bracket-holds boolean is always `true`).
-- **Lower bound is tight** when $e_C$ is constant: in §3, the lower
-  curve coincides with $\varepsilon$ to floating-point.
-- **Slack peaks at $\varepsilon^* = 1/5$, $w^* \approx 0.1610$**:
-  verified numerically by 5000-point grid in §4. NB06 reproduces
-  the same values symbolically (Symbolics) and via `Optim.brent`.
-- **Falsification (§5).** The lower bound takes $H$ as argument,
-  not $\varepsilon$ — substitution-error is the canonical bug.
+- **Chain rule** $H(X,Y) = H(X) + H(Y\mid X)$ is verified to
+  floating-point precision *for any slider configuration* by the
+  assertion in §3. The symmetric version
+  $H(X,Y) = H(Y) + H(X\mid Y)$ is verified the same way.
+- **Symmetry of MI.** $I(X;Y) = I(Y;X)$ follows because
+  $H(X) + H(Y) - H(X,Y)$ is manifestly symmetric in $X,Y$. The §3
+  table prints both expansions; they agree to 1e-12.
+- **Asymmetry of conditional entropy.** $H(Y\mid X) \neq H(X\mid Y)$
+  in general — the §3 table shows two distinct numbers. Equality
+  holds iff $H(X) = H(Y)$.
+- **Independence ⇔ MI = 0.** Verified visually in §4: the MI curve
+  hits exactly 0 at $\alpha = 0$ (where $P = P_X P_Y^\top$).
+- **Non-negativity is load-bearing.** §5 shows the formula still
+  evaluates on a non-distribution; the *meaning* breaks first.
 """
 
-# ╔═╡ a0000005-0000-0000-0000-00000000000f
+# ╔═╡ 02ex0001-0000-0000-0000-000000000001
 md"""
 ## 7. Exercises — replicate, don't derive
 
-Every exercise re-applies the §1–§5 demonstrations in a new setting.
-None requires new theory.
+Each exercise asks you to *re-express* something already shown
+above, in a slightly different setting. None require new theory.
 
-### E1. Replicate the §3 plot for $m = 2$ and $m = 10$
+### E1. Repeat §1–§3 on a $3\times 3$ table
 
-The bracket's *shape* on a constant-$e$ family does **not** depend
-on $m$ — $H/2 - H_{\mathrm{bin}}^{-1}(H)$ is purely a function of
-$H$. Verify by re-doing §3 with `m = 2` and `m = 10`; the three
-curves coincide. The point: the number of cells controls
-*tightness* on real partitions, not the envelope itself.
+Build a $3 \times 3$ joint distribution `Q` (any non-negative
+matrix summing to 1; use `Q = [0.2 0.05 0.05; 0.1 0.3 0.05; 0.05 0.1 0.1]`
+or your own). Compute $H(X), H(Y), H(X,Y), H(Y\mid X), I(X;Y)$ using
+the *same* helpers `xlog2x` and `H` defined in §2 — they already
+work on arrays of any shape. Verify the chain rule with the same
+assertion as §3. **Output:** a markdown table identical in shape
+to the §3 table.
 """
 
-# ╔═╡ a0000005-0000-0000-0000-000000000010
-let
-    bracket_curves(m) = begin
-        εs = 0.001:0.001:0.499
-        q = fill(1/m, m)
-        H_e = [sum(q .* Hbin.(fill(εi, m))) for εi in εs]
-        H_e ./ 2 .- Hbin_inverse.(H_e), εs
-    end
-    p = plot(legend=:topright)
-    for mm in (2, 5, 10)
-        slack, εs = bracket_curves(mm)
-        plot!(p, εs, slack; label="m = $(mm)", lw=2)
-    end
-    xlabel!(p, L"\varepsilon = e_C"); ylabel!(p, "slack")
-    title!(p, "envelope independent of m on constant-e family")
-    p
+# ╔═╡ 02ex0001-0000-0000-0000-000000000002
+begin
+    # E1 — replicate §3 on a 3×3.
+    Q = [0.20 0.05 0.05;
+         0.10 0.30 0.05;
+         0.05 0.10 0.10]
+    @assert isapprox(sum(Q), 1.0; atol=1e-12)
+    QX = vec(sum(Q; dims=2)); QY = vec(sum(Q; dims=1))
+    HQX = H(QX); HQY = H(QY); HQXY = H(Q)
+    HQY_given_X = sum(QX[i] > 0 ? QX[i] * H(Q[i, :] ./ QX[i]) : 0.0 for i in 1:3)
+    @assert abs(HQXY - (HQX + HQY_given_X)) < 1e-12
+    (; HQX, HQY, HQXY, HQY_given_X, MI=HQX + HQY - HQXY)
 end
 
-# ╔═╡ a0000005-0000-0000-0000-000000000011
+# ╔═╡ 02ex0001-0000-0000-0000-000000000003
 md"""
-### E2. Replicate §2 with a **non-uniform** prior $q$
+### E2. Re-express §3 in **nats** instead of bits
 
-Set $m = 3$ cells with $q = (0.5, 0.3, 0.2)$ and per-cell errors
-$e = (0.4, 0.1, 0.0)$. Compute $\varepsilon(\Pi), H(Y\mid\Pi)$,
-the bracket endpoints, and verify $\varepsilon \in [\mathrm{lower},
-\mathrm{upper}]$. This is the *general* bracket setting (no
-constant-$e$ shortcut). The bracket should still hold.
+Define `xlogex(p) = p > 0 ? p * log(p) : 0.0` (natural log) and
+`Hn(p) = -sum(xlogex, p)`. Recompute the §3 table with these helpers
+on the original `P`. Observe that every quantity scales by
+$\ln 2 \approx 0.6931$. **Hint:** $H_{\mathrm{nats}} = H_{\mathrm{bits}} \cdot \ln 2$.
+This is the same base-change drill as NB01 §6.
 """
 
-# ╔═╡ a0000005-0000-0000-0000-000000000012
-let
-    qq = [0.5, 0.3, 0.2]
-    ee = [0.4, 0.1, 0.0]
-    @assert isapprox(sum(qq), 1.0; atol=1e-12)
-    Hpi  = sum(qq .* Hbin.(ee))
-    epsΠ = sum(qq .* ee)
-    lo   = Hbin_inverse(Hpi)
-    hi   = Hpi / 2
-    @assert lo - 1e-9 ≤ epsΠ ≤ hi + 1e-9
-    (Hpi=round(Hpi; digits=6),
-     epsΠ=round(epsΠ; digits=6),
-     lower=round(lo; digits=6),
-     upper=round(hi; digits=6),
-     slack=round(hi - lo; digits=6))
+# ╔═╡ 02ex0001-0000-0000-0000-000000000004
+begin
+    xlogex(p) = p > 0 ? p * log(p) : 0.0
+    Hn(p::AbstractArray) = -sum(xlogex, p)
+    HX_nats  = Hn(PX)
+    HXY_nats = Hn(P)
+    # Predicted from bits: HX * ln(2).
+    HX_predicted_nats = HX * log(2)
+    @assert abs(HX_nats - HX_predicted_nats) < 1e-12
+    (; HX_nats, HXY_nats, ratio = HX_nats / HX)  # ratio ≈ 0.6931
 end
 
-# ╔═╡ a0000005-0000-0000-0000-000000000013
+# ╔═╡ 02ex0001-0000-0000-0000-000000000005
 md"""
-### E3. Re-derive $w^*$ in **nats** instead of bits
+### E3. Demonstrate MI symmetry $I(X;Y) = I(Y;X)$ by swapping axes
 
-Define `Hbin_nats(p) = -p*log(p) - (1-p)*log(1-p)` and `Hbin_inv_nats`
-by bisection. Re-do the §4 grid scan. You find the **same**
-$\varepsilon^* = 1/5$ (location is unit-free) and
-$w^*_{\text{nats}} = w^* \cdot \ln 2 \approx 0.1116$ (the value
-scales with the unit). Unit-change drill, identical in spirit to
-NB01 §6 and NB02 §E2.
+Compute $I(Y;X)$ by transposing `P` (so rows become columns) and
+re-running §2 on `P'`. Assert the result equals `MI` from §3 to
+1e-12. This is a one-line replication of the symmetry already
+made visible in the §3 table.
 """
 
-# ╔═╡ a0000005-0000-0000-0000-000000000014
+# ╔═╡ 02ex0001-0000-0000-0000-000000000006
 let
-    Hb(p) = (p ≤ 0 || p ≥ 1) ? 0.0 : -p*log(p) - (1-p)*log(1-p)
-    function Hb_inv(h; tol=1e-12)
-        h ≤ 0 && return 0.0
-        h ≥ log(2) && return 0.5
-        lo, hi = 0.0, 0.5
-        while hi - lo > tol
-            mid = 0.5*(lo + hi)
-            Hb(mid) < h ? (lo = mid) : (hi = mid)
-        end
-        0.5*(lo + hi)
+    Pt = P'
+    PXt = vec(sum(Pt; dims=2)); PYt = vec(sum(Pt; dims=1))
+    MI_swapped = H(PXt) + H(PYt) - H(Pt)
+    @assert abs(MI_swapped - MI) < 1e-12
+    md"$I(Y;X) = $(round(MI_swapped; digits=6)) bits — matches $I(X;Y) = $(round(MI; digits=6)) bits."
+end
+
+# ╔═╡ 02ex0001-0000-0000-0000-000000000007
+md"""
+### E4. Re-do §4 with $Y$-mixing instead of $X$-mixing
+
+In §4 we swept along $(1-\alpha) P_X P_Y^\top + \alpha P$. Re-do
+it but mix toward the **column-independent** distribution
+$P_X \cdot (\text{uniform on } Y)$ — i.e.\ replace $P_Y$ with
+$[0.5, 0.5]$. Plot the new MI curve on the same axes. Two
+observations should land: (i) the curve starts higher than §4's
+(uniform $Y$ is not the marginal of $P$), and (ii) the curve still
+crosses zero somewhere if and only if the mixed distribution
+becomes a product.
+"""
+
+# ╔═╡ 02ex0001-0000-0000-0000-000000000008
+let
+    PY_uniform = [0.5, 0.5]
+    P_indep_u = PX * PY_uniform'
+    αs2 = 0.0:0.01:1.0
+    MIs2 = map(αs2) do α
+        Pα = (1 - α) * P_indep_u + α * P
+        H(vec(sum(Pα; dims=2))) + H(vec(sum(Pα; dims=1))) - H(Pα)
     end
-    g = 5000
-    εg = range(1/g, 0.5 - 1/g; length=g)
-    sg = [Hb(εi)/2 - εi for εi in εg]
-    i  = argmax(sg)
-    eps_star, w_star_nats = εg[i], sg[i]
-    w_star_bits = w_star_nats / log(2)
+    plot(αs, MIs; label="§4 mix → P_X P_Y^T", lw=2)
+    plot!(αs2, MIs2; label="E4 mix → P_X · uniform", lw=2, ls=:dash)
+    xlabel!(L"\alpha"); ylabel!(L"I(X;Y)\;[\mathrm{bits}]")
+end
+
+# ╔═╡ 02ex0001-0000-0000-0000-000000000009
+md"""
+### E5. Symbolic chain rule with `Symbolics.jl`
+
+Use `Symbolics.jl` to declare two abstract probabilities
+$a := P(X=0), b := P(Y=0\mid X=0)$, build $H_{\mathrm{bin}}(a)$ and
+the joint distribution
+$\begin{pmatrix} a b & a(1-b) \\ (1-a)c & (1-a)(1-c) \end{pmatrix}$
+for symbolic $c := P(Y=0\mid X=1)$, and have `simplify` verify the
+chain rule **symbolically**. This is the Edelman-style cross-check:
+the identity that pytest confirms numerically in §3 is the same
+identity Symbolics confirms algebraically.
+
+The next notebook (03) takes the same machinery and applies it to
+**Fano vs Hellman–Raviv** — two different bounds on the same
+$\varepsilon$, with $H_{\mathrm{bin}}$ doing different work in each.
+"""
+
+# ╔═╡ 02ex0001-0000-0000-0000-00000000000a
+let
+    @variables a b c
+    # H_bin in nats for symbolic clarity (avoids log2 simplification mess).
+    Hb(p) = -p*log(p) - (1-p)*log(1-p)
+    HXs   = Hb(a)
+    # Build the joint:  P(X=0,Y=0)=a*b, P(X=0,Y=1)=a*(1-b),
+    #                   P(X=1,Y=0)=(1-a)*c, P(X=1,Y=1)=(1-a)*(1-c)
+    Pents = [a*b, a*(1-b), (1-a)*c, (1-a)*(1-c)]
+    HXYs  = -sum(p*log(p) for p in Pents)
+    HY_given_Xs = a*Hb(b) + (1-a)*Hb(c)
+    diff = simplify(HXYs - (HXs + HY_given_Xs); expand=true)
     md"""
-    Nats grid scan:
-    - $\varepsilon^* \approx $(round(eps_star; digits=6))$ — same as §4.
-    - $w^*_{\text{nats}} \approx $(round(w_star_nats; digits=6))$
-    - rescaled to bits: $w^*_{\text{nats}}/\ln 2 = $(round(w_star_bits; digits=6))$ — matches §4 to 1e-3.
+    Symbolic residual `H(X,Y) - (H(X) + H(Y|X))`:
+    ```
+    $(diff)
+    ```
+    Numerically zero on any substitution; if `simplify` does not
+    collapse it fully, that is a Symbolics presentation choice,
+    not a counterexample. Plug a, b, c = 0.4, 0.25, 0.3 and the
+    expression evaluates to ≤ 1e-14.
     """
 end
 
-# ╔═╡ a0000005-0000-0000-0000-000000000015
-md"""
-### E4. Replicate §5 falsification with the **upper** bound
-
-§5 broke the lower bound by passing the wrong argument. Build the
-analogous bug for the upper bound: plot $H_{\mathrm{bin}}(\varepsilon)/2$
-(correct upper) versus $\varepsilon/2$ (wrong) against the true
-$\varepsilon$. Which is a valid upper bound? Why does the argument-
-type confusion ($H$ vs $\varepsilon$) matter symmetrically on both
-sides of Theorem 1?
-"""
-
-# ╔═╡ a0000005-0000-0000-0000-000000000016
-let
-    εs = 0.001:0.001:0.499
-    upper_ok  = [Hbin(εi) / 2 for εi in εs]   # H/2 with H = Hbin(ε)
-    upper_bad = collect(εs) ./ 2              # ε/2 — *not* an upper bound on ε
-    plot(εs, εs;        label=L"\varepsilon (\mathrm{truth})", lw=2, c=:black)
-    plot!(εs, upper_ok; label=L"H_{\mathrm{bin}}(\varepsilon)/2\;(\mathrm{correct\ upper})", lw=2)
-    plot!(εs, upper_bad; label=L"\varepsilon/2\;(\mathrm{wrong})", lw=2, ls=:dash)
-    xlabel!(L"\varepsilon")
-    title!("the wrong upper falls below ε — not an upper bound")
-end
-
-# ╔═╡ a0000005-0000-0000-0000-000000000017
-md"""
-### E5. Cross-check §4 against the Python HW3 reference
-
-HW3 Q4 (`onboarding/projects/psets/hw3/starter/q4_wstar.py`) grid-
-searches the same maximum in Python and its tests assert
-$\varepsilon^* \in (0.199, 0.201)$ and $w^* \in (0.160, 0.162)$.
-Run that test from a terminal:
-
-```
-pytest onboarding/projects/psets/hw3/tests/test_q4.py -v
-```
-
-Two independent implementations (Julia bisection + Python `np.argmax`)
-on the same fact — the strongest cross-check the curriculum offers.
-"""
-
-# ╔═╡ a0000005-0000-0000-0000-000000000018
+# ╔═╡ 02ex0001-0000-0000-0000-00000000000b
 md"""
 ## 8. Next
 
-**Notebook 06** — *locate $\varepsilon^*$ and $w^*$ closed-form with
-Symbolics + Optim + Enzyme*. Three independent derivations of the
-same scalar, all collapsing to $\varepsilon^* = 1/5$.
+**Notebook 03** — *Fano vs Hellman–Raviv*. Same $H_{\mathrm{bin}}$,
+two different inequalities, two different load-bearing
+preconditions. Then **Unit II** (04–07) opens with the partition
+$\Pi$ and assembles the paper's bracket from these primitives.
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-IntervalArithmetic = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
-IntervalArithmetic = "~1.0.9"
 LaTeXStrings = "~1.4.0"
 Plots = "~1.41.6"
 PlutoUI = "~0.7.83"
+Symbolics = "~6.58.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -382,12 +423,67 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "1bbcb07c690d9e9d73689e3af232565602167277"
+project_hash = "65354a78a2ef6271d302b6c41b4596e7a9204020"
+
+[[deps.ADTypes]]
+git-tree-sha1 = "bbc22a9a08a0ef6460041086d8a7b27940ed4ffd"
+uuid = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
+version = "1.22.0"
+
+    [deps.ADTypes.extensions]
+    ADTypesChainRulesCoreExt = "ChainRulesCore"
+    ADTypesConstructionBaseExt = "ConstructionBase"
+    ADTypesEnzymeCoreExt = "EnzymeCore"
+
+    [deps.ADTypes.weakdeps]
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
+    EnzymeCore = "f151be2c-9106-41f4-ab19-57ee4f262869"
 
 [[deps.AbstractPlutoDingetjes]]
 git-tree-sha1 = "6c3913f4e9bdf6ba3c08041a446fb1332716cbc2"
 uuid = "6e696c72-6542-2067-7265-42206c756150"
 version = "1.4.0"
+
+[[deps.AbstractTrees]]
+git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
+uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
+version = "0.4.5"
+
+[[deps.Accessors]]
+deps = ["CompositionsBase", "ConstructionBase", "Dates", "InverseFunctions", "MacroTools"]
+git-tree-sha1 = "2eeb2c9bef11013efc6f8f97f32ee59b146b09fb"
+uuid = "7d9f7c33-5ae7-4f3b-8dc6-eff91059b697"
+version = "0.1.44"
+
+    [deps.Accessors.extensions]
+    AxisKeysExt = "AxisKeys"
+    IntervalSetsExt = "IntervalSets"
+    LinearAlgebraExt = "LinearAlgebra"
+    StaticArraysExt = "StaticArrays"
+    StructArraysExt = "StructArrays"
+    TestExt = "Test"
+    UnitfulExt = "Unitful"
+
+    [deps.Accessors.weakdeps]
+    AxisKeys = "94b1ba4f-4ee9-5380-92f1-94cde586c3c5"
+    IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
+    LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+    StructArrays = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
+    Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+    Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+
+[[deps.Adapt]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "28e1637322d4019ed2577cbec9268fab9b7da117"
+uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
+version = "4.6.0"
+weakdeps = ["SparseArrays", "StaticArrays"]
+
+    [deps.Adapt.extensions]
+    AdaptSparseArraysExt = "SparseArrays"
+    AdaptStaticArraysExt = "StaticArrays"
 
 [[deps.AliasTables]]
 deps = ["PtrArrays", "Random"]
@@ -399,6 +495,42 @@ version = "1.1.3"
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 version = "1.1.2"
 
+[[deps.ArrayInterface]]
+deps = ["Adapt", "LinearAlgebra"]
+git-tree-sha1 = "3d0cabd25fab32390e3bcb82cd67e700aebd9816"
+uuid = "4fba245c-0d91-5ea0-9b3e-6abc04ee57a9"
+version = "7.25.0"
+
+    [deps.ArrayInterface.extensions]
+    ArrayInterfaceAMDGPUExt = "AMDGPU"
+    ArrayInterfaceBandedMatricesExt = "BandedMatrices"
+    ArrayInterfaceBlockBandedMatricesExt = "BlockBandedMatrices"
+    ArrayInterfaceCUDAExt = "CUDA"
+    ArrayInterfaceCUDSSExt = ["CUDSS", "CUDA"]
+    ArrayInterfaceChainRulesCoreExt = "ChainRulesCore"
+    ArrayInterfaceChainRulesExt = "ChainRules"
+    ArrayInterfaceGPUArraysCoreExt = "GPUArraysCore"
+    ArrayInterfaceMetalExt = "Metal"
+    ArrayInterfaceReverseDiffExt = "ReverseDiff"
+    ArrayInterfaceSparseArraysExt = "SparseArrays"
+    ArrayInterfaceStaticArraysCoreExt = "StaticArraysCore"
+    ArrayInterfaceTrackerExt = "Tracker"
+
+    [deps.ArrayInterface.weakdeps]
+    AMDGPU = "21141c5a-9bdb-4563-92ae-f87d6854732e"
+    BandedMatrices = "aae01518-5342-5314-be14-df237901396f"
+    BlockBandedMatrices = "ffab5731-97b5-5995-9138-79e8c1846df0"
+    CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+    CUDSS = "45b445bb-4962-46a0-9369-b4df9d0f772e"
+    ChainRules = "082447d4-558c-5d27-93f4-14fc19e9eca2"
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    GPUArraysCore = "46192b85-c4d5-4398-a991-12ede77f4527"
+    Metal = "dde4c033-4e86-420c-a63e-0dd931031962"
+    ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+    StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+    Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
+
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 version = "1.11.0"
@@ -406,6 +538,11 @@ version = "1.11.0"
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 version = "1.11.0"
+
+[[deps.Bijections]]
+git-tree-sha1 = "a2d308fcd4c2fb90e943cf9cd2fbfa9c32b69733"
+uuid = "e2ed5e7c-b2de-5872-ae92-c73ca462fb04"
+version = "0.2.2"
 
 [[deps.BitFlags]]
 git-tree-sha1 = "bbe1079eecf9c9fbb52765193ad2bae27ae09bc8"
@@ -418,23 +555,21 @@ git-tree-sha1 = "1b96ea4a01afe0ea4090c5c8039690672dd13f2e"
 uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
 version = "1.0.9+0"
 
-[[deps.CRlibm]]
-deps = ["CRlibm_jll"]
-git-tree-sha1 = "66188d9d103b92b6cd705214242e27f5737a1e5e"
-uuid = "96374032-68de-5a5b-8d9e-752f78720389"
-version = "1.0.2"
-
-[[deps.CRlibm_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "e329286945d0cfc04456972ea732551869af1cfc"
-uuid = "4e9b3aee-d8a1-5a3d-ad8b-7d824db253f0"
-version = "1.0.1+0"
-
 [[deps.Cairo_jll]]
 deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "Libdl", "Pixman_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
 git-tree-sha1 = "1fa950ebc3e37eccd51c6a8fe1f92f7d86263522"
 uuid = "83423d85-b0ee-5818-9007-b63ccbeb887a"
 version = "1.18.7+0"
+
+[[deps.ChainRulesCore]]
+deps = ["Compat", "LinearAlgebra"]
+git-tree-sha1 = "12177ad6b3cad7fd50c8b3825ce24a99ad61c18f"
+uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+version = "1.26.1"
+weakdeps = ["SparseArrays"]
+
+    [deps.ChainRulesCore.extensions]
+    ChainRulesCoreSparseArraysExt = "SparseArrays"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -463,12 +598,10 @@ deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statist
 git-tree-sha1 = "8b3b6f87ce8f65a2b4f857528fd8d70086cd72b1"
 uuid = "c3611d14-8923-5661-9e6a-0046d554d3a4"
 version = "0.11.0"
+weakdeps = ["SpecialFunctions"]
 
     [deps.ColorVectorSpace.extensions]
     SpecialFunctionsExt = "SpecialFunctions"
-
-    [deps.ColorVectorSpace.weakdeps]
-    SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [[deps.Colors]]
 deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
@@ -476,10 +609,55 @@ git-tree-sha1 = "37ea44092930b1811e666c3bc38065d7d87fcc74"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.13.1"
 
+[[deps.Combinatorics]]
+git-tree-sha1 = "08c8b6831dc00bfea825826be0bc8336fc369860"
+uuid = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
+version = "1.0.2"
+
+[[deps.CommonSolve]]
+git-tree-sha1 = "dd91a10d8b8ae06e15706158eaf1a3e87e97b5f5"
+uuid = "38540f10-b2f7-11e9-35d8-d573e4eb0ff2"
+version = "0.2.7"
+
+    [deps.CommonSolve.extensions]
+    CommonSolveEnzymeCoreExt = "EnzymeCore"
+
+    [deps.CommonSolve.weakdeps]
+    EnzymeCore = "f151be2c-9106-41f4-ab19-57ee4f262869"
+
+[[deps.CommonWorldInvalidations]]
+git-tree-sha1 = "ae52d1c52048455e85a387fbee9be553ec2b68d0"
+uuid = "f70d9fcc-98c5-4d4a-abd7-e4cdeebd8ca8"
+version = "1.0.0"
+
+[[deps.Compat]]
+deps = ["TOML", "UUIDs"]
+git-tree-sha1 = "9d8a54ce4b17aa5bdce0ea5c34bc5e7c340d16ad"
+uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
+version = "4.18.1"
+weakdeps = ["Dates", "LinearAlgebra"]
+
+    [deps.Compat.extensions]
+    CompatLinearAlgebraExt = "LinearAlgebra"
+
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "1.3.0+1"
+
+[[deps.CompositeTypes]]
+git-tree-sha1 = "bce26c3dab336582805503bed209faab1c279768"
+uuid = "b152e2b5-7a66-4b01-a709-34e65c35f657"
+version = "0.1.4"
+
+[[deps.CompositionsBase]]
+git-tree-sha1 = "802bb88cd69dfd1509f6670416bd4434015693ad"
+uuid = "a33af91c-f02d-484b-be07-31d278c5ca2b"
+version = "0.1.2"
+weakdeps = ["InverseFunctions"]
+
+    [deps.CompositionsBase.extensions]
+    CompositionsBaseInverseFunctionsExt = "InverseFunctions"
 
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
@@ -487,22 +665,21 @@ git-tree-sha1 = "21d088c496ea22914fe80906eb5bce65755e5ec8"
 uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
 version = "2.5.1"
 
+[[deps.ConstructionBase]]
+git-tree-sha1 = "b4b092499347b18a015186eae3042f72267106cb"
+uuid = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
+version = "1.6.0"
+weakdeps = ["IntervalSets", "LinearAlgebra", "StaticArrays"]
+
+    [deps.ConstructionBase.extensions]
+    ConstructionBaseIntervalSetsExt = "IntervalSets"
+    ConstructionBaseLinearAlgebraExt = "LinearAlgebra"
+    ConstructionBaseStaticArraysExt = "StaticArrays"
+
 [[deps.Contour]]
 git-tree-sha1 = "439e35b0b36e2e5881738abc8857bd92ad6ff9a8"
 uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
 version = "0.6.3"
-
-[[deps.CoreMath]]
-deps = ["CoreMath_jll"]
-git-tree-sha1 = "8c0480f92b1b1796239156a1b9b1bfb1b39499b4"
-uuid = "b7a15901-be09-4a0e-87d2-2e66b0e09b5a"
-version = "0.1.0"
-
-[[deps.CoreMath_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "a692a4c1dc59a4b8bc0b6403876eb3250fde2bc3"
-uuid = "a38c48d9-6df1-5ac9-9223-b6ada3b5572b"
-version = "0.1.0+0"
 
 [[deps.DataAPI]]
 git-tree-sha1 = "abe83f3a2f1b857aac70ef8b269080af17764bbe"
@@ -532,15 +709,67 @@ git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 version = "1.9.1"
 
+[[deps.DiffRules]]
+deps = ["IrrationalConstants", "LogExpFunctions", "NaNMath", "Random", "SpecialFunctions"]
+git-tree-sha1 = "79a2aca180a85c690c58a020d47b426954b590f8"
+uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
+version = "1.16.0"
+
+[[deps.Distributed]]
+deps = ["Random", "Serialization", "Sockets"]
+uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+version = "1.11.0"
+
+[[deps.Distributions]]
+deps = ["AliasTables", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SpecialFunctions", "Statistics", "StatsAPI", "StatsBase", "StatsFuns"]
+git-tree-sha1 = "e421c1938fafab0165b04dc1a9dbe2a26272952c"
+uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
+version = "0.25.125"
+
+    [deps.Distributions.extensions]
+    DistributionsChainRulesCoreExt = "ChainRulesCore"
+    DistributionsDensityInterfaceExt = "DensityInterface"
+    DistributionsTestExt = "Test"
+
+    [deps.Distributions.weakdeps]
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    DensityInterface = "b429d917-457f-4dbc-8f4c-0cc954292b1d"
+    Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
 [[deps.DocStringExtensions]]
 git-tree-sha1 = "7442a5dfe1ebb773c29cc2962a8980f47221d76c"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 version = "0.9.5"
 
+[[deps.DomainSets]]
+deps = ["CompositeTypes", "FunctionMaps", "IntervalSets", "LinearAlgebra", "StaticArrays"]
+git-tree-sha1 = "4599e0cd684f3ff6cbbab73c77553a3d01a8d74d"
+uuid = "5b8099bc-c8ec-5219-889f-1d9e522a28bf"
+version = "0.7.18"
+
+    [deps.DomainSets.extensions]
+    DomainSetsMakieExt = "Makie"
+    DomainSetsRandomExt = "Random"
+
+    [deps.DomainSets.weakdeps]
+    Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+    Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 version = "1.7.0"
+
+[[deps.DynamicPolynomials]]
+deps = ["LinearAlgebra", "MultivariatePolynomials", "MutableArithmetics", "Reexport", "StarAlgebras", "Test"]
+git-tree-sha1 = "5bfabc3827dfdd164359bad6800c115a81280c00"
+uuid = "7c1d4256-1411-5781-91ec-d7bc3513ac07"
+version = "0.6.6"
+
+[[deps.EnumX]]
+git-tree-sha1 = "c49898e8438c828577f04b92fc9368c388ac783c"
+uuid = "4e289a0a-7415-4d19-859d-a7e5c4648b56"
+version = "1.0.7"
 
 [[deps.EpollShim_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -560,6 +789,16 @@ git-tree-sha1 = "c307cd83373868391f3ac30b41530bc5d5d05d08"
 uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
 version = "2.8.1+0"
 
+[[deps.ExprTools]]
+git-tree-sha1 = "27415f162e6028e81c72b82ef756bf321213b6ec"
+uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
+version = "0.1.10"
+
+[[deps.ExproniconLite]]
+git-tree-sha1 = "c13f0b150373771b0fdc1713c97860f8df12e6c2"
+uuid = "55351af7-c7e9-48d6-89ff-24e801d99491"
+version = "0.10.14"
+
 [[deps.FFMPEG]]
 deps = ["FFMPEG_jll"]
 git-tree-sha1 = "95ecf07c2eea562b5adbd0696af6db62c0f52560"
@@ -575,6 +814,19 @@ version = "8.1.0+0"
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 version = "1.11.0"
+
+[[deps.FillArrays]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "2f979084d1e13948a3352cf64a25df6bd3b4dca3"
+uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
+version = "1.16.0"
+weakdeps = ["PDMats", "SparseArrays", "StaticArrays", "Statistics"]
+
+    [deps.FillArrays.extensions]
+    FillArraysPDMatsExt = "PDMats"
+    FillArraysSparseArraysExt = "SparseArrays"
+    FillArraysStaticArraysExt = "StaticArrays"
+    FillArraysStatisticsExt = "Statistics"
 
 [[deps.FixedPointNumbers]]
 deps = ["Random", "Statistics"]
@@ -605,11 +857,48 @@ git-tree-sha1 = "7a214fdac5ed5f59a22c2d9a885a16da1c74bbc7"
 uuid = "559328eb-81f9-559d-9380-de523a88c83c"
 version = "1.0.17+0"
 
+[[deps.FunctionMaps]]
+deps = ["CompositeTypes", "LinearAlgebra", "StaticArrays"]
+git-tree-sha1 = "31bd99a57edf98990d1c21486032963955450e8d"
+uuid = "a85aefff-f8ca-4649-a888-c8e5398bc76c"
+version = "0.1.2"
+
+[[deps.FunctionWrappers]]
+git-tree-sha1 = "d62485945ce5ae9c0c48f124a84998d755bae00e"
+uuid = "069b7b12-0de2-55c6-9aab-29f3d0a68a2e"
+version = "1.1.3"
+
+[[deps.FunctionWrappersWrappers]]
+deps = ["FunctionWrappers", "PrecompileTools", "TruncatedStacktraces"]
+git-tree-sha1 = "b28fca87e487d18ba462317e4a95d7253ae51929"
+uuid = "77dc65aa-8811-40c2-897b-53d922fa7daf"
+version = "1.9.1"
+
+    [deps.FunctionWrappersWrappers.extensions]
+    FunctionWrappersWrappersEnzymeExt = ["Enzyme", "EnzymeCore"]
+    FunctionWrappersWrappersMooncakeExt = "Mooncake"
+
+    [deps.FunctionWrappersWrappers.weakdeps]
+    Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
+    EnzymeCore = "f151be2c-9106-41f4-ab19-57ee4f262869"
+    Mooncake = "da2b9cff-9c12-43a0-ae48-6db2b0edb7d6"
+
+[[deps.Future]]
+deps = ["Random"]
+uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
+version = "1.11.0"
+
 [[deps.GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll", "libdecor_jll", "xkbcommon_jll"]
 git-tree-sha1 = "9e0fb9e54594c47f278d75063980e43066e26e20"
 uuid = "0656b61e-2033-5cc2-a64a-77c0f6c09b89"
 version = "3.4.1+1"
+
+[[deps.GPUArraysCore]]
+deps = ["Adapt"]
+git-tree-sha1 = "83cf05ab16a73219e5f6bd1bdfa9848fa24ac627"
+uuid = "46192b85-c4d5-4398-a991-12ede77f4527"
+version = "0.2.0"
 
 [[deps.GR]]
 deps = ["Artifacts", "Base64", "DelimitedFiles", "Downloads", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Preferences", "Printf", "Qt6Wayland_jll", "Random", "Serialization", "Sockets", "TOML", "Tar", "Test", "p7zip_jll"]
@@ -670,6 +959,12 @@ git-tree-sha1 = "f923f9a774fcf3f5cb761bfa43aeadd689714813"
 uuid = "2e76f6c2-a576-52d4-95c1-20adfe4de566"
 version = "8.5.1+0"
 
+[[deps.HypergeometricFunctions]]
+deps = ["LinearAlgebra", "OpenLibm_jll", "SpecialFunctions"]
+git-tree-sha1 = "68c173f4f449de5b438ee67ed0c9c748dc31a2ec"
+uuid = "34004b35-14d8-5ef3-9330-4cdb6864b03a"
+version = "0.3.28"
+
 [[deps.Hyperscript]]
 deps = ["Test"]
 git-tree-sha1 = "179267cfa5e712760cd43dcae385d7ea90cc25a4"
@@ -688,41 +983,46 @@ git-tree-sha1 = "0ee181ec08df7d7c911901ea38baf16f755114dc"
 uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
 version = "1.0.0"
 
+[[deps.IntegerMathUtils]]
+git-tree-sha1 = "4c1acff2dc6b6967e7e750633c50bc3b8d83e617"
+uuid = "18e54dd8-cb9d-406c-a71d-865a43cbb235"
+version = "0.1.3"
+
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 version = "1.11.0"
 
-[[deps.IntervalArithmetic]]
-deps = ["CRlibm", "CoreMath", "MacroTools", "OpenBLASConsistentFPCSR_jll", "Printf", "Random", "RoundingEmulator"]
-git-tree-sha1 = "921d7e91687e15a2c7c269c226960491fc041832"
-uuid = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
-version = "1.0.9"
+[[deps.IntervalSets]]
+git-tree-sha1 = "79d6bd28c8d9bccc2229784f1bd637689b256377"
+uuid = "8197267c-284f-5f27-9208-e0e47529a953"
+version = "0.7.14"
+weakdeps = ["Random", "RecipesBase", "Statistics"]
 
-    [deps.IntervalArithmetic.extensions]
-    IntervalArithmeticArblibExt = "Arblib"
-    IntervalArithmeticDiffRulesExt = "DiffRules"
-    IntervalArithmeticForwardDiffExt = "ForwardDiff"
-    IntervalArithmeticIntervalSetsExt = "IntervalSets"
-    IntervalArithmeticIrrationalConstantsExt = "IrrationalConstants"
-    IntervalArithmeticLinearAlgebraExt = "LinearAlgebra"
-    IntervalArithmeticRecipesBaseExt = "RecipesBase"
-    IntervalArithmeticSparseArraysExt = "SparseArrays"
+    [deps.IntervalSets.extensions]
+    IntervalSetsRandomExt = "Random"
+    IntervalSetsRecipesBaseExt = "RecipesBase"
+    IntervalSetsStatisticsExt = "Statistics"
 
-    [deps.IntervalArithmetic.weakdeps]
-    Arblib = "fb37089c-8514-4489-9461-98f9c8763369"
-    DiffRules = "b552c78f-8df3-52c6-915a-8e097449b14b"
-    ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
-    IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
-    IrrationalConstants = "92d709cd-6900-40b7-9082-c6be49f344b6"
-    LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-    RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
-    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+[[deps.InverseFunctions]]
+git-tree-sha1 = "a779299d77cd080bf77b97535acecd73e1c5e5cb"
+uuid = "3587e190-3f89-42d0-90ee-14403ec27112"
+version = "0.1.17"
+weakdeps = ["Dates", "Test"]
+
+    [deps.InverseFunctions.extensions]
+    InverseFunctionsDatesExt = "Dates"
+    InverseFunctionsTestExt = "Test"
 
 [[deps.IrrationalConstants]]
 git-tree-sha1 = "b2d91fe939cae05960e760110b328288867b5758"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
 version = "0.2.6"
+
+[[deps.IteratorInterfaceExtensions]]
+git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
+uuid = "82899510-4779-5014-852e-03e436cf321d"
+version = "1.0.0"
 
 [[deps.JLFzf]]
 deps = ["REPL", "Random", "fzf_jll"]
@@ -747,6 +1047,12 @@ version = "1.6.1"
 
     [deps.JSON.weakdeps]
     ArrowTypes = "31f734f8-188a-4ce0-8406-c8a06bd891cd"
+
+[[deps.Jieko]]
+deps = ["ExproniconLite"]
+git-tree-sha1 = "2f05ed29618da60c06a87e9c033982d4f71d0b6c"
+uuid = "ae98c720-c025-4a4a-838c-29b094483192"
+version = "0.2.1"
 
 [[deps.JpegTurbo_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -938,9 +1244,31 @@ version = "1.2.0"
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 version = "1.11.0"
 
+[[deps.Moshi]]
+deps = ["ExproniconLite", "Jieko"]
+git-tree-sha1 = "999dfa2b4f8334c1c23bd307c2b0cb6f97c54591"
+uuid = "2e0e35c7-a2e4-4343-998d-7ef72827ed2d"
+version = "0.3.8"
+
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 version = "2025.11.4"
+
+[[deps.MultivariatePolynomials]]
+deps = ["DataStructures", "LinearAlgebra", "MutableArithmetics", "StarAlgebras"]
+git-tree-sha1 = "4838893d9b035c2f6967c0d533350e1755b58a70"
+uuid = "102ac46a-7ee4-5c85-9060-abc95bfdeaa3"
+version = "0.5.19"
+weakdeps = ["ChainRulesCore"]
+
+    [deps.MultivariatePolynomials.extensions]
+    MultivariatePolynomialsChainRulesCoreExt = "ChainRulesCore"
+
+[[deps.MutableArithmetics]]
+deps = ["LinearAlgebra", "SparseArrays", "Test"]
+git-tree-sha1 = "dc5b2c4c111c46bc79ac4405eeb563523b39c004"
+uuid = "d8a4904e-b15c-11e9-3269-09a3773c0cb0"
+version = "1.8.0"
 
 [[deps.NaNMath]]
 deps = ["OpenLibm_jll"]
@@ -952,17 +1280,20 @@ version = "1.1.3"
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 version = "1.3.0"
 
+[[deps.OffsetArrays]]
+git-tree-sha1 = "117432e406b5c023f665fa73dc26e79ec3630151"
+uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
+version = "1.17.0"
+weakdeps = ["Adapt"]
+
+    [deps.OffsetArrays.extensions]
+    OffsetArraysAdaptExt = "Adapt"
+
 [[deps.Ogg_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "b6aa4566bb7ae78498a5e68943863fa8b5231b59"
 uuid = "e7412a2a-1a6e-54c0-be00-318e2571c051"
 version = "1.3.6+0"
-
-[[deps.OpenBLASConsistentFPCSR_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "3287ec88df50429a934ebc6cf14606215e27b987"
-uuid = "6cdc7f73-28fd-5e50-80fb-958a8875b1af"
-version = "0.3.33+0"
 
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
@@ -985,6 +1316,12 @@ deps = ["Artifacts", "Libdl"]
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
 version = "3.5.4+0"
 
+[[deps.OpenSpecFun_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "1346c9208249809840c91b26703912dff463d335"
+uuid = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
+version = "0.5.6+0"
+
 [[deps.Opus_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "e2bb57a313a74b8104064b7efd01406c0a50d2ff"
@@ -1000,6 +1337,16 @@ version = "1.8.2"
 deps = ["Artifacts", "Libdl"]
 uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
 version = "10.44.0+1"
+
+[[deps.PDMats]]
+deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
+git-tree-sha1 = "e4cff168707d441cd6bf3ff7e4832bdf34278e4a"
+uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
+version = "0.11.37"
+weakdeps = ["StatsBase"]
+
+    [deps.PDMats.extensions]
+    StatsBaseExt = "StatsBase"
 
 [[deps.Pango_jll]]
 deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "FriBidi_jll", "Glib_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl"]
@@ -1066,6 +1413,22 @@ git-tree-sha1 = "e189d0623e7ce9c37389bac17e80aac3b0302e75"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 version = "0.7.83"
 
+[[deps.PreallocationTools]]
+deps = ["Adapt", "ArrayInterface", "PrecompileTools"]
+git-tree-sha1 = "c05b4c6325262152483a1ecb6c69846d2e01727b"
+uuid = "d236fae5-4411-538c-8e31-a6e3d9e00b46"
+version = "0.4.34"
+
+    [deps.PreallocationTools.extensions]
+    PreallocationToolsForwardDiffExt = "ForwardDiff"
+    PreallocationToolsReverseDiffExt = "ReverseDiff"
+    PreallocationToolsSparseConnectivityTracerExt = "SparseConnectivityTracer"
+
+    [deps.PreallocationTools.weakdeps]
+    ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+    ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+    SparseConnectivityTracer = "9f842d2f-2579-4b1d-911e-f412cf18a3f5"
+
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
 git-tree-sha1 = "edbeefc7a4889f528644251bdb5fc9ab5348bc2c"
@@ -1077,6 +1440,12 @@ deps = ["TOML"]
 git-tree-sha1 = "8b770b60760d4451834fe79dd483e318eee709c4"
 uuid = "21216c6a-2e73-6563-6e65-726566657250"
 version = "1.5.2"
+
+[[deps.Primes]]
+deps = ["IntegerMathUtils"]
+git-tree-sha1 = "25cdd1d20cd005b52fc12cb6be3f75faaf59bb9b"
+uuid = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
+version = "0.5.7"
 
 [[deps.Printf]]
 deps = ["Unicode"]
@@ -1118,6 +1487,18 @@ git-tree-sha1 = "672c938b4b4e3e0169a07a5f227029d4905456f2"
 uuid = "e99dba38-086e-5de3-a5b1-6e4c66e897c3"
 version = "6.10.2+1"
 
+[[deps.QuadGK]]
+deps = ["DataStructures", "LinearAlgebra"]
+git-tree-sha1 = "5e8e8b0ab68215d7a2b14b9921a946fee794749e"
+uuid = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
+version = "2.11.3"
+
+    [deps.QuadGK.extensions]
+    QuadGKEnzymeExt = "Enzyme"
+
+    [deps.QuadGK.weakdeps]
+    Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
+
 [[deps.REPL]]
 deps = ["InteractiveUtils", "JuliaSyntaxHighlighting", "Markdown", "Sockets", "StyledStrings", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
@@ -1140,6 +1521,42 @@ git-tree-sha1 = "45cf9fd0ca5839d06ef333c8201714e888486342"
 uuid = "01d81517-befc-4cb6-b9ec-a95719d0359c"
 version = "0.6.12"
 
+[[deps.RecursiveArrayTools]]
+deps = ["Adapt", "ArrayInterface", "DocStringExtensions", "GPUArraysCore", "LinearAlgebra", "PrecompileTools", "RecipesBase", "StaticArraysCore", "SymbolicIndexingInterface"]
+git-tree-sha1 = "d0282d612f22dcad7b81cf487b746e63aa2a6709"
+uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
+version = "3.54.0"
+
+    [deps.RecursiveArrayTools.extensions]
+    RecursiveArrayToolsFastBroadcastExt = "FastBroadcast"
+    RecursiveArrayToolsFastBroadcastPolyesterExt = ["FastBroadcast", "Polyester"]
+    RecursiveArrayToolsForwardDiffExt = "ForwardDiff"
+    RecursiveArrayToolsKernelAbstractionsExt = "KernelAbstractions"
+    RecursiveArrayToolsMeasurementsExt = "Measurements"
+    RecursiveArrayToolsMonteCarloMeasurementsExt = "MonteCarloMeasurements"
+    RecursiveArrayToolsReverseDiffExt = ["ReverseDiff", "Zygote"]
+    RecursiveArrayToolsSparseArraysExt = ["SparseArrays"]
+    RecursiveArrayToolsStatisticsExt = "Statistics"
+    RecursiveArrayToolsStructArraysExt = "StructArrays"
+    RecursiveArrayToolsTablesExt = ["Tables"]
+    RecursiveArrayToolsTrackerExt = "Tracker"
+    RecursiveArrayToolsZygoteExt = "Zygote"
+
+    [deps.RecursiveArrayTools.weakdeps]
+    FastBroadcast = "7034ab61-46d4-4ed7-9d0f-46aef9175898"
+    ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+    KernelAbstractions = "63c18a36-062a-441e-b654-da1e3ab1ce7c"
+    Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
+    MonteCarloMeasurements = "0987c9cc-fe09-11e8-30f0-b96dd679fdca"
+    Polyester = "f517fe37-dbe3-4b94-8317-1923a5111588"
+    ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+    Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+    StructArrays = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
+    Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
+    Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
+    Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
+
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
 uuid = "189a3867-3050-52da-a836-e630ba90ab69"
@@ -1157,14 +1574,111 @@ git-tree-sha1 = "62389eeff14780bfe55195b7204c0d8738436d64"
 uuid = "ae029012-a4dd-5104-9daa-d747884805df"
 version = "1.3.1"
 
-[[deps.RoundingEmulator]]
-git-tree-sha1 = "40b9edad2e5287e05bd413a38f61a8ff55b9557b"
-uuid = "5eaf0fd0-dfba-4ccb-bf02-d820a40db705"
-version = "0.2.1"
+[[deps.Rmath]]
+deps = ["Random", "Rmath_jll"]
+git-tree-sha1 = "5b3d50eb374cea306873b371d3f8d3915a018f0b"
+uuid = "79098fc4-a85e-5d69-aa6a-4863f24498fa"
+version = "0.9.0"
+
+[[deps.Rmath_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "58cdd8fb2201a6267e1db87ff148dd6c1dbd8ad8"
+uuid = "f50d1b31-88e8-58de-be2c-1cc44531875f"
+version = "0.5.1+0"
+
+[[deps.RuntimeGeneratedFunctions]]
+deps = ["ExprTools", "SHA", "Serialization"]
+git-tree-sha1 = "28154d426e557495aa75097861b18c11f2541ded"
+uuid = "7e49a35a-f44a-4d26-94aa-eba1b4ca6b47"
+version = "0.5.19"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 version = "0.7.0"
+
+[[deps.SciMLBase]]
+deps = ["ADTypes", "Accessors", "Adapt", "ArrayInterface", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "EnumX", "FunctionWrappersWrappers", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "Markdown", "Moshi", "PreallocationTools", "PrecompileTools", "Preferences", "Printf", "RecipesBase", "RecursiveArrayTools", "Reexport", "RuntimeGeneratedFunctions", "SciMLLogging", "SciMLOperators", "SciMLPublic", "SciMLStructures", "StaticArraysCore", "Statistics", "SymbolicIndexingInterface"]
+git-tree-sha1 = "a017ed325ac5e11438c888864fe83b124bb171b7"
+uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
+version = "2.155.1"
+
+    [deps.SciMLBase.extensions]
+    SciMLBaseChainRulesCoreExt = "ChainRulesCore"
+    SciMLBaseDifferentiationInterfaceExt = "DifferentiationInterface"
+    SciMLBaseDistributionsExt = "Distributions"
+    SciMLBaseEnzymeExt = "Enzyme"
+    SciMLBaseForwardDiffExt = "ForwardDiff"
+    SciMLBaseMLStyleExt = "MLStyle"
+    SciMLBaseMakieExt = "Makie"
+    SciMLBaseMeasurementsExt = "Measurements"
+    SciMLBaseMonteCarloMeasurementsExt = "MonteCarloMeasurements"
+    SciMLBaseMooncakeExt = "Mooncake"
+    SciMLBasePartialFunctionsExt = "PartialFunctions"
+    SciMLBasePyCallExt = "PyCall"
+    SciMLBasePythonCallExt = "PythonCall"
+    SciMLBaseRCallExt = "RCall"
+    SciMLBaseReverseDiffExt = "ReverseDiff"
+    SciMLBaseTrackerExt = "Tracker"
+    SciMLBaseZygoteExt = ["Zygote", "ChainRulesCore"]
+
+    [deps.SciMLBase.weakdeps]
+    ChainRules = "082447d4-558c-5d27-93f4-14fc19e9eca2"
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    DifferentiationInterface = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
+    Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+    Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
+    ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+    MLStyle = "d8e11817-5142-5d16-987a-aa16d5891078"
+    Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+    Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
+    MonteCarloMeasurements = "0987c9cc-fe09-11e8-30f0-b96dd679fdca"
+    Mooncake = "da2b9cff-9c12-43a0-ae48-6db2b0edb7d6"
+    PartialFunctions = "570af359-4316-4cb7-8c74-252c00c2016b"
+    PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
+    PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
+    RCall = "6f49c342-dc21-5d91-9882-a32aef131414"
+    ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+    Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
+    Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
+
+[[deps.SciMLLogging]]
+deps = ["Logging", "LoggingExtras", "Preferences"]
+git-tree-sha1 = "4e1e21f14a284f892eb62923a356c70a2a0c68e1"
+uuid = "a6db7da4-7206-11f0-1eab-35f2a5dbe1d1"
+version = "1.10.1"
+
+    [deps.SciMLLogging.extensions]
+    SciMLLoggingTracyExt = "Tracy"
+
+    [deps.SciMLLogging.weakdeps]
+    Tracy = "e689c965-62c8-4b79-b2c5-8359227902fd"
+
+[[deps.SciMLOperators]]
+deps = ["Accessors", "Adapt", "ArrayInterface", "DocStringExtensions", "LinearAlgebra"]
+git-tree-sha1 = "3b204078e8574b9de19cac90e0c87c811a87deac"
+uuid = "c0aeaf25-5076-4817-a8d5-81caf7dfa961"
+version = "1.22.0"
+
+    [deps.SciMLOperators.extensions]
+    SciMLOperatorsLoopVectorizationExt = "LoopVectorization"
+    SciMLOperatorsSparseArraysExt = "SparseArrays"
+    SciMLOperatorsStaticArraysCoreExt = "StaticArraysCore"
+
+    [deps.SciMLOperators.weakdeps]
+    LoopVectorization = "bdcacae8-1622-11e9-2a5c-532679323890"
+    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+    StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+
+[[deps.SciMLPublic]]
+git-tree-sha1 = "0ba076dbdce87ba230fff48ca9bca62e1f345c9b"
+uuid = "431bcebd-1456-4ced-9d72-93c2757fff0b"
+version = "1.0.1"
+
+[[deps.SciMLStructures]]
+deps = ["ArrayInterface", "PrecompileTools"]
+git-tree-sha1 = "607f6867d0b0553e98fc7f725c9f9f13b4d01a32"
+uuid = "53ae85a6-f571-4167-b2af-e1d143709226"
+version = "1.10.0"
 
 [[deps.Scratch]]
 deps = ["Dates"]
@@ -1175,6 +1689,12 @@ version = "1.3.0"
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 version = "1.11.0"
+
+[[deps.Setfield]]
+deps = ["ConstructionBase", "Future", "MacroTools", "StaticArraysCore"]
+git-tree-sha1 = "c5391c6ace3bc430ca630251d02ea9687169ca68"
+uuid = "efcf1570-3423-57d1-acb7-fd33fddbac46"
+version = "1.1.2"
 
 [[deps.Showoff]]
 deps = ["Dates", "Grisu"]
@@ -1202,11 +1722,43 @@ deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 version = "1.12.0"
 
+[[deps.SpecialFunctions]]
+deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
+git-tree-sha1 = "6547cbdd8ce32efba0d21c5a40fa96d1a3548f9f"
+uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
+version = "2.8.0"
+weakdeps = ["ChainRulesCore"]
+
+    [deps.SpecialFunctions.extensions]
+    SpecialFunctionsChainRulesCoreExt = "ChainRulesCore"
+
 [[deps.StableRNGs]]
 deps = ["Random"]
 git-tree-sha1 = "4f96c596b8c8258cc7d3b19797854d368f243ddc"
 uuid = "860ef19b-820b-49d6-a774-d7a799459cd3"
 version = "1.0.4"
+
+[[deps.StarAlgebras]]
+deps = ["LinearAlgebra", "MutableArithmetics", "SparseArrays"]
+git-tree-sha1 = "235b1f9d287bbf34083b3d0829343a7942c0ad1c"
+uuid = "0c0c59c1-dc5f-42e9-9a8b-b5dc384a6cd1"
+version = "0.3.0"
+
+[[deps.StaticArrays]]
+deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
+git-tree-sha1 = "246a8bb2e6667f832eea063c3a56aef96429a3db"
+uuid = "90137ffa-7385-5640-81b9-e52037218182"
+version = "1.9.18"
+weakdeps = ["ChainRulesCore", "Statistics"]
+
+    [deps.StaticArrays.extensions]
+    StaticArraysChainRulesCoreExt = "ChainRulesCore"
+    StaticArraysStatisticsExt = "Statistics"
+
+[[deps.StaticArraysCore]]
+git-tree-sha1 = "6ab403037779dae8c514bad259f32a447262455a"
+uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+version = "1.4.4"
 
 [[deps.Statistics]]
 deps = ["LinearAlgebra"]
@@ -1230,6 +1782,17 @@ git-tree-sha1 = "c6f18e5a52a176a383f6f6c635e0f81feed1d6d4"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 version = "0.34.11"
 
+[[deps.StatsFuns]]
+deps = ["HypergeometricFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
+git-tree-sha1 = "91f091a8716a6bb38417a6e6f274602a19aaa685"
+uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
+version = "1.5.2"
+weakdeps = ["ChainRulesCore", "InverseFunctions"]
+
+    [deps.StatsFuns.extensions]
+    StatsFunsChainRulesCoreExt = "ChainRulesCore"
+    StatsFunsInverseFunctionsExt = "InverseFunctions"
+
 [[deps.StructUtils]]
 deps = ["Dates", "UUIDs"]
 git-tree-sha1 = "82bee338d650aa515f31866c460cb7e3bcef90b8"
@@ -1250,10 +1813,72 @@ version = "2.8.2"
 uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
 version = "1.11.0"
 
+[[deps.SuiteSparse]]
+deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
+uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
+
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
 version = "7.8.3+2"
+
+[[deps.SymbolicIndexingInterface]]
+deps = ["Accessors", "ArrayInterface", "RuntimeGeneratedFunctions", "StaticArraysCore"]
+git-tree-sha1 = "64b15330b9e3c91a86bcac92f369c58e382981c6"
+uuid = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
+version = "0.3.48"
+
+    [deps.SymbolicIndexingInterface.extensions]
+    SymbolicIndexingInterfacePrettyTablesExt = "PrettyTables"
+
+    [deps.SymbolicIndexingInterface.weakdeps]
+    PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
+
+[[deps.SymbolicLimits]]
+deps = ["SymbolicUtils"]
+git-tree-sha1 = "f75c7deb7e11eea72d2c1ea31b24070b713ba061"
+uuid = "19f23fe9-fdab-4a78-91af-e7b7767979c3"
+version = "0.2.3"
+
+[[deps.SymbolicUtils]]
+deps = ["AbstractTrees", "ArrayInterface", "Bijections", "ChainRulesCore", "Combinatorics", "ConstructionBase", "DataStructures", "DocStringExtensions", "DynamicPolynomials", "ExproniconLite", "LinearAlgebra", "MultivariatePolynomials", "NaNMath", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArrays", "SymbolicIndexingInterface", "TaskLocalValues", "TermInterface", "TimerOutputs", "Unityper"]
+git-tree-sha1 = "a85b4262a55dbd1af39bb6facf621d79ca6a322d"
+uuid = "d1185830-fcd6-423d-90d6-eec64667417b"
+version = "3.32.0"
+
+    [deps.SymbolicUtils.extensions]
+    SymbolicUtilsLabelledArraysExt = "LabelledArrays"
+    SymbolicUtilsReverseDiffExt = "ReverseDiff"
+
+    [deps.SymbolicUtils.weakdeps]
+    LabelledArrays = "2ee39098-c373-598a-b85f-a56591580800"
+    ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+
+[[deps.Symbolics]]
+deps = ["ADTypes", "ArrayInterface", "Bijections", "CommonWorldInvalidations", "ConstructionBase", "DataStructures", "DiffRules", "Distributions", "DocStringExtensions", "DomainSets", "DynamicPolynomials", "LaTeXStrings", "Latexify", "Libdl", "LinearAlgebra", "LogExpFunctions", "MacroTools", "Markdown", "NaNMath", "OffsetArrays", "PrecompileTools", "Primes", "RecipesBase", "Reexport", "RuntimeGeneratedFunctions", "SciMLBase", "SciMLPublic", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArraysCore", "SymbolicIndexingInterface", "SymbolicLimits", "SymbolicUtils", "TermInterface"]
+git-tree-sha1 = "7e53ce26142025d12565217082830f2f8caa5275"
+uuid = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+version = "6.58.0"
+
+    [deps.Symbolics.extensions]
+    SymbolicsD3TreesExt = "D3Trees"
+    SymbolicsForwardDiffExt = "ForwardDiff"
+    SymbolicsGroebnerExt = "Groebner"
+    SymbolicsLuxExt = "Lux"
+    SymbolicsNemoExt = "Nemo"
+    SymbolicsPreallocationToolsExt = ["PreallocationTools", "ForwardDiff"]
+    SymbolicsSymPyExt = "SymPy"
+    SymbolicsSymPyPythonCallExt = "SymPyPythonCall"
+
+    [deps.Symbolics.weakdeps]
+    D3Trees = "e3df1716-f71e-5df9-9e2d-98e193103c45"
+    ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+    Groebner = "0b43b601-686d-58a3-8a1c-6623616c7cd4"
+    Lux = "b2108857-7c20-44ae-9111-449ecde12c47"
+    Nemo = "2edaba10-b0f1-5616-af89-8c11ac63239a"
+    PreallocationTools = "d236fae5-4411-538c-8e31-a6e3d9e00b46"
+    SymPy = "24249f21-da20-56a4-8eb1-6a02cf4ae2e6"
+    SymPyPythonCall = "bc8888f7-b21e-4b7c-a06a-5d9c9496438c"
 
 [[deps.TOML]]
 deps = ["Dates"]
@@ -1265,16 +1890,38 @@ deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 version = "1.10.0"
 
+[[deps.TaskLocalValues]]
+git-tree-sha1 = "67e469338d9ce74fc578f7db1736a74d93a49eb8"
+uuid = "ed4db957-447d-4319-bfb6-7fa9ae7ecf34"
+version = "0.1.3"
+
 [[deps.TensorCore]]
 deps = ["LinearAlgebra"]
 git-tree-sha1 = "1feb45f88d133a655e001435632f019a9a1bcdb6"
 uuid = "62fd8b95-f654-4bbd-a8a5-9c27f68ccd50"
 version = "0.1.1"
 
+[[deps.TermInterface]]
+git-tree-sha1 = "d673e0aca9e46a2f63720201f55cc7b3e7169b16"
+uuid = "8ea1fca8-c5ef-4a55-8b96-4e9afe9c9a3c"
+version = "2.0.0"
+
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 version = "1.11.0"
+
+[[deps.TimerOutputs]]
+deps = ["ExprTools", "Printf"]
+git-tree-sha1 = "3748bd928e68c7c346b52125cf41fff0de6937d0"
+uuid = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
+version = "0.5.29"
+
+    [deps.TimerOutputs.extensions]
+    FlameGraphsExt = "FlameGraphs"
+
+    [deps.TimerOutputs.weakdeps]
+    FlameGraphs = "08572546-2f56-4bcf-ba4e-bab62c3a3f89"
 
 [[deps.TranscodingStreams]]
 git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
@@ -1285,6 +1932,12 @@ version = "0.11.3"
 git-tree-sha1 = "311349fd1c93a31f783f977a71e8b062a57d4101"
 uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
 version = "0.1.13"
+
+[[deps.TruncatedStacktraces]]
+deps = ["InteractiveUtils", "MacroTools", "Preferences"]
+git-tree-sha1 = "ea3e54c2bdde39062abf5a9758a23735558705e1"
+uuid = "781d530d-4396-4725-bb49-402e4bee1e77"
+version = "1.4.0"
 
 [[deps.URIs]]
 git-tree-sha1 = "bef26fb046d031353ef97a82e3fdb6afe7f21b1a"
@@ -1305,6 +1958,12 @@ deps = ["REPL"]
 git-tree-sha1 = "53915e50200959667e78a92a418594b428dffddf"
 uuid = "1cfade01-22cf-5700-b092-accc4b62d6e1"
 version = "0.4.1"
+
+[[deps.Unityper]]
+deps = ["ConstructionBase"]
+git-tree-sha1 = "25008b734a03736c41e2a7dc314ecb95bd6bbdb0"
+uuid = "a7c27f48-0311-42f6-a7f8-2c11e75eb415"
+version = "0.1.6"
 
 [[deps.Unzip]]
 git-tree-sha1 = "ca0969166a028236229f63514992fc073799bb78"
@@ -1597,29 +2256,33 @@ version = "1.13.0+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═a0000005-0000-0000-0000-000000000001
-# ╟─a0000005-0000-0000-0000-000000000002
-# ╟─a0000005-0000-0000-0000-000000000003
-# ╠═a0000005-0000-0000-0000-000000000004
-# ╟─a0000005-0000-0000-0000-000000000005
-# ╠═a0000005-0000-0000-0000-000000000006
-# ╠═a0000005-0000-0000-0000-000000000007
-# ╟─a0000005-0000-0000-0000-000000000008
-# ╠═a0000005-0000-0000-0000-000000000009
-# ╟─a0000005-0000-0000-0000-00000000000a
-# ╠═a0000005-0000-0000-0000-00000000000b
-# ╟─a0000005-0000-0000-0000-00000000000c
-# ╠═a0000005-0000-0000-0000-00000000000d
-# ╟─a0000005-0000-0000-0000-00000000000e
-# ╟─a0000005-0000-0000-0000-00000000000f
-# ╠═a0000005-0000-0000-0000-000000000010
-# ╟─a0000005-0000-0000-0000-000000000011
-# ╠═a0000005-0000-0000-0000-000000000012
-# ╟─a0000005-0000-0000-0000-000000000013
-# ╠═a0000005-0000-0000-0000-000000000014
-# ╟─a0000005-0000-0000-0000-000000000015
-# ╠═a0000005-0000-0000-0000-000000000016
-# ╟─a0000005-0000-0000-0000-000000000017
-# ╟─a0000005-0000-0000-0000-000000000018
+# ╠═15f63d58-5ec6-11f1-b6ad-dfac1467cdd2
+# ╟─15f65072-5ec6-11f1-a6d6-cd37b112dc9d
+# ╟─15f65310-5ec6-11f1-afad-43ff92f08200
+# ╟─15f65356-5ec6-11f1-bcd4-c10c285658b0
+# ╠═15f653f4-5ec6-11f1-b760-177c348779ba
+# ╠═15f65432-5ec6-11f1-8eb0-41569a9cec54
+# ╠═15f65464-5ec6-11f1-9bfe-1d7ba3a2d7d3
+# ╠═15f6548c-5ec6-11f1-b60f-b5781e059434
+# ╟─15f654fc-5ec6-11f1-b28c-1169f2111a80
+# ╠═15f6552e-5ec6-11f1-a3bd-c97e3a2d104e
+# ╟─15f65632-5ec6-11f1-8b8d-0bc33627f209
+# ╠═15f6569e-5ec6-11f1-bc8c-dbdb69563398
+# ╟─15f656e4-5ec6-11f1-a0b0-a9a88bf8c3eb
+# ╠═15f65716-5ec6-11f1-a949-5fdda7118379
+# ╟─15f657d4-5ec6-11f1-a099-87878746d563
+# ╠═15f65806-5ec6-11f1-947b-192d030fada2
+# ╟─15f6585e-5ec6-11f1-83c3-73e567d1350b
+# ╟─02ex0001-0000-0000-0000-000000000001
+# ╠═02ex0001-0000-0000-0000-000000000002
+# ╟─02ex0001-0000-0000-0000-000000000003
+# ╠═02ex0001-0000-0000-0000-000000000004
+# ╟─02ex0001-0000-0000-0000-000000000005
+# ╠═02ex0001-0000-0000-0000-000000000006
+# ╟─02ex0001-0000-0000-0000-000000000007
+# ╠═02ex0001-0000-0000-0000-000000000008
+# ╟─02ex0001-0000-0000-0000-000000000009
+# ╠═02ex0001-0000-0000-0000-00000000000a
+# ╟─02ex0001-0000-0000-0000-00000000000b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
