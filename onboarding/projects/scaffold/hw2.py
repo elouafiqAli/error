@@ -9,10 +9,20 @@ from onboarding.projects.scaffold import Cell, write_pair, _setup_cells
 HW2_CELLS: list[Cell] = [
     Cell("md",
          "# HW2 — Partitions, conditional entropy, and 1-WL on toy graphs\n\n"
-         "**Reading.** `handout.md` Q1–Q5.\n\n"
+         "**Reading.** `handout.md` Q1–Q5; "
+         "[`PAPER-ARXIV.md`](../../../../PAPER-ARXIV.md) §3.1 "
+         "(Definitions 3.1–3.2, **Lemma 3.1**) and §3.3 (scope: "
+         "$\\mathcal{F}_\\mathrm{WL}$).\n\n"
          "**Goal.** Hand-derive $H(Y\\mid\\Pi)$ on a 6-node toy, code "
-         "`cond_entropy`, implement one round of 1-WL refinement, and "
-         "exhibit the $C_6$ vs $2K_3$ blind spot. Five assertion gates."),
+         "`cond_entropy`, prove **Lemma 3.1** (*purity ⟺ zero "
+         "conditional entropy*) numerically, implement one round of 1-WL "
+         "refinement, and exhibit the $C_6$ vs $2K_3$ blind spot — the "
+         "**qualitative ceiling** of Xu et al. (ICLR 2019, GIN) and "
+         "Morris et al. (AAAI 2019, $k$-GNNs) that **HW3's bracket will "
+         "quantify**. Six assertion gates.\n\n"
+         "**Julia companion (optional).** "
+         "[`julia-theory/notebooks/04_bayes_error_landscape.jl`](../../../julia-theory/notebooks/04_bayes_error_landscape.jl) "
+         "is the reactive slider twin of Q2 (per-cell $e_C$, $q_C$ on a 3-simplex)."),
     *_setup_cells("hw2"),
     Cell("demo",
          "# Reuse hbin from HW1's solution if exported, else re-define inline.\n"
@@ -94,6 +104,74 @@ HW2_CELLS: list[Cell] = [
     Cell("reflect",
          "reflect.log('Q2.hw2.Q2_cond_entropy', 'cond_entropy correct on singleton, trivial, toy', 'HIGH')\n"),
 
+    # --- Q2.5: Lemma 3.1 (purity iff zero conditional entropy) ---------
+    Cell("md",
+         "## Q2.5 — **Lemma 3.1** (purity ⟺ zero conditional entropy)\n\n"
+         "**Statement (Paper §3.1).** Call $\\Pi$ **pure for $Y$** if every "
+         "cell $C \\in \\Pi$ is label-constant ($y$ is constant on $C$). Then\n\n"
+         "$$\n"
+         "H(Y \\mid \\Pi) = 0 \\iff \\Pi \\text{ is pure for } Y.\n"
+         "$$\n\n"
+         "**Sketch.** $H(Y\\mid\\Pi) = \\sum_C q_C H_\\mathrm{bin}(e_C)$ with "
+         "$q_C > 0$ and $H_\\mathrm{bin}(e) \\ge 0$, equality iff $e \\in \\{0, 1\\}$. "
+         "After per-cell binarisation $e_C \\leftarrow \\min(e_C, 1-e_C) \\in [0, 1/2]$, "
+         "the only zero is $e_C = 0$, i.e. cell is single-class.\n\n"
+         "**Adversarial framing.** A reader who only memorises Theorem 1 may "
+         "conflate \"low $H$\" with \"low $\\varepsilon$\". Lemma 3.1 is the "
+         "*iff* that grounds the lower bracket: $H=0$ is **not** an accident "
+         "of one cell, it is purity of the entire partition."),
+    Cell("solution",
+         "def is_pure(partition, labels) -> bool:\n"
+         "    \"\"\"True iff every cell is label-constant.\"\"\"\n"
+         "    for C in partition:\n"
+         "        if len(set(labels[C].tolist())) > 1:\n"
+         "            return False\n"
+         "    return True\n"),
+    Cell("md", "**Distinguish — *iff*, not just *if*.** A naive reader might prove only the easy direction (purity $\\Rightarrow H=0$). The reverse — $H=0 \\Rightarrow$ purity — uses strict positivity of $H_\\mathrm{bin}$ on $(0, 1)$."),
+    Cell("demo",
+         "# Build a non-trivial witness of each direction.\n"
+         "# (a) Pure partition: split y by label.\n"
+         "y_pure = np.array([0,0,0,1,1,1])\n"
+         "Pi_pure = [np.array([0,1,2]), np.array([3,4,5])]\n"
+         "H_pure  = cond_entropy(Pi_pure, y_pure)\n"
+         "print(f'pure: H={H_pure:.6f}, is_pure={is_pure(Pi_pure, y_pure)}')\n"
+         "\n"
+         "# (b) Mixed cell ⇒ H>0.\n"
+         "y_mix = np.array([0,0,1,1,1,0])\n"
+         "Pi_mix = [np.array([0,1,2,3,4,5])]\n"
+         "H_mix  = cond_entropy(Pi_mix, y_mix)\n"
+         "print(f'mixed: H={H_mix:.6f}, is_pure={is_pure(Pi_mix, y_mix)}')\n"
+         "\n"
+         "# (c) Border case: every singleton ⇒ trivially pure ⇒ H=0.\n"
+         "Pi_sing = [np.array([i]) for i in range(6)]\n"
+         "H_sing2 = cond_entropy(Pi_sing, y_mix)\n"
+         "print(f'singletons: H={H_sing2:.6f}, is_pure={is_pure(Pi_sing, y_mix)}')\n"),
+    Cell("md", "**Gate Q2.5.** Forward (purity $\\Rightarrow H=0$) AND reverse (mixed cell $\\Rightarrow H>0$) on three witnesses."),
+    Cell("gate",
+         "# Lemma 3.1 — forward direction: pure ⇒ H = 0.\n"
+         "assert is_pure(Pi_pure, y_pure) and H_pure == 0.0, f'Q2.5: pure partition has H={H_pure} ≠ 0'\n"
+         "assert is_pure(Pi_sing, y_mix) and H_sing2 == 0.0, f'Q2.5: singletons have H={H_sing2} ≠ 0'\n"
+         "# Reverse direction: H > 0 ⇒ NOT pure.\n"
+         "assert H_mix > 0 and not is_pure(Pi_mix, y_mix), f'Q2.5: mixed cell has H={H_mix} but is_pure={is_pure(Pi_mix, y_mix)}'\n"
+         "# Final: sweep 200 random partitions; the equivalence must never break.\n"
+         "import random\n"
+         "random.seed(1)\n"
+         "for trial in range(200):\n"
+         "    yy = np.array([random.randint(0, 1) for _ in range(8)])\n"
+         "    nc = random.randint(1, 4)\n"
+         "    perm = list(range(8)); random.shuffle(perm)\n"
+         "    cuts = sorted(random.sample(range(1, 8), nc - 1)) if nc > 1 else []\n"
+         "    edges = [0] + cuts + [8]\n"
+         "    PP = [np.array(perm[edges[i]:edges[i+1]]) for i in range(nc)]\n"
+         "    HH = cond_entropy(PP, yy)\n"
+         "    pp = is_pure(PP, yy)\n"
+         "    assert (HH == 0.0) == pp, f'Q2.5 random trial {trial}: H={HH}, is_pure={pp}'\n"
+         "print('[GATE OK] Q2.5: Lemma 3.1 verified on 3 hand witnesses + 200 random partitions')\n"),
+    Cell("reflect",
+         "reflect.log('Q2.hw2.Q2.5_lemma_3_1',\n"
+         "            'Lemma 3.1 (purity ⟺ H(Y|Π)=0) verified on 3 witnesses + 200 random partitions',\n"
+         "            'HIGH')\n"),
+
     # --- Q3+Q4: wl_step + C6 vs 2K3 -------------------------------------
     Cell("md",
          "## Q3+Q4 — One-round 1-WL refinement and the $C_6$ vs $2K_3$ blind spot\n\n"
@@ -164,6 +242,34 @@ HW2_CELLS: list[Cell] = [
     Cell("reflect",
          "reflect.log('Q2.hw2.Q3Q4_wl_blindspot',\n"
          "            'C6 vs 2K3 share stable-colour multiset (6,) under 1-WL; P3 separates endpoints from middle',\n"
+         "            'HIGH')\n"),
+
+    # --- Q4.5: provenance — Xu 2019 / Morris 2019 -----------------------
+    Cell("md",
+         "## Q4.5 — Provenance: Xu et al. (GIN) and Morris et al. ($k$-GNN)\n\n"
+         "The $C_6$ vs $2K_3$ blind spot you just exhibited is the central "
+         "negative result of **two ICLR/AAAI 2019 papers**:\n\n"
+         "- **Xu, Hu, Leskovec, Jegelka.** *How Powerful are Graph Neural Networks?* "
+         "  ICLR 2019. The **GIN** paper. Theorem 3: any MPNN with countable "
+         "  multiset aggregator is at most as expressive as 1-WL.\n"
+         "- **Morris, Ritzert, Fey, Hamilton, Lenssen, Rattan, Grohe.** *Weisfeiler "
+         "  and Leman Go Neural: Higher-order Graph Neural Networks.* AAAI 2019. "
+         "  The **$k$-GNN** paper. Same qualitative ceiling at 1-WL; lifts it to "
+         "  $k$-WL via tuple states.\n\n"
+         "Both papers say *qualitatively*: \"MPNNs can never separate $C_6$ from "
+         "$2K_3$.\" **Paper A** (Theorem 1, HW3 next week) sharpens this to a "
+         "**quantitative budget**: for any MPNN-induced partition $\\Pi$, the "
+         "Bayes error obeys\n\n"
+         "$$\n"
+         "H_\\mathrm{bin}^{-1}\\!\\big(H(Y\\mid\\Pi)\\big) \\;\\le\\; \\varepsilon^*_\\Pi \\;\\le\\; \\tfrac{1}{2}\\, H(Y\\mid\\Pi).\n"
+         "$$\n\n"
+         "The slack at the worst point is **$w^\\star \\approx 0.1610$** "
+         "attained at **$\\varepsilon^\\star = 1/5$** — the number HW3.Q4 will "
+         "grid-search you to. *That* is the upgrade from \"impossible\" to "
+         "\"impossible by exactly this much.\""),
+    Cell("reflect",
+         "reflect.log('Q2.hw2.Q4.5_provenance',\n"
+         "            'Xu 2019 (GIN) + Morris 2019 (k-GNN) give the qualitative 1-WL ceiling; Theorem 1 quantifies it (w*≈0.1610).',\n"
          "            'HIGH')\n"),
 
     # --- Q5 writeup -----------------------------------------------------

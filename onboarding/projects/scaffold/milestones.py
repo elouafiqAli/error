@@ -56,7 +56,13 @@ def m1_cells() -> list[Cell]:
         Cell("md",
              "# Milestone 1 — Cora + label and 1-WL partitions\n\n"
              "Load Cora, build the *label partition* (7 cells, $e_C = 0$ everywhere) "
-             "and the *1-WL partition* at depths $L \\in \\{1,2,3\\}$. Histogram per-cell $e_C$."),
+             "and the **architecture-induced partition** $\\Pi_\\mathcal{A}(G, L)$ "
+             "(Def 3.1) at depths $L \\in \\{1,2,3\\}$, instantiated by 1-WL. "
+             "Verify **Proposition 3.2** numerically: refinement *shrinks both* "
+             "$H(Y\\mid\\Pi)$ *and* $\\varepsilon^*_\\Pi$ (binarised).\n\n"
+             "**Julia companion (optional).** "
+             "[`julia-theory/notebooks/08_refinement_monotonicity.jl`](../../../julia-theory/notebooks/08_refinement_monotonicity.jl) "
+             "is the reactive twin: split a cell with a slider; watch the bracket interval contract."),
         *_setup_cells("m1"),
         _import_shared(),
         _data_cell(),
@@ -71,21 +77,31 @@ def m1_cells() -> list[Cell]:
              "assert abs(sum(P_lbl.q) - 1.0) < 1e-12\n"
              "print('[GATE OK] M1.label: 7 cells, all e_C=0, q sums to 1')\n"),
 
-        Cell("md", "## 1-WL partitions at $L \\in \\{1, 2, 3\\}$\nMonotone refinement: #cells non-decreasing in $L$."),
+        Cell("md", "## 1-WL partitions at $L \\in \\{1, 2, 3\\}$ — **Prop 3.2** numerical audit.\n\nProp 3.2 says: if $\\Pi'$ refines $\\Pi$ then $H(Y\\mid\\Pi') \\le H(Y\\mid\\Pi)$ and (after binarisation) $\\varepsilon^*_{\\Pi'} \\le \\varepsilon^*_\\Pi$. Each WL depth $L+1$ refines $L$, so both quantities must be **non-increasing in $L$**."),
         Cell("demo",
              "P_wl = {L: wl_partition(_cora, depth=L) for L in (1, 2, 3)}\n"
+             "def H_eps(P):\n"
+             "    bin_e = np.array([min(e, 1-e) for e in P.e])\n"
+             "    q = np.array(P.q)\n"
+             "    return float(np.sum(q * np.array([hbin(e) for e in bin_e]))), float(np.sum(q * bin_e))\n"
              "for L, P in P_wl.items():\n"
-             "    print(f'L={L}: {len(P.cells)} cells; max e_C = {max(P.e):.4f}; mean e_C = {float(np.mean(P.e)):.4f}')\n"),
+             "    H_, e_ = H_eps(P)\n"
+             "    print(f'L={L}: {len(P.cells)} cells; H(Y|Π)={H_:.4f}; ε*={e_:.4f}; max e_C={max(P.e):.4f}')\n"),
         Cell("gate",
              "ncells = [len(P_wl[L].cells) for L in (1,2,3)]\n"
-             "assert ncells[0] <= ncells[1] <= ncells[2], f'M1: refinement not monotone: {ncells}'\n"
-             "# Multi-class Bayes error e_C = 1 - p_mode lives in [0, (K-1)/K]; binarisation min(e, 1-e) ∈ [0, 1/2] is what the bracket consumes.\n"
+             "assert ncells[0] <= ncells[1] <= ncells[2], f'M1: refinement not monotone in cell count: {ncells}'\n"
+             "# Prop 3.2 (real): H and ε* non-increasing under refinement (binarised).\n"
+             "Hs   = [H_eps(P_wl[L])[0] for L in (1,2,3)]\n"
+             "epss = [H_eps(P_wl[L])[1] for L in (1,2,3)]\n"
+             "assert Hs[0]   + 1e-12 >= Hs[1]   >= Hs[2]   - 1e-12, f'M1.Prop3.2: H not monotone non-increasing: {Hs}'\n"
+             "assert epss[0] + 1e-12 >= epss[1] >= epss[2] - 1e-12, f'M1.Prop3.2: ε* not monotone non-increasing: {epss}'\n"
+             "# Multi-class e_C ∈ [0, (K-1)/K]; binarisation min(e, 1-e) ∈ [0, 1/2] is what the bracket consumes.\n"
              "for L, P in P_wl.items():\n"
              "    assert all(0 <= e <= 1 - 1/K + 1e-12 for e in P.e), f'M1: bad e_C at L={L}'\n"
              "    bin_e = [min(e, 1 - e) for e in P.e]\n"
              "    assert all(0 <= e <= 0.5 + 1e-12 for e in bin_e), f'M1: binarised e_C out of [0,1/2] at L={L}'\n"
              "    assert abs(sum(P.q) - 1.0) < 1e-12\n"
-             "print(f'[GATE OK] M1.wl: monotone refinement ncells={ncells}; multi-class e_C bounded, binarisation in [0,1/2]')\n"),
+             "print(f'[GATE OK] M1.wl + Prop 3.2: ncells={ncells} monotone; H={[round(h,4) for h in Hs]} ↓; ε*={[round(e,4) for e in epss]} ↓')\n"),
 
         Cell("md", "## Histogram of per-cell $e_C$ for $L=2$"),
         Cell("demo",
@@ -157,8 +173,13 @@ def m2_cells() -> list[Cell]:
 def m3_cells() -> list[Cell]:
     return [
         Cell("md",
-             "# Milestone 3 — Train GCN on Cora, audit against bracket\n\n"
-             "Trains a 2-layer GCN on Cora **on a real Modal T4 GPU** (you'll watch the cell stream logs back) and audits the empirical error against the M2 bracket. A CPU mirror runs first for sanity and CI.\n\n"
+             "# Milestone 3 — Train GCN on Cora, audit against bracket — **E04 in miniature**\n\n"
+             "This milestone reproduces **E04** ([`PAPER-ARXIV.md`](../../../../PAPER-ARXIV.md) §7.1, Trained-GNN "
+             "Correspondence) in miniature: 1 dataset × 1 architecture × 1 seed, vs. the "
+             "full E04 sweep of 3 datasets × 4 archs × 5 seeds. Trains a 2-layer GCN on "
+             "Cora **on a real Modal T4 GPU** (you'll watch the cell stream logs back) "
+             "and audits the empirical error against the M2 bracket. A CPU mirror runs "
+             "first for sanity and CI.\n\n"
              "**Modal-in-notebook crash course.** Modal apps are Python objects with `@app.function(gpu=...)` decorators. Inside a notebook you (1) import the `app` and decorated functions, (2) open a context with `app.run()` (allocates the container), (3) call `fn.remote(...)` — args pickled, work runs on the GPU, result returns as a normal Python object. First call cold-starts ~30s; subsequent calls reuse the warm container."),
         *_setup_cells("m3"),
         _import_shared(),
@@ -239,9 +260,21 @@ def m3_cells() -> list[Cell]:
 def m4_cells() -> list[Cell]:
     return [
         Cell("md",
-             "# Milestone 4 — NAS sweep on Cora (MLP / GCN / SAGE / GIN)\n\n"
-             "Trains four small architectures on Cora (CPU), audits each "
-             "against the bracket, and produces a comparative table."),
+             "# Milestone 4 — NAS sweep on Cora (MLP / GCN / SAGE / GIN) — **Corollary 3.4** instance\n\n"
+             "Trains four small architectures on Cora (CPU + GPU), audits each "
+             "against the bracket, and produces a comparative table.\n\n"
+             "**This milestone instantiates Corollary 3.4** (PA-MPC sandwich for "
+             "admissible families, [`PAPER-ARXIV.md`](../../../../PAPER-ARXIV.md) §3.2):\n\n"
+             "$$\nH_\\mathrm{bin}^{-1}\\!\\big(H(Y\\mid\\Pi_\\mathcal{A}(G, L))\\big) \\;\\le\\; \\mathrm{PA\\text{-}MPC}(\\mathcal{A}, L) \\;\\le\\; \\tfrac{1}{2}\\, H(Y\\mid\\Pi_\\mathcal{A}(G, L)).\n$$\n\n"
+             "**Admissibility (Def 3.5).** GCN, SAGE, GIN are all admissible "
+             "architecture families (countable multiset aggregators, neighbour-state "
+             "injectivity, etc.); **MLP is not** — it has no neighbour aggregation, "
+             "so $\\Pi^{(L)}_\\mathrm{MLP} = \\Pi^{(0)}_\\mathrm{MLP}$ for all $L$. "
+             "That is *why* MLP's bracket on Cora is wider and MLP loses to the "
+             "structural arches — the sandwich predicts it before training.\n\n"
+             "**Julia companion (optional).** "
+             "[`julia-theory/notebooks/11_aggregator_triple.jl`](../../../julia-theory/notebooks/11_aggregator_triple.jl) "
+             "shows $r_T$ inflation: sum's upper bracket on Cora is $\\Delta_{\\max}=168\\times$ looser than mean/sym."),
         *_setup_cells("m4"),
         _import_shared(),
         _data_cell(),
@@ -352,7 +385,23 @@ def m5_cells() -> list[Cell]:
         Cell("md",
              "# Milestone 5 — Calibrated capstone report (auto-assembled)\n\n"
              "Renders the cumulative reflection log into a structured "
-             "capstone report. Run after completing M1–M4."),
+             "capstone report. Run after completing M1–M4.\n\n"
+             "## Open frontier (Paper §9)\n\n"
+             "Once you have the bracket, here is what the paper **leaves open**:\n\n"
+             "- **Conjecture C1** (continuous-transfer). For any admissible family "
+             "  $(\\mathcal{A}, \\Pi^{(0)}_\\mathcal{A})$ there is a quantitative "
+             "  continuous analogue of Theorem 1 over $L^2(\\mu)$ task spaces; "
+             "  empirically frozen 2026-05-30 (see §9.E), formally open.\n"
+             "- **Conjecture C1'** (2-WL extension, E10). The same bracket "
+             "  with $\\Pi_\\mathcal{A}$ replaced by the 2-WL partition. "
+             "  No proof; experimental probe still cold.\n"
+             "- **Proposition 3.6** (prior-aware Fano sharpening) is paper-only "
+             "  (no claim ID, no Lean witness, no decision gate) and **out of "
+             "  scope** of the TMLR submission — explicit known gap.\n\n"
+             "**Lean witness (BLUE, optional).** A Lean 4 mechanisation skeleton "
+             "lives in `partition-sandwich-preprint/formal/` — contributing here "
+             "is BLUE in the syllabus colour code (pure rigour polish, skip "
+             "freely). The Python+Julia tracks of this onboarding never depend on it."),
         *_setup_cells("m5"),
         Cell("demo",
              "from onboarding.projects import reflect\n"

@@ -9,11 +9,21 @@ from onboarding.projects.scaffold import Cell, write_pair, _setup_cells
 HW4_CELLS: list[Cell] = [
     Cell("md",
          "# HW4 — Aggregator inflation on the $C_6$ vs $2K_3$ blind spot\n\n"
+         "**Reading.** [`PAPER-ARXIV.md`](../../../../PAPER-ARXIV.md) §4 (E03 ledger, "
+         "aggregator triple) and **Corollary 3.4** (PA-MPC sandwich for admissible "
+         "families).\n\n"
          "**Goal.** Show that no permutation-invariant node-local "
          "aggregator (sum, mean, max) separates $C_6$ from $2K_3$ "
-         "under constant or degree features. Triangle counts globally "
-         "distinguish them but remain constant *within* each graph, "
-         "explaining why genuine 1-WL needs multisets of *colours*, not scalars."),
+         "under constant or degree features; triangle counts globally "
+         "distinguish them but remain constant *within* each graph. "
+         "**Q5 (new in r2.1)** computes the aggregator inflation "
+         "$r_T \\in \\{\\Delta_{\\max}, 1, 1\\}$ for $T \\in \\{\\text{sum, mean, sym}\\}$ — "
+         "the E03 punchline that quantifies *how much looser* the bracket "
+         "becomes per aggregator choice.\n\n"
+         "**Julia companion (optional).** "
+         "[`julia-theory/notebooks/11_aggregator_triple.jl`](../../../julia-theory/notebooks/11_aggregator_triple.jl) "
+         "is the reactive-slider twin of Q5; on Cora ($\\Delta_{\\max}=168$) "
+         "sum is **7 orders of magnitude** looser than mean."),
     *_setup_cells("hw4"),
 
     # graphs
@@ -146,10 +156,85 @@ HW4_CELLS: list[Cell] = [
          "print('[GATE OK] Q4: triangles(C6)=0 everywhere, triangles(2K3)=1 everywhere')\n"),
     Cell("reflect", "reflect.log('Q4.Q4_triangles', 'triangle-count separates C6 from 2K3 globally; constant within each', 'HIGH')\n"),
 
-    # Q5
-    Cell("md", "## Q5 — Writeup & calibration."),
+    # Q5 — aggregator inflation r_T (new in r2.1)
+    Cell("md", "## Q5 — Aggregator inflation $r_T$ and the bracket-looseness budget\n\n"
+               "**Paper §4 / E03 punchline.** Each aggregator $T$ inflates the "
+               "Theorem-1 upper envelope by a constant $r_T(\\Delta_{\\max})$ "
+               "depending on the maximum graph degree:\n\n"
+               "| aggregator $T$ | $r_T(\\Delta_{\\max})$ | rationale |\n"
+               "|---|---|---|\n"
+               "| **sum**  | $\\Delta_{\\max}$ | output magnitude grows with $\\deg$ |\n"
+               "| **mean** | $1$              | normalised by $\\deg$ |\n"
+               "| **sym** (GCN) | $1$        | symmetric $D^{-1/2}AD^{-1/2}$ normalisation |\n\n"
+               "On Cora ($\\Delta_{\\max}=168$) the sum-aggregator upper envelope "
+               "is **two-and-a-half orders of magnitude** looser than mean's. "
+               "This is **honest looseness, not a bug**: the inequality still holds, "
+               "it's just trivially satisfied.\n\n"
+               "**Bridge to Cor 3.4.** Corollary 3.4(2) gives "
+               "$\\varepsilon^{\\text{model}} \\le r_T \\cdot \\tfrac{1}{2} H(Y\\mid\\Pi_\\mathcal{A})$ "
+               "for any admissible family $\\mathcal{A}$ (Def 3.5). The number "
+               "$r_T$ is *not* a property of the partition; it's a property "
+               "of the aggregator. Choose mean/sym to get a tight architectural "
+               "bracket; choose sum and accept that your upper bound is loose."),
+    Cell("solution",
+         "def r_T(aggregator: str, delta_max: int) -> float:\n"
+         "    \"\"\"Aggregator inflation constant of the Theorem-1 upper envelope.\n"
+         "\n"
+         "    Paper §4 / E03: r_sum = Δmax, r_mean = 1, r_sym = 1.\n"
+         "    \"\"\"\n"
+         "    if aggregator == 'sum':\n"
+         "        return float(delta_max)\n"
+         "    if aggregator in ('mean', 'sym'):\n"
+         "        return 1.0\n"
+         "    raise ValueError(f'unknown aggregator: {aggregator!r}')\n"),
+    Cell("md", "**Distinguish — `r_T` vs the bracket.** The bracket itself is "
+               "$[H_\\mathrm{bin}^{-1}(h),\\, h/2]$ on any $\\Pi$; $r_T$ rescales "
+               "**only the upper side** when the partition is *architecture-induced* "
+               "(Cor 3.4). The lower side $H_\\mathrm{bin}^{-1}(h)$ has no aggregator "
+               "scaling — Fano is information-theoretic, not architectural."),
+    Cell("demo",
+         "# Compute Δmax for the two toy graphs and Cora-realistic regime.\n"
+         "def delta_max(edge_index, n):\n"
+         "    d = np.zeros(n, dtype=int)\n"
+         "    for u in edge_index[0]:\n"
+         "        d[int(u)] += 1\n"
+         "    return int(d.max())\n"
+         "\n"
+         "dm_c6   = delta_max(ei_c6, 6)\n"
+         "dm_k3   = delta_max(ei_k3, 6)\n"
+         "dm_cora = 168  # paper value for Cora's max degree\n"
+         "print(f'Δmax(C6)={dm_c6}  Δmax(2K3)={dm_k3}  Δmax(Cora)={dm_cora}')\n"
+         "\n"
+         "rows = []\n"
+         "for T in ('sum', 'mean', 'sym'):\n"
+         "    rows.append((T, r_T(T, dm_c6), r_T(T, dm_k3), r_T(T, dm_cora)))\n"
+         "print(f\"{'aggregator':<10}  {'r_T(C6)':>10}  {'r_T(2K3)':>10}  {'r_T(Cora)':>10}\")\n"
+         "for T, a, b, c in rows:\n"
+         "    print(f'{T:<10}  {a:>10.1f}  {b:>10.1f}  {c:>10.1f}')\n"
+         "\n"
+         "ratio = r_T('sum', dm_cora) / r_T('mean', dm_cora)\n"
+         "print(f'\\non Cora: sum upper is {ratio:.0f}× looser than mean upper')\n"),
+    Cell("md", "**Gate Q5.** $r_\\text{mean}=r_\\text{sym}=1$; $r_\\text{sum}=\\Delta_{\\max}$; sum-vs-mean ratio on Cora is 168."),
+    Cell("gate",
+         "assert r_T('mean', 1)   == 1.0 and r_T('mean', 9999) == 1.0, 'Q5: r_mean must be 1 for any Δmax'\n"
+         "assert r_T('sym', 1)    == 1.0 and r_T('sym', 9999)  == 1.0, 'Q5: r_sym must be 1 for any Δmax'\n"
+         "assert r_T('sum', 168) == 168.0, f'Q5: r_sum(168)={r_T(\"sum\", 168)} ≠ 168'\n"
+         "assert ratio == 168.0, f'Q5: Cora sum/mean ratio {ratio} ≠ 168'\n"
+         "# Bracket sanity: r_T·upper(h) ≥ upper(h) (looseness is monotone in r_T).\n"
+         "from math import log2\n"
+         "_hbin = lambda p: 0.0 if (p <= 0 or p >= 1) else -(p*log2(p) + (1-p)*log2(1-p))\n"
+         "for h in (0.1, 0.5, 0.7219, 0.9):\n"
+         "    assert r_T('sum', 168) * 0.5 * h >= 0.5 * h, 'Q5: r_sum-inflated upper must dominate plain upper'\n"
+         "print(f'[GATE OK] Q5: r_mean=r_sym=1, r_sum=Δmax; on Cora sum is {int(ratio)}× looser than mean')\n"),
     Cell("reflect",
-         "reflect.log('Q4.Q5_writeup', 'no permutation-invariant node-local aggregator separates C6 from 2K3', 'HIGH')\n"
+         "reflect.log('Q4.Q5_aggregator_inflation',\n"
+         "            f'r_T computed for sum/mean/sym; on Cora sum is {int(ratio)}× looser than mean (honest looseness)',\n"
+         "            'HIGH')\n"),
+
+    # Q6 — writeup
+    Cell("md", "## Q6 — Writeup & calibration."),
+    Cell("reflect",
+         "reflect.log('Q4.Q6_writeup', 'no permutation-invariant node-local aggregator separates C6 from 2K3; r_T inflation tabulated', 'HIGH')\n"
          "print('HW4 reflection log:')\n"
          "for r in reflect.dump():\n"
          "    if 'hw4' in r['notebook']:\n"

@@ -22,3 +22,7 @@ onboarding/projects/data/
 # Generated reflection log + plots
 onboarding/projects/.reflection.jsonl
 onboarding/projects/**/plots/
+
+# Julia auto-generated manifest files (instantiated locally)
+Manifest.toml
+onboarding/julia-theory/Manifest.toml

@@ -8,10 +8,24 @@ from onboarding.projects.scaffold import Cell, write_pair, _setup_cells
 
 HW3_CELLS: list[Cell] = [
     Cell("md",
-         "# HW3 — Binary-entropy bracket verifier from scratch\n\n"
-         "Goal: build `hbin_inverse`, `upper`, `lower`, a random "
+         "# HW3 — Binary-entropy bracket verifier from scratch — **Theorem 1**\n\n"
+         "**Reading.** [`PAPER-ARXIV.md`](../../../../PAPER-ARXIV.md) **§3.2 Theorem 1** "
+         "and **Appendix A** (the proof). See also the standalone walk-"
+         "through in [`proof_walk.ipynb`](proof_walk.ipynb) — pure markdown + "
+         "numeric checks of each algebraic step.\n\n"
+         "**Goal.** Build `hbin_inverse`, `upper_HR`, `lower_Fano`, a random "
          "verifier of $\\mathrm{lower}(H) \\le \\varepsilon \\le \\mathrm{upper}(H)$, "
-         "and grid-search $(\\varepsilon^*, w^*) = (1/5, 0.1610)$."),
+         "grid-search $(\\varepsilon^*, w^*) = (1/5, 0.1610)$, and (**Q5, new in r2.1**) "
+         "explicitly construct the two extremal families of **Proposition 3.5** "
+         "(no closed-form improvement of the sandwich): an HR-saturating sequence "
+         "that drives $\\varepsilon \\to h/2$ and a Fano-saturating sequence "
+         "that drives $\\varepsilon \\to H_\\mathrm{bin}^{-1}(h)$.\n\n"
+         "**Julia companion (optional).** "
+         "[`julia-theory/notebooks/05_bracket_envelope.jl`](../../../julia-theory/notebooks/05_bracket_envelope.jl) "
+         "is the reactive slider twin of Q2; "
+         "[`06_uniform_slack.jl`](../../../julia-theory/notebooks/06_uniform_slack.jl) "
+         "derives $\\varepsilon^*=1/5$ symbolically via `Symbolics.jl` — read "
+         "alongside Q4."),
     *_setup_cells("hw3"),
     Cell("demo",
          "from math import log2\n"
@@ -49,15 +63,35 @@ HW3_CELLS: list[Cell] = [
     Cell("reflect", "reflect.log('Q3.Q1_hbin_inverse', 'bisection inverse round-trips ≤1e-9', 'HIGH')\n"),
 
     # Q2 bracket + envelope plot
-    Cell("md", "## Q2 — `upper(h) = h/2`, `lower(h) = H^{-1}(h)`, envelope plot.\n\n"
-               "**Concept.** The bracket has width 0 at $h=0$ and at $h=1$; widest near $h \\approx H_\\mathrm{bin}(1/5) \\approx 0.7219$."),
+    Cell("md", "## Q2 — `upper_HR(h) = h/2` (Hellman–Raviv) and `lower_Fano(h) = H^{-1}(h)` (Fano), envelope plot.\n\n"
+               "**Concept (Theorem 1).** For binary $Y$ and any finite partition $\\Pi$,\n\n"
+               "$$\nH_\\mathrm{bin}^{-1}\\!\\big(H(Y\\mid\\Pi)\\big) \\;\\le\\; \\varepsilon^*_\\Pi \\;\\le\\; \\tfrac{1}{2}\\, H(Y\\mid\\Pi).\n$$\n\n"
+               "**Naming the endpoints (Appendix A).**\n\n"
+               "- **Upper = Hellman–Raviv per cell + Jensen.** For each cell $C$, "
+               "$e_C \\le \\tfrac{1}{2} H_\\mathrm{bin}(e_C)$ (Hellman–Raviv 1970). "
+               "Multiply by $q_C$ and sum: $\\varepsilon^* = \\sum_C q_C e_C \\le \\tfrac{1}{2}\\sum_C q_C H_\\mathrm{bin}(e_C) = \\tfrac{1}{2} H(Y\\mid\\Pi)$. "
+               "That is `upper_HR(h) = h/2` — no Jensen needed, just linearity.\n"
+               "- **Lower = Fano per cell + concavity inversion.** Fano (1961) for "
+               "binary $Y$ in cell $C$: $H_\\mathrm{bin}(e_C) \\le H(Y\\mid C)$ "
+               "(here equality by construction). Apply $H_\\mathrm{bin}^{-1}$ on the "
+               "$[0, 1/2]$ branch (monotone), then aggregate via concavity of $H_\\mathrm{bin}^{-1} \\circ H_\\mathrm{bin}$ — "
+               "the **Jensen** step that gives `lower_Fano(h) = H_bin^{-1}(h)` "
+               "is the only non-trivial inequality in the proof.\n\n"
+               "The bracket has width 0 at $h=0$ and at $h=1$; widest near "
+               "$h \\approx H_\\mathrm{bin}(1/5) \\approx 0.7219$ (Q4)."),
     Cell("solution",
-         "def upper(h: float) -> float:\n"
+         "def upper_HR(h: float) -> float:\n"
+         "    \"\"\"Hellman–Raviv upper endpoint of Theorem 1: ε ≤ h/2.\"\"\"\n"
          "    return 0.5 * h\n"
          "\n"
-         "def lower(h: float) -> float:\n"
-         "    return hbin_inverse(h)\n"),
-    Cell("md", "**Distinguish.** Upper is linear; lower is concave-then-convex inverse. Their gap is $w(h) = h/2 - H_\\mathrm{bin}^{-1}(h)$."),
+         "def lower_Fano(h: float) -> float:\n"
+         "    \"\"\"Fano lower endpoint of Theorem 1: ε ≥ H_bin^{-1}(h) on [0, 1/2].\"\"\"\n"
+         "    return hbin_inverse(h)\n"
+         "\n"
+         "# Pedagogical aliases used by the rest of the curriculum.\n"
+         "upper = upper_HR\n"
+         "lower = lower_Fano\n"),
+    Cell("md", "**Distinguish — *which* inequality goes which way.** A common error is to swap them. The mnemonic: **HR upper-bounds error by entropy/2** (cheap to compute), **Fano lower-bounds error by $H^{-1}$** (expensive — requires bisection). Their gap is $w(h) = h/2 - H_\\mathrm{bin}^{-1}(h)$, peaking at $w^* \\approx 0.1610$."),
     Cell("demo",
          "hs = np.linspace(0, 1, 401)\n"
          "ups = np.array([upper(h) for h in hs])\n"
@@ -132,6 +166,62 @@ HW3_CELLS: list[Cell] = [
          "assert 0.160 < w_star  < 0.162, f'Q4: w*={w_star} out of band'\n"
          "print(f'[GATE OK] Q4: eps*={eps_star:.4f}, w*={w_star:.4f}')\n"),
     Cell("reflect", "reflect.log('Q3.Q4_wstar', f'eps*={eps_star:.4f}, w*={w_star:.4f}', 'HIGH')\n"),
+
+    # Q4.5 Proposition 3.5 — sharpness witnesses
+    Cell("md", "## Q4.5 — **Proposition 3.5** sharpness: both endpoints are saturated by explicit families.\n\n"
+               "**Statement (Paper §3.2).** No closed-form improvement of the sandwich exists: for any $h \\in (0, 1)$ there are partition families $(\\Pi_\\alpha^\\mathrm{HR})_{\\alpha}$ and $(\\Pi_\\alpha^\\mathrm{J})_{\\alpha}$ with $H(Y\\mid\\Pi_\\alpha) \\to h$ such that $\\varepsilon^*(\\Pi_\\alpha^\\mathrm{HR}) \\to h/2$ (upper saturated) and $\\varepsilon^*(\\Pi_\\alpha^\\mathrm{J}) \\to H_\\mathrm{bin}^{-1}(h)$ (lower saturated).\n\n"
+               "**Constructions.**\n\n"
+               "- **HR-saturating** ($\\Pi^\\mathrm{HR}$, two-mass): one cell with mass $1-\\alpha$ and $e=0$, one cell with mass $\\alpha$ and $e=1/2$. Then $\\varepsilon = \\alpha/2$, $H = \\alpha$, so $\\varepsilon = H/2$ **exactly** — the upper endpoint is hit with equality.\n"
+               "- **Fano-saturating** ($\\Pi^\\mathrm{J}$, constant-$e$): every cell has the same $e_C = e$ (any cell sizes). Then $H = H_\\mathrm{bin}(e)$ and $\\varepsilon = e = H_\\mathrm{bin}^{-1}(H)$ **exactly** — the lower endpoint is hit with equality."),
+    Cell("solution",
+         "def witness_HR(alpha: float):\n"
+         "    \"\"\"Two-mass HR-saturator: returns (eps, H) hitting ε = H/2.\"\"\"\n"
+         "    q = np.array([1 - alpha, alpha])\n"
+         "    e = np.array([0.0, 0.5])\n"
+         "    eps = float(np.sum(q * e))\n"
+         "    H   = float(np.sum(q * np.array([hbin(ei) for ei in e])))\n"
+         "    return eps, H\n"
+         "\n"
+         "def witness_Fano(e: float, m: int = 5):\n"
+         "    \"\"\"Constant-e Fano-saturator on m equal-mass cells: returns (eps, H) hitting ε = H_bin^{-1}(H).\"\"\"\n"
+         "    q = np.full(m, 1.0 / m)\n"
+         "    ee = np.full(m, e)\n"
+         "    eps = float(np.sum(q * ee))\n"
+         "    H   = float(np.sum(q * np.array([hbin(ei) for ei in ee])))\n"
+         "    return eps, H\n"),
+    Cell("md", "**Distinguish — sharpness vs tightness.** Sharpness = endpoints are attained by *some* feasible $\\Pi$; tightness on a *specific* $\\Pi$ would mean *equality* there. Proposition 3.5 is about the envelope, not about any single problem."),
+    Cell("demo",
+         "alphas = np.linspace(0.05, 0.95, 19)\n"
+         "hr_eps, hr_H = zip(*[witness_HR(a) for a in alphas])\n"
+         "hr_eps, hr_H = np.array(hr_eps), np.array(hr_H)\n"
+         "hr_residual = hr_eps - hr_H/2\n"
+         "print(f'HR witness: max|ε - H/2| = {np.max(np.abs(hr_residual)):.2e}')\n"
+         "\n"
+         "es = np.linspace(0.02, 0.48, 24)\n"
+         "fa_eps, fa_H = zip(*[witness_Fano(e) for e in es])\n"
+         "fa_eps, fa_H = np.array(fa_eps), np.array(fa_H)\n"
+         "fa_residual = fa_eps - np.array([hbin_inverse(h) for h in fa_H])\n"
+         "print(f'Fano witness: max|ε - H_bin^{{-1}}(H)| = {np.max(np.abs(fa_residual)):.2e}')\n"
+         "\n"
+         "hs = np.linspace(0, 1, 401)\n"
+         "fig, ax = plt.subplots(figsize=(7, 4.5))\n"
+         "ax.fill_between(hs, [lower(h) for h in hs], [upper(h) for h in hs], color='C2', alpha=0.18, label='Theorem 1 bracket')\n"
+         "ax.plot(hr_H, hr_eps, 'o-', color='C3', label='HR-saturating Π^HR (upper)')\n"
+         "ax.plot(fa_H, fa_eps, 's-', color='C0', label='Fano-saturating Π^J (lower)')\n"
+         "ax.set_xlabel('H(Y|Π)'); ax.set_ylabel('ε(Π)'); ax.legend()\n"
+         "ax.set_title('Q4.5 — Proposition 3.5 sharpness witnesses')\n"
+         "plt.tight_layout()\n"
+         "_plots = _PROJECTS / 'psets' / 'hw3' / 'plots'; _plots.mkdir(exist_ok=True)\n"
+         "fig.savefig(_plots / 'hw3_q45_sharpness.png', dpi=120); plt.show()\n"),
+    Cell("md", "**Gate Q4.5.** Both residuals $< 10^{-9}$ on their respective grids."),
+    Cell("gate",
+         "assert np.max(np.abs(hr_residual)) < 1e-9, f'Q4.5: HR witness off by {np.max(np.abs(hr_residual))}'\n"
+         "assert np.max(np.abs(fa_residual)) < 1e-9, f'Q4.5: Fano witness off by {np.max(np.abs(fa_residual))}'\n"
+         "print(f'[GATE OK] Q4.5: both Proposition 3.5 witnesses saturate the bracket to ≤1e-9')\n"),
+    Cell("reflect",
+         "reflect.log('Q3.Q4.5_sharpness',\n"
+         "            'Prop 3.5 witnesses constructed: 2-mass family saturates upper, constant-e family saturates lower (residual ≤1e-9)',\n"
+         "            'HIGH')\n"),
 
     # Q5 writeup
     Cell("md", "## Q5 — Writeup & calibration."),

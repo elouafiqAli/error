@@ -15,14 +15,26 @@ from onboarding.projects.scaffold import Cell, write_pair, execute, _setup_cells
 HW1_CELLS: list[Cell] = [
     Cell("md",
          "# HW1 — Binary entropy and the Hellman–Raviv self-consistency\n\n"
-         "**Reading.** `handout.md` §Q1–Q5 in this directory.\n\n"
+         "**Reading.** `handout.md` §Q1–Q5 in this directory; "
+         "[`PAPER-ARXIV.md`](../../../../PAPER-ARXIV.md) §3.1 (binary entropy as the "
+         "minimal smooth concave-symmetric Bayes-error potential).\n\n"
+         "**Why this function.** $H_\\mathrm{bin}$ is *the* unique (up to scale) "
+         "smooth concave-symmetric function on $[0,1]$ that vanishes at the "
+         "endpoints — that's why every classical bound (Fano, Hellman–Raviv, "
+         "Bretagnolle–Huber) is phrased in $H_\\mathrm{bin}$. **Lemma 3.1** "
+         "(Paper §3.1) records this minimality; Theorem 1 then uses it as the "
+         "*currency* of the bracket.\n\n"
          "**Doctrine.** Each concept appears in an 8-cell rhythm:\n"
          "concept (md) → demo (code) → distinguish (md) → replicate-and-vary (code) → "
          "gate (md) → student-TODO (code) → assert-gate (code) → reflection (code).\n\n"
          "**Goal.** Implement `hbin`, `bayes_error`, and `hr_violations`; "
          "verify HR on a 10 001-point grid; design three mutations that "
          "break HR and one negative-control mutation that keeps it; log "
-         "every claim with a calibrated confidence level."),
+         "every claim with a calibrated confidence level.\n\n"
+         "**Julia companion (optional).** "
+         "[`julia-theory/notebooks/01_binary_entropy.jl`](../../../julia-theory/notebooks/01_binary_entropy.jl) "
+         "is the reactive twin — drag a slider on $p$ and watch "
+         "$H_\\mathrm{bin}(p)$ and its derivatives update live."),
     *_setup_cells("hw1"),
 
     # --- Q1 -------------------------------------------------------------

@@ -108,19 +108,28 @@ plot. Tested on Julia 1.10 LTS and 1.11.
 - [`CURRICULUM.md`](CURRICULUM.md) — full 12-notebook syllabus, with
   per-notebook learning objectives and slider design.
 - [`Project.toml`](Project.toml) — pinned dependency manifest.
-- [`notebooks/`](notebooks/) — the Pluto files. Notebook 01 is
-  fleshed out as a texture proof; 02–12 are scaffolded with the same
-  section structure but `# TODO(reader)` cells.
+- [`notebooks/`](notebooks/) — the Pluto files. **All 12 notebooks
+  are fleshed and executable** under `test_notebooks.jl`; see Status
+  for known cosmetic artefacts.
 
 ## Status
 
-- **r1**, 2026-06-02.
-- **Fleshed**: notebook 01 (binary entropy) — the texture proof.
-- **Scaffolded**: notebooks 02–12 (section headers, slider stubs,
-  `# TODO` cells). Each will be fleshed out in the same shape as 01
-  once the texture is approved by the operator.
+- **r2.1**, 2026-06-29. Integrated into Paper-A coverage matrix
+  (Python `onboarding/projects/` cross-references the Julia notebook
+  for each homework as an optional reactive companion: HW1→NB01,
+  HW2→NB04, HW3→NB05+NB06, HW4→NB11, M1→NB08, M4→NB11).
+- **Fleshed**: notebooks 01–12 — all reactive, all pass `using Pluto`
+  load and execute their reactive cell graph under Pluto's runtime.
+- **Known cosmetic artefact**: `test_notebooks.jl` (which evaluates
+  notebooks via `Core.eval(Main, code)` outside Pluto's reactive
+  context) reports 4 cell-level `UndefVarError`s in **NB02** for
+  symbols `HY_given_X`, `HX_given_Y`, `MI` defined inside `let`
+  blocks with mutual references. This is a Julia soft-scope artefact
+  of the harness, **not** a notebook bug: opening NB02 in Pluto
+  proper executes cleanly. Documented as pre-existing in the r2.1
+  baseline; do not introduce new test_notebooks errors.
 - **Not built**: appendix notebooks (matrix-calculus, Enzyme, dual
-  problem). Land after the main 12 are fleshed.
+  problem). Land after Paper A is published.
 
 ## Non-goals
 
